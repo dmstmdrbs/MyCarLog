@@ -2,18 +2,29 @@ import { useEffect, useState } from 'react';
 import { database } from '@/database';
 import Vehicle from '@shared/models/Vehicle';
 
-const useVehicle = (id: string) => {
+export const useVehicle = (id: string) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
 
-  useEffect(() => {
-    const fetchVehicle = async () => {
+  const fetchVehicle = async () => {
+    try {
+      setIsLoading(true);
       const vehicle = await database.get<Vehicle>('vehicles').find(id);
       setVehicle(vehicle);
-    };
+    } catch (error) {
+      console.error('Failed to fetch vehicle:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchVehicle();
   }, [id]);
 
-  return { vehicle };
-};
+  const refetch = async () => {
+    await fetchVehicle();
+  };
 
-export default useVehicle;
+  return { vehicle, isLoading, refetch };
+};

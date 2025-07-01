@@ -1,20 +1,15 @@
 import React from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
 import Vehicle from '@shared/models/Vehicle';
-import VehicleCard from './VehicleCard';
+import { VehicleCard } from './VehicleCard';
 import { Box } from '@shared/components/ui/box';
 
 interface VehicleListProps {
   vehicles: Vehicle[];
   onEdit: (vehicle: Vehicle) => void;
-  onDelete: (id: string) => void;
 }
 
-export default function VehicleList({
-  vehicles,
-  onEdit,
-  onDelete,
-}: VehicleListProps) {
+export const VehicleList = ({ vehicles, onEdit }: VehicleListProps) => {
   return (
     <FlatList
       data={vehicles}
@@ -28,4 +23,4 @@ export default function VehicleList({
       )}
     />
   );
-}
+};

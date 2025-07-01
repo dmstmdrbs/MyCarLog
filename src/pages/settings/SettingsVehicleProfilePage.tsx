@@ -1,39 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { database } from '@/database';
 import Vehicle from '@shared/models/Vehicle';
-import VehicleList from '@features/vehicle/VehicleList';
 import { Button, ButtonIcon } from '@shared/components/ui/button';
 import { Box } from '@shared/components/ui/box';
 import { AddIcon } from '@shared/components/ui/icon';
+import { VehicleList } from '@features/vehicle';
+import { useVehicles } from '@shared/contexts/vehicles';
 
 export function SettingsVehicleProfilePage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const { vehicles, refetch } = useVehicles();
   const navigation = useNavigation();
 
-  // 차량 전체 조회
-  const fetchVehicles = async () => {
-    const collection = database.get<Vehicle>('vehicles');
-    const all = await collection.query().fetch();
-    setVehicles(all);
-  };
-
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', fetchVehicles);
+    const unsubscribe = navigation.addListener('focus', refetch);
     return unsubscribe;
   }, [navigation]);
-
-  // 차량 삭제
-  const handleDelete = async (id: string) => {
-    const collection = database.get<Vehicle>('vehicles');
-    const vehicle = await collection.find(id);
-    await database.write(async () => {
-      await vehicle.markAsDeleted();
-      await vehicle.destroyPermanently();
-    });
-    fetchVehicles();
-  };
 
   // 차량 추가 페이지 이동
   const handleAdd = () => {
@@ -50,11 +32,7 @@ export function SettingsVehicleProfilePage() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <Box className="flex-1 bg-white relative">
-        <VehicleList
-          vehicles={vehicles}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <VehicleList vehicles={vehicles} onEdit={handleEdit} />
         <Button
           onPress={handleAdd}
           className="absolute bottom-8 right-8 w-16 h-16 rounded-full bg-primary-500"

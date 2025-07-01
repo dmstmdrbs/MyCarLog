@@ -1,4 +1,4 @@
-import useVehicles from '@/features/vehicle/hooks/useVehicles';
+import { useVehicles } from '@shared/contexts/vehicles';
 import { useNavigation } from '@react-navigation/native';
 import { Box } from '@shared/components/ui/box';
 import { useEffect } from 'react';

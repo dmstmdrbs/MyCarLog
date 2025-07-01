@@ -1,7 +1,7 @@
 import PageLayout from '@shared/components/layout/PageLayout';
 import { Text } from '@shared/components/ui/text';
 import useFuelRecord from '@features/fuelRecord/hooks/useFuelRecord';
-import useVehicle from '@features/vehicle/hooks/useVehicle';
+import { useVehicle } from '@features/vehicle';
 import { useState } from 'react';
 import { Button, ButtonText } from '@shared/components/ui/button';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

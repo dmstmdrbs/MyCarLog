@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Vehicle from '@shared/models/Vehicle';
-import useVehicles from '../hooks/useVehicles';
+import { useVehicles } from '@shared/contexts/vehicles';
 
 interface SelectedVehicleContextType {
   vehicles: Vehicle[];

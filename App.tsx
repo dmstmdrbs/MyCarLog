@@ -19,7 +19,8 @@ import {
   seedDefaultPaymentMethods,
 } from '@/database/seedData';
 import { useEffect } from 'react';
-import useVehicles from '@/features/vehicle/hooks/useVehicles';
+
+import { useVehicles, VehiclesProvider } from '@shared/contexts/vehicles';
 
 // 각 Stack Navigator 정의
 
@@ -91,12 +92,14 @@ export default function App() {
   }, []);
 
   return (
-    <PaymentMethodsProvider paymentMethods={[]}>
-      <SelectedVehicleProvider>
-        <GluestackUIProvider>
-          <AppNavigator />
-        </GluestackUIProvider>
-      </SelectedVehicleProvider>
-    </PaymentMethodsProvider>
+    <VehiclesProvider>
+      <PaymentMethodsProvider paymentMethods={[]}>
+        <SelectedVehicleProvider>
+          <GluestackUIProvider>
+            <AppNavigator />
+          </GluestackUIProvider>
+        </SelectedVehicleProvider>
+      </PaymentMethodsProvider>
+    </VehiclesProvider>
   );
 }

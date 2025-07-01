@@ -3,7 +3,6 @@ import { Alert, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { database } from '../../database';
 import Vehicle from '@shared/models/Vehicle';
-import VehicleForm from '../../features/vehicle/VehicleForm';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
 
@@ -11,11 +10,11 @@ import { Toast, ToastTitle, useToast } from '@shared/components/ui/toast';
 import { CheckIcon, Icon } from '@shared/components/ui/icon';
 import { Divider } from '@shared/components/ui/divider';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
-import useVehicles from '@/features/vehicle/hooks/useVehicles';
+import { useVehicle, useVehicleMutation, VehicleForm } from '@features/vehicle';
+import { useVehicles } from '@shared/contexts/vehicles';
 
 export function VehicleProfileFormPage() {
   const navigation = useNavigation();
-  const { refetch } = useVehicles();
   const route = useRoute();
   // @ts-ignore
   const { vehicleId } = route.params || {};
@@ -25,30 +24,25 @@ export function VehicleProfileFormPage() {
   const [model, setModel] = useState('');
   const [type, setType] = useState<'ICE' | 'EV'>('ICE');
   const [loading, setLoading] = useState(false);
-  const [vehicleCount, setVehicleCount] = useState(0);
   const [isDefault, setIsDefault] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const toast = useToast();
-  // 수정 모드일 때 기존 데이터 불러오기
+
+  const { vehicle } = useVehicle(vehicleId);
+  const { vehicles, refetch: refetchVehicles } = useVehicles();
+  const { addVehicle, updateVehicle, deleteVehicle } = useVehicleMutation();
+
+  const vehicleCount = vehicles?.length || 0;
+
   useEffect(() => {
-    if (vehicleId) {
-      (async () => {
-        const collection = database.get<Vehicle>('vehicles');
-        const vehicle = await collection.find(vehicleId);
-        setNickname(vehicle.nickname);
-        setManufacturer(vehicle.manufacturer);
-        setModel(vehicle.model);
-        setType(vehicle.type);
-        setIsDefault(vehicle.isDefault || false);
-      })();
+    if (vehicle) {
+      setNickname(vehicle.nickname);
+      setManufacturer(vehicle.manufacturer);
+      setModel(vehicle.model);
+      setType(vehicle.type);
+      setIsDefault(vehicle.isDefault);
     }
-    // 전체 차량 개수 조회
-    (async () => {
-      const collection = database.get<Vehicle>('vehicles');
-      const all = await collection.query().fetch();
-      setVehicleCount(all.length);
-    })();
-  }, [vehicleId]);
+  }, [vehicle]);
 
   const handleFormChange = (field: string, value: string) => {
     if (field === 'nickname') setNickname(value);
@@ -65,38 +59,34 @@ export function VehicleProfileFormPage() {
       console.log('model', model);
       console.log('type', type);
       console.log('vehicleId', vehicleId);
-      console.log('vehicleCount', vehicleCount);
 
-      const collection = database.get<Vehicle>('vehicles');
-      console.log('collection', collection);
       if (vehicleId) {
         // 수정
-        const vehicle = await collection.find(vehicleId);
-        await database.write(async () => {
-          await vehicle.update((v) => {
-            v.nickname = nickname;
-            v.manufacturer = manufacturer;
-            v.model = model;
-            v.type = type;
-          });
+        await updateVehicle({
+          id: vehicleId,
+          nickname,
+          manufacturer,
+          model,
+          type,
+          isDefault,
         });
       } else {
         // 추가
-        await database.write(async () => {
-          await collection.create(function (v) {
-            v.nickname = nickname;
-            v.manufacturer = manufacturer;
-            v.model = model;
-            v.type = type;
-            v.isDefault = vehicleCount === 0;
-          });
+        await addVehicle({
+          nickname,
+          manufacturer,
+          model,
+          type,
+          isDefault: vehicleCount === 0,
         });
       }
-      await refetch();
+      await refetchVehicles();
       navigation.goBack();
     } catch (error) {
       console.error(error);
       Alert.alert('저장 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,12 +144,7 @@ export function VehicleProfileFormPage() {
 
   const handleDelete = async () => {
     try {
-      const collection = database.get<Vehicle>('vehicles');
-      const vehicle = await collection.find(vehicleId);
-      await database.write(async () => {
-        await vehicle.markAsDeleted();
-        await vehicle.destroyPermanently();
-      });
+      await deleteVehicle(vehicleId);
       navigation.goBack();
     } catch (error) {
       console.error(error);

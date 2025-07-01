@@ -33,7 +33,7 @@ interface VehicleFormProps {
   isDefault: boolean;
 }
 
-export default function VehicleForm({
+export const VehicleForm = ({
   nickname,
   manufacturer,
   model,
@@ -43,7 +43,7 @@ export default function VehicleForm({
   setDefaultProfile,
   onSubmit,
   editingId,
-}: VehicleFormProps) {
+}: VehicleFormProps) => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   return (
@@ -145,4 +145,4 @@ export default function VehicleForm({
       </Box>
     </FormControl>
   );
-}
+};

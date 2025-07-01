@@ -3,7 +3,7 @@ import { Text } from '@shared/components/ui/text';
 import Vehicle from '@shared/models/Vehicle';
 import { Box } from '@shared/components/ui/box';
 
-const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
+export const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
   const { nickname, model, manufacturer, type, isDefault } = vehicle;
 
   return (
@@ -26,5 +26,3 @@ const VehicleCard = ({ vehicle }: { vehicle: Vehicle }) => {
     </Box>
   );
 };
-
-export default VehicleCard;

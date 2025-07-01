@@ -5,13 +5,14 @@ import { FlatList } from 'react-native';
 import { Button, ButtonIcon, ButtonText } from '@shared/components/ui/button';
 import { AddIcon } from '@shared/components/ui/icon';
 import { useNavigation } from '@react-navigation/native';
-import { FuelStackParamList } from '@/pages/fuelManagement/navigator';
+import { FuelStackParamList } from '@pages/fuelManagement/navigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { formatDate } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import useVehicle from '@/features/vehicle/hooks/useVehicle';
-import { formatNumber } from '@/shared/utils/format';
-import PaymentMethod from '@/shared/models/PaymentMethod';
+
+import { formatNumber } from '@shared/utils/format';
+import PaymentMethod from '@shared/models/PaymentMethod';
+import { useVehicle } from '@features/vehicle';
 
 type Props = {
   vehicleId: string;
