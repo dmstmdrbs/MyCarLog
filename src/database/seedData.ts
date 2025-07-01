@@ -1,4 +1,5 @@
-import { database } from '../database';
+import PaymentMethod from '@shared/models/PaymentMethod';
+import { database } from '@/database';
 import MaintenanceItem from '@shared/models/MaintenanceItem';
 
 export const defaultMaintenanceItems = [
@@ -20,7 +21,14 @@ export const defaultMaintenanceItems = [
   },
   { name: '냉각수 보충', maintenance_km: 200_000, maintenance_month: 120 },
   { name: '배터리', maintenance_km: 60_000, maintenance_month: 36 },
-];
+] as const;
+
+export const defaultPaymentMethods = [
+  { name: '현금', type: 'cash' },
+  { name: '카드', type: 'credit' },
+  { name: '상품권', type: 'giftcard' },
+  { name: '기타', type: 'etc' },
+] as const;
 
 export async function seedDefaultMaintenanceItems() {
   const collection = database.get<MaintenanceItem>('maintenance_items');
@@ -32,13 +40,32 @@ export async function seedDefaultMaintenanceItems() {
         await collection.create((record) => {
           record.name = item.name;
 
-          if (item.maintenance_km) {
+          if ('maintenance_km' in item) {
             record.maintenanceKm = item.maintenance_km;
+          } else {
+            record.maintenanceKm = undefined;
           }
-          if (item.maintenance_month) {
+          if ('maintenance_month' in item) {
             record.maintenanceMonth = item.maintenance_month;
+          } else {
+            record.maintenanceMonth = undefined;
           }
-          record.createdAt = Date.now();
+        });
+      }
+    });
+  }
+}
+
+export async function seedDefaultPaymentMethods() {
+  const collection = database.get<PaymentMethod>('payment_methods');
+  const existing = await collection.query().fetch();
+
+  if (existing.length === 0) {
+    await database.write(async () => {
+      for (const item of defaultPaymentMethods) {
+        await collection.create((record) => {
+          record.name = item.name;
+          record.type = item.type as PaymentMethod['type'];
         });
       }
     });

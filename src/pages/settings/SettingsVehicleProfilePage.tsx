@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { database } from '../database';
+import { database } from '@/database';
 import Vehicle from '@shared/models/Vehicle';
-import VehicleList from '../features/vehicleCrud/VehicleList';
-import { Button, ButtonIcon } from '@/shared/components/ui/button';
-import { Box } from '@/shared/components/ui/box';
-import { AddIcon } from '@/shared/components/ui/icon';
+import VehicleList from '@features/vehicle/VehicleList';
+import { Button, ButtonIcon } from '@shared/components/ui/button';
+import { Box } from '@shared/components/ui/box';
+import { AddIcon } from '@shared/components/ui/icon';
 
-export default function SettingsVehicleProfilePage() {
+export function SettingsVehicleProfilePage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const navigation = useNavigation();
 
@@ -37,12 +37,12 @@ export default function SettingsVehicleProfilePage() {
 
   // 차량 추가 페이지 이동
   const handleAdd = () => {
-    (navigation as any).navigate('VehicleProfileForm', {});
+    (navigation as any).navigate('SettingsVehicleProfileForm', {});
   };
 
   // 차량 수정 페이지 이동
   const handleEdit = (vehicle: Vehicle) => {
-    (navigation as any).navigate('VehicleProfileForm', {
+    (navigation as any).navigate('SettingsVehicleProfileForm', {
       vehicleId: vehicle.id,
     });
   };

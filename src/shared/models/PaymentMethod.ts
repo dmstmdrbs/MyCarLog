@@ -2,16 +2,16 @@ import { Model } from '@nozbe/watermelondb';
 import { field, readonly } from '@nozbe/watermelondb/decorators';
 import { TableSchemaSpec } from '@nozbe/watermelondb/Schema';
 
-export default class Station extends Model {
-  static table = 'stations';
+export default class PaymentMethod extends Model {
+  static table = 'payment_methods';
 
   @field('name') name!: string;
-  @field('type') type!: 'gas' | 'ev'; // 주유소/충전소 구분
+  @field('type') type!: 'credit' | 'cash' | 'giftcard' | 'etc';
   @readonly @field('created_at') createdAt!: number;
 }
 
-export const stationSchema: TableSchemaSpec = {
-  name: 'stations',
+export const paymentMethodSchema: TableSchemaSpec = {
+  name: 'payment_methods',
   columns: [
     { name: 'name', type: 'string' },
     { name: 'type', type: 'string' },

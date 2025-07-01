@@ -1,11 +1,5 @@
-import { Button, ButtonText } from '@/shared/components/ui/button';
-import {
-  Checkbox,
-  CheckboxGroup,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from '@/shared/components/ui/checkbox';
+import { Button, ButtonText } from '@shared/components/ui/button';
+
 import { Box } from '@shared//components/ui/box';
 import {
   FormControl,
@@ -13,7 +7,7 @@ import {
   FormControlHelperText,
   FormControlHelper,
 } from '@shared//components/ui/form-control';
-import { CheckIcon, CircleIcon } from '@shared//components/ui/icon';
+import { CircleIcon } from '@shared//components/ui/icon';
 import { Input, InputField } from '@shared//components/ui/input';
 import {
   Radio,

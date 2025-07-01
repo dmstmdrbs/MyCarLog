@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import Vehicle from '@shared/models/Vehicle';
 import VehicleCard from './VehicleCard';
 import { Box } from '@shared/components/ui/box';
@@ -29,13 +29,3 @@ export default function VehicleList({
     />
   );
 }
-
-const styles = StyleSheet.create({
-  item: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-});

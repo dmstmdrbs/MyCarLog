@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { database } from '../database';
+import { database } from '../../database';
 import Vehicle from '@shared/models/Vehicle';
-import VehicleForm from '../features/vehicleCrud/VehicleForm';
-import { Box } from '@/shared/components/ui/box';
-import { Button, ButtonText } from '@/shared/components/ui/button';
+import VehicleForm from '../../features/vehicle/VehicleForm';
+import { Box } from '@shared/components/ui/box';
+import { Button, ButtonText } from '@shared/components/ui/button';
 
-import { Toast, ToastTitle, useToast } from '@/shared/components/ui/toast';
-import { CheckIcon, Icon } from '@/shared/components/ui/icon';
-import { Divider } from '@/shared/components/ui/divider';
-import ConfirmModal from '@/shared/components/ui/modal/ConfirmModal';
+import { Toast, ToastTitle, useToast } from '@shared/components/ui/toast';
+import { CheckIcon, Icon } from '@shared/components/ui/icon';
+import { Divider } from '@shared/components/ui/divider';
+import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
+import useVehicles from '@/features/vehicle/hooks/useVehicles';
 
-export default function VehicleProfileFormPage() {
+export function VehicleProfileFormPage() {
   const navigation = useNavigation();
+  const { refetch } = useVehicles();
   const route = useRoute();
   // @ts-ignore
   const { vehicleId } = route.params || {};
@@ -90,6 +92,7 @@ export default function VehicleProfileFormPage() {
           });
         });
       }
+      await refetch();
       navigation.goBack();
     } catch (error) {
       console.error(error);

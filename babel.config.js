@@ -28,11 +28,14 @@ module.exports = function (api) {
             '@utils': './src/utils',
             '@assets': './src/assets',
             '@styles': './src/styles',
+            '@widgets': './src/widgets',
             'tailwind.config': './tailwind.config.js',
             'global.css': './global.css',
           },
         },
       ],
+      // Reanimated plugin은 반드시 마지막에 위치해야 합니다
+      'react-native-reanimated/plugin',
     ],
   };
 };

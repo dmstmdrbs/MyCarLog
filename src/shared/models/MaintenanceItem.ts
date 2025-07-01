@@ -1,5 +1,6 @@
 import { Model } from '@nozbe/watermelondb';
 import { field, readonly } from '@nozbe/watermelondb/decorators';
+import { TableSchemaSpec } from '@nozbe/watermelondb/Schema';
 
 export default class MaintenanceItem extends Model {
   static table = 'maintenance_items';
@@ -10,11 +11,12 @@ export default class MaintenanceItem extends Model {
   @readonly @field('created_at') createdAt!: number;
 }
 
-export const maintenanceItemSchema = {
+export const maintenanceItemSchema: TableSchemaSpec = {
   name: 'maintenance_items',
   columns: [
     { name: 'name', type: 'string' },
-    { name: 'vehicle_type', type: 'string', isOptional: true },
+    { name: 'maintenance_km', type: 'number', isOptional: true },
+    { name: 'maintenance_month', type: 'number', isOptional: true },
     { name: 'created_at', type: 'number' },
   ],
 };

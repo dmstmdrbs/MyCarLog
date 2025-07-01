@@ -9,10 +9,10 @@ import {
   Alert,
   SafeAreaView,
 } from 'react-native';
-import { database } from '../database';
+import { database } from '@/database';
 import MaintenanceItem from '@shared/models/MaintenanceItem';
 
-export default function DevMaintenanceItemCrudScreen() {
+export function SettingsMaintenanceItemPage() {
   const [items, setItems] = useState<MaintenanceItem[]>([]);
   const [name, setName] = useState('');
   const [maintenanceKm, setMaintenanceKm] = useState('');
