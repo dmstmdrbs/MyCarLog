@@ -3,15 +3,11 @@ import {
   queryKeys,
   invalidationHelpers,
 } from '../../../shared/queries/queryKeys';
-import { PaymentMethodRepository } from '../../../shared/repositories';
-import PaymentMethod, {
+import {
   CreatePaymentMethodData,
   UpdatePaymentMethodData,
-  PaymentMethodType,
 } from '../../../shared/models/PaymentMethod';
-
-// Repository 인스턴스
-const paymentMethodRepository = new PaymentMethodRepository();
+import { paymentMethodRepository } from '@/shared/repositories';
 
 /**
  * 모든 결제 수단 목록을 조회하는 Query Hook

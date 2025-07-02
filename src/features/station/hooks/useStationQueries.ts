@@ -1,10 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, invalidationHelpers } from '@shared/queries/queryKeys';
-import { StationRepository } from '@shared/repositories';
+import { stationRepository } from '@shared/repositories';
 import { CreateStationData, UpdateStationData } from '@shared/models/Station';
-
-// Repository 인스턴스
-const stationRepository = new StationRepository();
 
 /**
  * 모든 주유소 목록을 조회하는 Query Hook
@@ -18,7 +15,7 @@ export const useStations = (filters?: { type?: 'gas' | 'ev' }) => {
       }
       return stationRepository.findAll();
     },
-    staleTime: 1000 * 60 * 15, // 15분간 fresh (주유소는 자주 변경되지 않음)
+    staleTime: 0, // 15분간 fresh (주유소는 자주 변경되지 않음)
     initialData: [],
   });
 };
@@ -43,7 +40,7 @@ export const useStation = (stationId: string) => {
     queryKey: queryKeys.stations.detail(stationId),
     queryFn: () => stationRepository.findById(stationId),
     enabled: !!stationId,
-    staleTime: 1000 * 60 * 15, // 15분간 fresh
+    staleTime: 0, // 15분간 fresh
   });
 };
 
@@ -76,7 +73,7 @@ export const useStationStats = () => {
         evCount: stations.filter((s) => s.type === 'ev').length,
       };
     },
-    staleTime: 1000 * 60 * 15, // 15분간 fresh
+    staleTime: 0, // 15분간 fresh
   });
 };
 

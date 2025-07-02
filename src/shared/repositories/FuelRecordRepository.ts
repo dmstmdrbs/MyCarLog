@@ -190,7 +190,7 @@ export class FuelRecordRepository
     }
   }
 
-  async createFuelRecord(data: CreateFuelRecordData): Promise<FuelRecord> {
+  async create(data: CreateFuelRecordData): Promise<FuelRecord> {
     try {
       return await this.database.write(async () => {
         return await this.collection.create((record) => {

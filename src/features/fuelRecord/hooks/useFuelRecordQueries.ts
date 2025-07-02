@@ -1,15 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, invalidationHelpers } from '@shared/queries/queryKeys';
-import { FuelRecordRepository } from '@shared/repositories';
+import { fuelRecordRepository } from '@shared/repositories';
 import {
   CreateFuelRecordData,
   UpdateFuelRecordData,
   FuelRecordType,
   MonthlyFuelStats,
 } from '@shared/models/FuelRecord';
-
-// Repository 인스턴스
-const fuelRecordRepository = new FuelRecordRepository();
 
 /**
  * 특정 차량의 연료 기록 목록을 조회하는 Query Hook

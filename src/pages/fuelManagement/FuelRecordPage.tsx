@@ -16,12 +16,14 @@ import {
 } from '@features/fuelRecord/hooks/useFuelRecordQueries';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { formatDate } from 'date-fns';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 
 export function FuelRecordPage({ route }: Props) {
   const { vehicleId, targetDate } = route.params;
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(vehicleId);
+  const navigation = useNavigation();
 
   const [energyRecord, setEnergyRecord] = useState<EnergyRecordFormData>({
     date: formatDate(targetDate, 'yyyy-MM-dd'),
@@ -46,6 +48,7 @@ export function FuelRecordPage({ route }: Props) {
       vehicleId,
       date: new Date(data.date).getTime(), // string -> number(timestamp)
     });
+    navigation.goBack();
   };
 
   // 차량 정보가 로딩 중일 때

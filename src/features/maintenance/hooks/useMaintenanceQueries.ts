@@ -5,6 +5,7 @@ import {
   UpdateMaintenanceItemData,
 } from '@shared/repositories';
 import { queryKeys } from '@/shared/queries/queryKeys';
+
 export const useMaintenanceQueries = () => {
   return useQuery({
     queryKey: queryKeys.maintenanceItems.lists(),

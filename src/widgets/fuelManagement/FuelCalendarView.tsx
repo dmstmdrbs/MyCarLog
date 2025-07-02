@@ -13,20 +13,24 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FuelStackParamList } from '@pages/fuelManagement/navigator';
 import { useVehicle } from '@features/vehicle';
-import { MonthlyStatsCard } from './MonthlyStatsCard';
-import { FuelRecordList } from './FuelRecordList';
-import { FloatingAddButton } from './FloatingAddButton';
-import { FuelCalendar } from './FuelCalendar';
-import { paymentMethodMap } from './paymentMethodMap';
-import { getFuelUnit, getFuelUnitPrice } from './unitUtils';
+import { MonthlyStatsCard } from './ui/MonthlyStatsCard';
+import { FuelRecordList } from './ui/FuelRecordList';
+import { FloatingAddButton } from './ui/FloatingAddButton';
+import { FuelCalendar } from './ui/FuelCalendar';
+import { paymentMethodMap } from './constants/paymentMethodMap';
+import { getFuelUnit, getFuelUnitPrice } from './utils/unitUtils';
 
 type Props = {
   vehicleId: string;
+  currentDate: Date;
+  onDateChange: (date: Date) => void;
 };
 
-export const FuelCalendarView = ({ vehicleId }: Props) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
+export const FuelCalendarView = ({
+  vehicleId,
+  currentDate,
+  onDateChange,
+}: Props) => {
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
@@ -56,11 +60,11 @@ export const FuelCalendarView = ({ vehicleId }: Props) => {
   };
 
   const handleDayPress = (day: any) => {
-    setCurrentDate(new Date(day.dateString));
+    onDateChange(new Date(day.dateString));
   };
 
   const handleMonthChange = (date: DateData) => {
-    setCurrentDate(new Date(date.dateString));
+    onDateChange(new Date(date.dateString));
   };
 
   if (monthlyStatsLoading) {

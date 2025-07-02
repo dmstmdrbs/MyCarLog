@@ -93,21 +93,6 @@ export function EnergyRecordForm({
         : '주유소를 선택해주세요',
       amountPlaceholder: isEV ? '예: 45.2' : '예: 30.5',
       unitPricePlaceholder: isEV ? '예: 280' : '예: 1,650',
-      stations: isEV
-        ? [
-            { key: '테슬라 수퍼차저', label: '테슬라 수퍼차저' },
-            { key: 'SK 일렉링크', label: 'SK 일렉링크' },
-            { key: '현대 E-pit', label: '현대 E-pit' },
-            { key: 'GS칼텍스 충전소', label: 'GS칼텍스 충전소' },
-            { key: '환경부 급속충전소', label: '환경부 급속충전소' },
-          ]
-        : [
-            { key: '수원셀프고속주유소', label: '수원셀프고속주유소' },
-            { key: '오산셀프고속주유소', label: '오산셀프고속주유소' },
-            { key: 'SK에너지', label: 'SK에너지' },
-            { key: 'GS칼텍스', label: 'GS칼텍스' },
-            { key: 'S-OIL', label: 'S-OIL' },
-          ],
     }),
     [isEV],
   );
@@ -400,7 +385,7 @@ export function EnergyRecordForm({
                             {item.name}
                           </ButtonText>
                         </Button>
-                        {index !== config.stations.length - 1 && (
+                        {index !== stations.length - 1 && (
                           <Divider className="my-2" orientation="horizontal" />
                         )}
                       </Box>
