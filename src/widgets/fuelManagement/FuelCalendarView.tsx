@@ -19,6 +19,7 @@ import { FloatingAddButton } from './ui/FloatingAddButton';
 import { FuelCalendar } from './ui/FuelCalendar';
 import { paymentMethodMap } from './constants/paymentMethodMap';
 import { getFuelUnit, getFuelUnitPrice } from './utils/unitUtils';
+import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 
 type Props = {
   vehicleId: string;
@@ -35,11 +36,12 @@ export const FuelCalendarView = ({
   const currentMonth = currentDate.getMonth() + 1;
 
   const { data: vehicle } = useVehicle(vehicleId);
-  const {
-    data: monthlyStats,
-    isLoading: monthlyStatsLoading,
-    isError: monthlyStatsError,
-  } = useFuelRecordMonthlyStats(vehicleId, currentYear, currentMonth);
+  const { monthlyStatsQuery } = useFuelStatisticQueries({
+    vehicleId,
+    year: currentYear,
+    month: currentMonth,
+  });
+  const { data: monthlyStats } = monthlyStatsQuery;
 
   const { data: fuelRecordsByDate } = useFuelRecordsByDateRange(
     vehicleId,
@@ -67,7 +69,7 @@ export const FuelCalendarView = ({
     onDateChange(new Date(date.dateString));
   };
 
-  if (monthlyStatsLoading) {
+  if (monthlyStatsQuery.isLoading) {
     return (
       <Box className="flex-1 justify-center items-center">
         <Text>Loading...</Text>
@@ -75,7 +77,7 @@ export const FuelCalendarView = ({
     );
   }
 
-  if (monthlyStatsError) {
+  if (monthlyStatsQuery.isError) {
     return (
       <Box className="flex-1 justify-center items-center">
         <Text>Error</Text>
@@ -99,9 +101,11 @@ export const FuelCalendarView = ({
     <Box className="flex-1">
       {/* 월별 통계 카드 */}
       <MonthlyStatsCard
-        totalCost={monthlyStats.totalCost}
-        totalAmount={monthlyStats.totalAmount}
-        unit={unit}
+        totalCost={monthlyStats.totalCost ?? 0}
+        totalAmount={monthlyStats.totalAmount ?? 0}
+        avgUnitPrice={monthlyStats.avgUnitPrice ?? 0}
+        recordCount={monthlyStats.recordCount ?? 0}
+        hideIcon={true}
       />
 
       {/* 캘린더 */}

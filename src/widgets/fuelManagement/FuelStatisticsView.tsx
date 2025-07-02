@@ -10,6 +10,10 @@ import { Menu, MenuItem, MenuItemLabel } from '@shared/components/ui/menu';
 import { Box } from '@shared/components/ui/box';
 import { Spinner } from '@shared/components/ui/spinner';
 import { Text } from '@shared/components/ui/text';
+import { MonthlyStatsCard } from './ui/MonthlyStatsCard';
+import { PaymentStatsBarChart } from './ui/PaymentStatsBarChart';
+import { YearlyStatsLineChart } from './ui/YearlyStatsLineChart';
+import { ComparisonStatsCard } from './ui/ComparisonStatsCard';
 
 // 최근 5년 생성
 const now = new Date();
@@ -106,91 +110,61 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
       </Box>
 
       <ScrollView>
-        <Text className="font-bold text-lg mb-2">월별 주유 통계</Text>
+        {/* 월별 주유 통계 카드 */}
         {monthlyStatsLoading ? (
-          <Text>
+          <Box className="items-center justify-center h-24">
             <Spinner />
-          </Text>
+          </Box>
         ) : monthlyStatsQuery.error ? (
           <Text>에러!</Text>
         ) : monthlyStats ? (
-          <Box>
-            <Text>총 주유비: {formatNumber(monthlyStats?.totalCost ?? 0)}</Text>
-            <Text>
-              총 주유량: {formatNumber(monthlyStats?.totalAmount ?? 0)}
-            </Text>
-            <Text>
-              평균 단가: {formatNumber(monthlyStats?.avgUnitPrice ?? 0)}
-            </Text>
-            <Text>
-              주유 횟수: {formatNumber(monthlyStats?.recordCount ?? 0)}
-            </Text>
-          </Box>
+          <MonthlyStatsCard
+            totalCost={monthlyStats.totalCost ?? 0}
+            totalAmount={monthlyStats.totalAmount ?? 0}
+            avgUnitPrice={monthlyStats.avgUnitPrice ?? 0}
+            recordCount={monthlyStats.recordCount ?? 0}
+          />
         ) : (
           <Text>-</Text>
         )}
 
-        <Text className="font-bold text-lg mt-4 mb-2">
-          결제 수단별 지출 통계
-        </Text>
+        {/* 결제 수단별 지출 통계 차트 */}
         {paymentStatsLoading ? (
-          <Text>
+          <Box className="items-center justify-center h-24">
             <Spinner />
-          </Text>
+          </Box>
         ) : paymentStatsQuery.error ? (
           <Text>에러!</Text>
-        ) : paymentStats?.length === 0 ? (
-          <Text>-</Text>
         ) : (
-          paymentStats?.map((stat, i) => (
-            <Text key={i}>
-              {stat.paymentType}: {formatNumber(stat.totalCost)}원 (
-              {formatNumber(stat.usageCount)}회)
-            </Text>
-          ))
+          <PaymentStatsBarChart paymentStats={paymentStats ?? []} />
         )}
 
-        <Text className="font-bold text-lg mt-4 mb-2">전월/전년 대비 통계</Text>
+        {/* 전월/전년 대비 통계 카드 */}
         {comparisonStatsLoading ? (
-          <Text>
+          <Box className="items-center justify-center h-24">
             <Spinner />
-          </Text>
+          </Box>
         ) : comparisonStatsQuery.error ? (
           <Text>에러!</Text>
         ) : comparisonStats ? (
-          <Box>
-            <Text>
-              이번달: {formatNumber(comparisonStats?.current.totalCost ?? 0)}원
-            </Text>
-            <Text>
-              전월: {formatNumber(comparisonStats?.prevMonth.totalCost ?? 0)}원
-            </Text>
-            <Text>
-              전년동월: {formatNumber(comparisonStats?.prevYear.totalCost ?? 0)}
-              원
-            </Text>
-          </Box>
+          <ComparisonStatsCard
+            current={comparisonStats.current.totalCost ?? 0}
+            prevMonth={comparisonStats.prevMonth.totalCost ?? 0}
+            prevYear={comparisonStats.prevYear.totalCost ?? 0}
+          />
         ) : (
           <Text>-</Text>
         )}
 
-        <Text className="font-bold text-lg mt-4 mb-2">연간 통계 (월별)</Text>
+        {/* 연간 통계 (월별) 라인차트 */}
         {yearlyStatsLoading ? (
-          <Text>
+          <Box className="items-center justify-center h-24">
             <Spinner />
-          </Text>
+          </Box>
         ) : yearlyStatsQuery.error ? (
           <Text>에러!</Text>
-        ) : yearlyStats?.length === 0 ? (
-          <Text>-</Text>
         ) : (
-          yearlyStats?.map((stat, i) => (
-            <Text key={i}>
-              {stat.month}월: {formatNumber(stat.totalCost)}원 /{' '}
-              {formatNumber(stat.totalAmount)}L /{' '}
-              {formatNumber(stat.recordCount)}회
-            </Text>
-          ))
+          <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
         )}
       </ScrollView>
     </Box>

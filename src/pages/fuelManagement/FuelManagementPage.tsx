@@ -9,6 +9,7 @@ import { FuelStatisticsView, Tab, TabItem } from '@/widgets/fuelManagement';
 import { Icon } from '@/shared/components/ui/icon';
 import { CalendarDaysIcon, ChartBarIcon } from 'lucide-react-native';
 import { useState } from 'react';
+import { cn } from '@/shared/utils/cn';
 
 export const FuelManagementPage = () => {
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
@@ -36,13 +37,29 @@ export const FuelManagementPage = () => {
     <PageLayout>
       <Tab>
         <TabItem
+          isActive={selectedTab === 'calendar'}
           label="캘린더"
-          icon={<Icon as={CalendarDaysIcon} />}
+          icon={
+            <Icon
+              as={CalendarDaysIcon}
+              className={cn(
+                selectedTab === 'calendar' ? 'text-white' : 'text-gray-600',
+              )}
+            />
+          }
           onPress={() => setSelectedTab('calendar')}
         />
         <TabItem
+          isActive={selectedTab === 'statistics'}
           label="통계"
-          icon={<Icon as={ChartBarIcon} />}
+          icon={
+            <Icon
+              as={ChartBarIcon}
+              className={cn(
+                selectedTab === 'statistics' ? 'text-white' : 'text-gray-600',
+              )}
+            />
+          }
           onPress={() => setSelectedTab('statistics')}
         />
       </Tab>

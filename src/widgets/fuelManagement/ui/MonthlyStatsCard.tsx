@@ -1,33 +1,49 @@
-import { Box } from '@/shared/components/ui/box';
-import { Text } from '@/shared/components/ui/text';
-import { formatNumber } from '@/shared/utils/format';
+import { Box } from '@shared/components/ui/box';
+import { Text } from '@shared/components/ui/text';
+import { formatNumber } from '@shared/utils/format';
+import { ReactNode } from 'react';
 
-interface MonthlyStatsCardProps {
+interface StatItem {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}
+
+interface Props {
   totalCost: number;
   totalAmount: number;
-  unit: string;
+  avgUnitPrice: number;
+  recordCount: number;
+  hideIcon?: boolean;
 }
 
 export const MonthlyStatsCard = ({
   totalCost,
   totalAmount,
-  unit,
-}: MonthlyStatsCardProps) => (
-  <Box className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-    <Text className="text-sm text-gray-600 mb-2">이번 달 통계</Text>
-    <Box className="flex-row justify-between">
-      <Box>
-        <Text className="text-2xl font-bold text-gray-900">
-          {formatNumber(totalCost)}원
-        </Text>
-        <Text className="text-sm text-gray-600">총 지출</Text>
-      </Box>
-      <Box>
-        <Text className="text-2xl font-bold text-gray-900">
-          {formatNumber(totalAmount)} {unit}
-        </Text>
-        <Text className="text-sm text-gray-600">총 {unit}</Text>
-      </Box>
+  avgUnitPrice,
+  recordCount,
+  hideIcon = false,
+}: Props) => {
+  const stats: StatItem[] = [
+    { icon: '💸', label: '총 주유비', value: `${formatNumber(totalCost)}원` },
+    { icon: '⛽️', label: '총 주유량', value: `${formatNumber(totalAmount)}L` },
+    {
+      icon: '💲',
+      label: '평균 단가',
+      value: `${formatNumber(avgUnitPrice)}원`,
+    },
+    { icon: '🔄', label: '주유 횟수', value: `${formatNumber(recordCount)}회` },
+  ];
+
+  return (
+    <Box className="flex-row flex-wrap justify-between bg-gray-50 rounded-lg p-4 mb-4">
+      {stats.map((item) => (
+        <Box key={item.label} className="w-1/4 items-center justify-center">
+          {!hideIcon && <Text className="text-2xl mb-1">{item.icon}</Text>}
+          <Text className="font-bold text-base mb-0.5">{item.value}</Text>
+          <Text className="text-xs text-gray-500">{item.label}</Text>
+        </Box>
+      ))}
     </Box>
-  </Box>
-);
+  );
+};

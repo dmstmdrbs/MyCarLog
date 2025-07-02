@@ -346,20 +346,33 @@ export class FuelRecordRepository
     year: number,
     month: number,
   ): Promise<
-    Array<{ paymentType: string; totalCost: number; usageCount: number }>
+    Array<{
+      paymentType: string;
+      paymentName: string;
+      totalCost: number;
+      usageCount: number;
+    }>
   > {
     const records = await this.findByMonth(vehicleId, year, month);
-    const stats: Record<string, { totalCost: number; usageCount: number }> = {};
+    const stats: Record<
+      string,
+      { paymentName: string; totalCost: number; usageCount: number }
+    > = {};
     records.forEach((record) => {
       if (!stats[record.paymentType]) {
-        stats[record.paymentType] = { totalCost: 0, usageCount: 0 };
+        stats[record.paymentType] = {
+          paymentName: record.paymentName,
+          totalCost: 0,
+          usageCount: 0,
+        };
       }
       stats[record.paymentType].totalCost += record.totalCost;
       stats[record.paymentType].usageCount += 1;
     });
     return Object.entries(stats).map(
-      ([paymentType, { totalCost, usageCount }]) => ({
+      ([paymentType, { paymentName, totalCost, usageCount }]) => ({
         paymentType,
+        paymentName,
         totalCost,
         usageCount,
       }),

@@ -1,22 +1,32 @@
 import { Box } from '@/shared/components/ui/box';
 import { Button, ButtonText } from '@/shared/components/ui/button';
+import { cn } from '@/shared/utils/cn';
 
 export const TabItem = ({
+  isActive,
   label,
   icon,
   onPress,
 }: {
+  isActive: boolean;
   label: string;
   icon: React.ReactNode;
   onPress: () => void;
 }) => {
   return (
     <Button
-      className={`flex-1 py-3 flex flex-row items-center gap-2 justify-center bg-white`}
+      className={cn(
+        'flex-1 py-3 flex flex-row items-center gap-2 justify-center bg-white',
+        isActive ? 'bg-primary-500' : 'bg-white',
+      )}
       onPress={onPress}
     >
       {icon}
-      <ButtonText className="text-gray-600 text-sm">{label}</ButtonText>
+      <ButtonText
+        className={cn('text-sm', isActive ? 'text-white' : 'text-gray-600')}
+      >
+        {label}
+      </ButtonText>
     </Button>
   );
 };
