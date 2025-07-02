@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Alert, SafeAreaView } from 'react-native';
+import { FlatList, Alert, SafeAreaView, ListRenderItem } from 'react-native';
 import MaintenanceItem from '@shared/models/MaintenanceItem';
 import {
   FormControl,
@@ -17,6 +17,8 @@ import {
   useMaintenanceQueries,
   useMaintenanceItemQueries,
 } from '@/features/maintenance/hooks/useMaintenanceQueries';
+import { Icon } from '@/shared/components/ui/icon';
+import { ListIcon } from 'lucide-react-native';
 
 const MaintenanceItemForm = ({
   initialData,
@@ -95,10 +97,27 @@ const MaintenanceItemForm = ({
   );
 };
 
+const MaintenanceItemList = ({
+  items,
+  renderItem,
+}: {
+  items: MaintenanceItem[];
+  renderItem: ListRenderItem<MaintenanceItem>;
+}) => {
+  return (
+    <FlatList
+      style={{ flex: 1 }}
+      contentContainerClassName="p-4 flex flex-col gap-4 bg-white"
+      data={items ?? []}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+    />
+  );
+};
 export function SettingsMaintenanceItemPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { data: items, isLoading } = useMaintenanceQueries();
+  const { data: items } = useMaintenanceQueries();
   const { data: item } = useMaintenanceItemQueries(editingId ?? '');
 
   useEffect(() => {
@@ -129,21 +148,30 @@ export function SettingsMaintenanceItemPage() {
     setEditingId(null);
   };
 
+  const showDeleteAlert = (id: string) => {
+    Alert.alert('정비 항목 삭제', '정비 항목을 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', onPress: () => handleDelete(id) },
+    ]);
+  };
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <Box className="p-4">
-        <MaintenanceItemForm initialData={item} onSave={handleSave} />
+        <MaintenanceItemForm initialData={item ?? null} onSave={handleSave} />
       </Box>
-      <FlatList
-        style={{ flex: 1 }}
-        contentContainerClassName="p-4 flex flex-col gap-4 bg-white"
-        data={items ?? []}
-        keyExtractor={(item) => item.id}
+      <Box className="p-4 border-b border-gray-200 flex flex-row items-center gap-2">
+        <Icon as={ListIcon} className="w-5 h-5" />
+        <Text className="text-lg font-bold">정비 항목</Text>
+      </Box>
+      <MaintenanceItemList
+        items={items ?? []}
         renderItem={({ item }) => (
           <Button
             className="h-12 w-full flex flex-row justify-between items-center border-b border-gray-200 rounded-none px-4 bg-white"
             style={{ borderBottomWidth: 1 }}
             onPress={() => handleEdit(item)}
+            onLongPress={() => showDeleteAlert(item.id)}
           >
             <ButtonText className="text-gray-800">
               {item.name}
