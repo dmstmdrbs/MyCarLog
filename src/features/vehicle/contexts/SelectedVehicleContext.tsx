@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Vehicle from '@shared/models/Vehicle';
-import { useVehicles } from '@shared/contexts/vehicles';
+import { useVehicles } from '../hooks/useVehicleQueries';
 
 interface SelectedVehicleContextType {
   vehicles: Vehicle[];
@@ -19,13 +19,13 @@ export const SelectedVehicleProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // TODO: WatermelonDB 연동, 일단 mock 데이터
-  const { vehicles, refetch } = useVehicles();
+  const { data: vehicles = [], refetch } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   useEffect(() => {
     if (vehicles.length > 0) {
-      const defaultProfile = vehicles.find((v) => v.isDefault) || vehicles[0];
+      const defaultProfile =
+        vehicles.find((v: Vehicle) => v.isDefault) || vehicles[0];
       console.log(defaultProfile);
       setSelectedVehicle(defaultProfile);
     }

@@ -4,23 +4,26 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { GluestackUIProvider } from '@shared/components/ui/gluestack-ui-provider';
-import { PaymentMethodsProvider } from '@shared/contexts/paymentMethods';
-import {
-  SelectedVehicleProvider,
-  useSelectedVehicle,
-} from '@features/vehicle/contexts/SelectedVehicleContext';
-
-import { MaintenanceStackScreen } from '@pages/maintenanceManagement';
-import { FuelStackScreen } from '@pages/fuelManagement';
-import { DriveStackScreen } from '@pages/driveManagement';
-import { SettingsStackScreen } from '@pages/settings';
+import { QueryProvider } from '@shared/providers/QueryProvider';
 import {
   seedDefaultMaintenanceItems,
   seedDefaultPaymentMethods,
 } from '@/database/seedData';
 import { useEffect } from 'react';
 
-import { useVehicles, VehiclesProvider } from '@shared/contexts/vehicles';
+import { Icon } from '@/shared/components/ui/icon';
+import {
+  CarIcon,
+  FuelIcon,
+  SettingsIcon,
+  WrenchIcon,
+} from 'lucide-react-native';
+
+import { MaintenanceStackScreen } from '@pages/maintenanceManagement';
+import { FuelStackScreen } from '@pages/fuelManagement';
+import { DriveStackScreen } from '@pages/driveManagement';
+import { SettingsStackScreen } from '@pages/settings';
+import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
 
 // 각 Stack Navigator 정의
 
@@ -28,38 +31,49 @@ const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
   const { selectedVehicle } = useSelectedVehicle();
-  const { isLoading, vehicles } = useVehicles();
   const isEV = selectedVehicle?.type === 'EV';
-
-  // 차량이 없을 때 탭바 숨기기
-  const shouldHideTabBar = !isLoading && vehicles.length === 0;
+  const fuelTitle = isEV ? '충전' : '주유';
 
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
-          tabBarStyle: shouldHideTabBar ? { display: 'none' } : undefined,
+          tabBarStyle: !selectedVehicle ? { display: 'none' } : undefined,
         }}
       >
         <Tab.Screen
           name="정비"
           component={MaintenanceStackScreen}
-          options={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarIcon: () => <Icon as={WrenchIcon} />,
+          }}
         />
         <Tab.Screen
-          name={isEV ? '충전' : '주유'}
+          name={fuelTitle}
           component={FuelStackScreen}
-          options={{ headerShown: false, popToTopOnBlur: true }}
+          options={{
+            headerShown: false,
+            popToTopOnBlur: true,
+            tabBarIcon: () => <Icon as={FuelIcon} />,
+          }}
         />
         <Tab.Screen
           name="운행"
           component={DriveStackScreen}
-          options={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarIcon: () => <Icon as={CarIcon} />,
+          }}
         />
         <Tab.Screen
           name="설정"
           component={SettingsStackScreen}
-          options={{ headerShown: false, popToTopOnBlur: true }}
+          options={{
+            headerShown: false,
+            popToTopOnBlur: true,
+            tabBarIcon: () => <Icon as={SettingsIcon} />,
+          }}
         />
       </Tab.Navigator>
     </NavigationContainer>
@@ -92,14 +106,12 @@ export default function App() {
   }, []);
 
   return (
-    <VehiclesProvider>
-      <PaymentMethodsProvider paymentMethods={[]}>
-        <SelectedVehicleProvider>
-          <GluestackUIProvider>
-            <AppNavigator />
-          </GluestackUIProvider>
-        </SelectedVehicleProvider>
-      </PaymentMethodsProvider>
-    </VehiclesProvider>
+    <QueryProvider>
+      <SelectedVehicleProvider>
+        <GluestackUIProvider>
+          <AppNavigator />
+        </GluestackUIProvider>
+      </SelectedVehicleProvider>
+    </QueryProvider>
   );
 }

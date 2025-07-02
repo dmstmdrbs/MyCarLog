@@ -1,6 +1,5 @@
 import PageLayout from '@shared/components/layout/PageLayout';
 import { Text } from '@shared/components/ui/text';
-import useFuelRecord from '@features/fuelRecord/hooks/useFuelRecord';
 import { useVehicle } from '@features/vehicle';
 import { useState } from 'react';
 import { Button, ButtonText } from '@shared/components/ui/button';
@@ -10,14 +9,18 @@ import { Box } from '@shared/components/ui/box';
 import { ScrollView } from 'react-native';
 import { EnergyRecordForm } from '@/features/fuelRecord';
 import type { EnergyRecordFormData } from '@/features/fuelRecord';
-import { useNavigation } from '@react-navigation/native';
+import {
+  useCreateFuelRecord,
+  // useUpdateFuelRecord,
+  // useDeleteFuelRecord,
+} from '@features/fuelRecord/hooks/useFuelRecordQueries';
+import { Spinner } from '@/shared/components/ui/spinner';
 
 type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 
 export function FuelRecordPage({ route }: Props) {
   const { vehicleId } = route.params;
-  const navigation = useNavigation();
-  const { vehicle } = useVehicle(vehicleId);
+  const { data: vehicle, isLoading: vehicleLoading } = useVehicle(vehicleId);
 
   const [energyRecord, setEnergyRecord] = useState<EnergyRecordFormData>({
     date: new Date().toISOString().split('T')[0], // 오늘 날짜를 YYYY-MM-DD 형식으로
@@ -32,37 +35,24 @@ export function FuelRecordPage({ route }: Props) {
     memo: '',
   });
 
-  const { addFuelRecord } = useFuelRecord({ vehicleId });
+  const createFuelRecordMutation = useCreateFuelRecord();
+  // const updateFuelRecordMutation = useUpdateFuelRecord();
+  // const deleteFuelRecordMutation = useDeleteFuelRecord();
 
-  const handleAddFuelRecord = async () => {
-    console.log('energyRecord', energyRecord);
-    try {
-      await addFuelRecord({
-        date: new Date(energyRecord.date).getTime(), // 선택된 날짜를 timestamp로 변환
-        totalCost: energyRecord.totalCost,
-        unitPrice: energyRecord.unitPrice,
-        amount: energyRecord.amount,
-        paymentMethodId: energyRecord.paymentMethodId,
-        paymentName: energyRecord.paymentName,
-        paymentType: energyRecord.paymentType,
-        stationId: energyRecord.stationId,
-        stationName: energyRecord.stationName,
-        memo: energyRecord.memo,
-      });
-      navigation.goBack();
-    } catch (error) {
-      console.error(error);
-    }
+  const handleAddFuelRecord = async (data: EnergyRecordFormData) => {
+    await createFuelRecordMutation.mutateAsync({
+      ...data,
+      vehicleId,
+      date: new Date(data.date).getTime(), // string -> number(timestamp)
+    });
   };
 
   // 차량 정보가 로딩 중일 때
-  if (!vehicle) {
+  if (vehicleLoading || !vehicle) {
     return (
       <PageLayout>
         <Box className="flex-1 justify-center items-center">
-          <Text className="text-lg text-gray-600">
-            차량 정보를 불러오는 중...
-          </Text>
+          <Spinner size="large" />
         </Box>
       </PageLayout>
     );
@@ -107,7 +97,7 @@ export function FuelRecordPage({ route }: Props) {
         <Box className="absolute bottom-0 left-0 right-0 border-gray-100 shadow-xs">
           <Box className="px-4 pt-4 pb-5">
             <Button
-              onPress={handleAddFuelRecord}
+              onPress={() => handleAddFuelRecord(energyRecord)}
               className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl active:shadow-lg active:scale-95 transform transition-all duration-150"
             >
               <Box className="flex-row items-center justify-center space-x-2">

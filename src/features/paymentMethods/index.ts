@@ -1,3 +1,1 @@
-import { usePaymentMethodsMutation } from './hooks/usePaymentMethodsMutation';
-
-export { usePaymentMethodsMutation };
+export * from './hooks/usePaymentMethodQueries';

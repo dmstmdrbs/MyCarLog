@@ -6,14 +6,16 @@ import { Button, ButtonIcon } from '@shared/components/ui/button';
 import { Box } from '@shared/components/ui/box';
 import { AddIcon } from '@shared/components/ui/icon';
 import { VehicleList } from '@features/vehicle';
-import { useVehicles } from '@shared/contexts/vehicles';
+import { useVehicles } from '@features/vehicle';
 
 export function SettingsVehicleProfilePage() {
-  const { vehicles, refetch } = useVehicles();
+  const { data: vehicles, refetch } = useVehicles();
   const navigation = useNavigation();
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', refetch);
+    const unsubscribe = navigation.addListener('focus', () => {
+      refetch();
+    });
     return unsubscribe;
   }, [navigation]);
 

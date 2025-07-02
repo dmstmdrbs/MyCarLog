@@ -50,7 +50,6 @@ export function SettingsMaintenanceItemPage() {
           i.name = name;
           if (maintenanceKm) i.maintenanceKm = Number(maintenanceKm);
           if (maintenanceMonth) i.maintenanceMonth = Number(maintenanceMonth);
-          i.createdAt = Date.now();
         });
       });
     }

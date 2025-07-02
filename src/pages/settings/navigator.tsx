@@ -8,7 +8,7 @@ import { SettingsMainPage } from './SettingsMainPage';
 const SettingsStack = createNativeStackNavigator();
 export function SettingsStackScreen() {
   return (
-    <SettingsStack.Navigator>
+    <SettingsStack.Navigator initialRouteName="SettingsMain">
       <SettingsStack.Screen
         name="SettingsMain"
         component={SettingsMainPage}

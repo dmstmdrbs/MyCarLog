@@ -1,12 +1,26 @@
-import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
+import { useVehicles } from '@/features/vehicle/hooks/useVehicleQueries';
 import { Button, ButtonIcon, ButtonText } from '../ui/button';
 import { ChevronDownIcon } from '../ui/icon';
 import { cn } from '@shared/utils/cn';
 import { Menu, MenuItem, MenuItemLabel } from '../ui/menu';
+import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
+import { useEffect } from 'react';
 
 const VehicleProfileHeaderMenu = () => {
-  const { selectedVehicle, vehicles, setSelectedVehicle } =
-    useSelectedVehicle();
+  const { data: vehicles = [] } = useVehicles();
+  const { selectedVehicle, setSelectedVehicle } = useSelectedVehicle();
+
+  const handleChangeSelectedProfile = async (vehicleId: string) => {
+    const vehicle = vehicles.find((v) => v.id === vehicleId);
+    console.log('vehicle', vehicle);
+    if (vehicle) {
+      setSelectedVehicle(vehicle);
+    }
+  };
+
+  useEffect(() => {
+    console.log('selectedVehicle', selectedVehicle?.id, selectedVehicle);
+  }, [selectedVehicle]);
 
   return (
     <Menu
@@ -36,9 +50,7 @@ const VehicleProfileHeaderMenu = () => {
             idx !== vehicles.length - 1 && ' border-b border-gray-200',
             selectedVehicle?.id === vehicle.id && ' bg-gray-50 font-bold',
           )}
-          onPress={() => {
-            setSelectedVehicle(vehicle);
-          }}
+          onPress={() => handleChangeSelectedProfile(vehicle.id)}
         >
           <MenuItemLabel size="sm">{vehicle.nickname}</MenuItemLabel>
         </MenuItem>

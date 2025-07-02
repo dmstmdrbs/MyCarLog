@@ -21,13 +21,15 @@ import {
   ModalHeader,
 } from '@shared/components/ui/modal';
 import { Divider } from '@shared/components/ui/divider';
+import { useStations, useCreateStation } from '@features/station';
 import PaymentMethod from '@shared/models/PaymentMethod';
-import { usePaymentMethodsContext } from '@shared/contexts/paymentMethods';
-import { useStationMutation, useStations } from '@features/station';
-import { usePaymentMethodsMutation } from '@features/paymentMethods';
 
 import { PaymentMethodForm } from './PaymentMethodForm';
 import { PaymentMethodList } from './PaymentMethodList';
+import {
+  usePaymentMethods,
+  useCreatePaymentMethod,
+} from '@features/paymentMethods';
 
 interface EnergyRecordFormData {
   date: string; // YYYY-MM-DD 형식
@@ -66,20 +68,15 @@ export function EnergyRecordForm({
   });
   const [newStationName, setNewStationName] = useState('');
 
-  const { paymentMethods } = usePaymentMethodsContext();
-  const { addPaymentMethod } = usePaymentMethodsMutation();
-  const { stations, refetch } = useStations();
-  const { addStation } = useStationMutation();
+  // 새로운 TanStack Query 방식 사용
+  const { data: paymentMethods = [] } = usePaymentMethods();
+  const { data: stations = [], refetch } = useStations();
+  const createPaymentMethod = useCreatePaymentMethod();
+  const createStation = useCreateStation();
 
   const selectedStation = useMemo(
     () => stations.find((s) => s.id === energyRecord.stationId),
     [stations, energyRecord.stationId],
-  );
-
-  const selectedPaymentMethod = useMemo(
-    () =>
-      paymentMethods.find((method) => method.type === energyRecord.paymentType),
-    [paymentMethods, energyRecord.paymentType],
   );
 
   // 차량 타입별 설정
@@ -202,7 +199,7 @@ export function EnergyRecordForm({
   const handleAddPaymentMethod = async () => {
     if (newPaymentMethod?.type) {
       try {
-        await addPaymentMethod({
+        await createPaymentMethod.mutateAsync({
           name: newPaymentMethod.name,
           type: newPaymentMethod.type,
         });
@@ -222,7 +219,10 @@ export function EnergyRecordForm({
 
   const handleAddStation = async () => {
     if (newStationName) {
-      await addStation(newStationName, vehicleType === 'EV' ? 'ev' : 'gas');
+      await createStation.mutateAsync({
+        name: newStationName,
+        type: vehicleType === 'EV' ? 'ev' : 'gas',
+      });
       await refetch();
       setNewStationName('');
     }

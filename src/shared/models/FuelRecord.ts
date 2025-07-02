@@ -19,6 +19,49 @@ export default class FuelRecord extends Model {
   @readonly @field('created_at') createdAt!: number;
 }
 
+// FuelRecord 타입 (클래스가 아닌 타입으로 사용할 때)
+export type FuelRecordType = FuelRecord;
+
+// 연료 기록 생성을 위한 데이터 타입
+export interface CreateFuelRecordData {
+  vehicleId: string;
+  date: number;
+  totalCost: number;
+  unitPrice: number;
+  amount: number;
+  paymentMethodId: string;
+  paymentName: string;
+  paymentType: string;
+  stationId: string;
+  stationName: string;
+  memo?: string;
+}
+
+// 연료 기록 수정을 위한 데이터 타입
+export interface UpdateFuelRecordData {
+  vehicleId?: string;
+  date?: number;
+  totalCost?: number;
+  unitPrice?: number;
+  amount?: number;
+  paymentMethodId?: string;
+  paymentName?: string;
+  paymentType?: string;
+  stationId?: string;
+  stationName?: string;
+  memo?: string;
+}
+
+// 월별 통계 타입
+export interface MonthlyFuelStats {
+  year: number;
+  month: number;
+  totalCost: number;
+  totalAmount: number;
+  averagePrice: number;
+  recordCount: number;
+}
+
 export const fuelRecordSchema: TableSchemaSpec = {
   name: 'fuel_records',
   columns: [

@@ -1,6 +1,20 @@
-import { useVehicle } from './hooks/useVehicle';
-import { useVehicleMutation } from './hooks/useVehicleMutation';
-import { VehicleForm } from './VehicleForm';
-import { VehicleList } from './VehicleList';
+export { VehicleCard } from './VehicleCard';
+export { VehicleForm } from './VehicleForm';
+export { VehicleList } from './VehicleList';
 
-export { useVehicle, VehicleForm, VehicleList, useVehicleMutation };
+// 새로운 TanStack Query hooks
+export {
+  useVehicle,
+  useVehicles,
+  useDefaultVehicle,
+  useVehicleStats,
+  useCreateVehicle,
+  useUpdateVehicle,
+  useDeleteVehicle,
+  useSetDefaultVehicle,
+  useOptimisticUpdateVehicle,
+} from './hooks/useVehicleQueries';
+export {
+  SelectedVehicleProvider,
+  useSelectedVehicle,
+} from './contexts/SelectedVehicleContext';

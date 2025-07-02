@@ -10,6 +10,21 @@ export default class Station extends Model {
   @readonly @field('created_at') createdAt!: number;
 }
 
+// Station 타입 (클래스가 아닌 타입으로 사용할 때)
+export type StationType = Station;
+
+// 주유소 생성을 위한 데이터 타입
+export interface CreateStationData {
+  name: string;
+  type: 'gas' | 'ev';
+}
+
+// 주유소 수정을 위한 데이터 타입
+export interface UpdateStationData {
+  name?: string;
+  type?: 'gas' | 'ev';
+}
+
 export const stationSchema: TableSchemaSpec = {
   name: 'stations',
   columns: [

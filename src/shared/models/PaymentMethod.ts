@@ -10,6 +10,21 @@ export default class PaymentMethod extends Model {
   @readonly @field('created_at') createdAt!: number;
 }
 
+// PaymentMethod 타입 (클래스가 아닌 타입으로 사용할 때)
+export type PaymentMethodType = PaymentMethod;
+
+// 결제 수단 생성을 위한 데이터 타입
+export interface CreatePaymentMethodData {
+  name: string;
+  type: 'credit' | 'cash' | 'giftcard' | 'etc';
+}
+
+// 결제 수단 수정을 위한 데이터 타입
+export interface UpdatePaymentMethodData {
+  name?: string;
+  type?: 'credit' | 'cash' | 'giftcard' | 'etc';
+}
+
 export const paymentMethodSchema: TableSchemaSpec = {
   name: 'payment_methods',
   columns: [

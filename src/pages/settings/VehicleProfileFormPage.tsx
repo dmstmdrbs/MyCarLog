@@ -10,8 +10,13 @@ import { Toast, ToastTitle, useToast } from '@shared/components/ui/toast';
 import { CheckIcon, Icon } from '@shared/components/ui/icon';
 import { Divider } from '@shared/components/ui/divider';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
-import { useVehicle, useVehicleMutation, VehicleForm } from '@features/vehicle';
-import { useVehicles } from '@shared/contexts/vehicles';
+import {
+  useVehicle,
+  useCreateVehicle,
+  useUpdateVehicle,
+  useDeleteVehicle,
+  VehicleForm,
+} from '@features/vehicle';
 
 export function VehicleProfileFormPage() {
   const navigation = useNavigation();
@@ -23,16 +28,14 @@ export function VehicleProfileFormPage() {
   const [manufacturer, setManufacturer] = useState('');
   const [model, setModel] = useState('');
   const [type, setType] = useState<'ICE' | 'EV'>('ICE');
-  const [loading, setLoading] = useState(false);
   const [isDefault, setIsDefault] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const toast = useToast();
 
-  const { vehicle } = useVehicle(vehicleId);
-  const { vehicles, refetch: refetchVehicles } = useVehicles();
-  const { addVehicle, updateVehicle, deleteVehicle } = useVehicleMutation();
-
-  const vehicleCount = vehicles?.length || 0;
+  const { data: vehicle } = useVehicle(vehicleId);
+  const createVehicleMutation = useCreateVehicle();
+  const updateVehicleMutation = useUpdateVehicle();
+  const deleteVehicleMutation = useDeleteVehicle();
 
   useEffect(() => {
     if (vehicle) {
@@ -52,41 +55,34 @@ export function VehicleProfileFormPage() {
 
   const handleSave = async () => {
     if (!nickname) return Alert.alert('차량 별칭을 입력하세요');
-    setLoading(true);
-    try {
-      console.log('nickname', nickname);
-      console.log('manufacturer', manufacturer);
-      console.log('model', model);
-      console.log('type', type);
-      console.log('vehicleId', vehicleId);
 
+    try {
       if (vehicleId) {
         // 수정
-        await updateVehicle({
+        await updateVehicleMutation.mutateAsync({
           id: vehicleId,
+          data: {
+            nickname,
+            manufacturer,
+            model,
+            type,
+            isDefault,
+          },
+        });
+      } else {
+        // 추가
+        await createVehicleMutation.mutateAsync({
           nickname,
           manufacturer,
           model,
           type,
           isDefault,
         });
-      } else {
-        // 추가
-        await addVehicle({
-          nickname,
-          manufacturer,
-          model,
-          type,
-          isDefault: vehicleCount === 0,
-        });
       }
-      await refetchVehicles();
       navigation.goBack();
     } catch (error) {
       console.error(error);
       Alert.alert('저장 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -144,7 +140,7 @@ export function VehicleProfileFormPage() {
 
   const handleDelete = async () => {
     try {
-      await deleteVehicle(vehicleId);
+      await deleteVehicleMutation.mutateAsync(vehicleId);
       navigation.goBack();
     } catch (error) {
       console.error(error);
