@@ -1,150 +1,158 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  FlatList,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
-import { database } from '@/database';
+import { FlatList, StyleSheet, Alert, SafeAreaView } from 'react-native';
 import MaintenanceItem from '@shared/models/MaintenanceItem';
+import {
+  FormControl,
+  FormControlLabel,
+} from '@shared/components/ui/form-control';
+import { Input, InputField } from '@shared/components/ui/input';
+import { Button, ButtonText } from '@shared/components/ui/button';
+import { Box } from '@shared/components/ui/box';
+import { Text } from '@shared/components/ui/text';
+import { CreateMaintenanceItemData } from '@shared/repositories';
+import {
+  useCreateMaintenanceItemMutation,
+  useUpdateMaintenanceItemMutation,
+  useDeleteMaintenanceItemMutation,
+  useMaintenanceQueries,
+  useMaintenanceItemQueries,
+} from '@/features/maintenance/hooks/useMaintenanceQueries';
 
-export function SettingsMaintenanceItemPage() {
-  const [items, setItems] = useState<MaintenanceItem[]>([]);
-  const [name, setName] = useState('');
-  const [maintenanceKm, setMaintenanceKm] = useState('');
-  const [maintenanceMonth, setMaintenanceMonth] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const fetchItems = async () => {
-    const collection = database.get<MaintenanceItem>('maintenance_items');
-    const all = await collection.query().fetch();
-    setItems(all);
-  };
+const MaintenanceItemForm = ({
+  initialData,
+  onSave,
+}: {
+  initialData: MaintenanceItem | null;
+  onSave: (formData: CreateMaintenanceItemData) => Promise<void>;
+}) => {
+  const [name, setName] = useState(initialData?.name ?? '');
+  const [maintenanceKm, setMaintenanceKm] = useState(
+    initialData?.maintenanceKm?.toString() ?? '',
+  );
+  const [maintenanceMonth, setMaintenanceMonth] = useState(
+    initialData?.maintenanceMonth?.toString() ?? '',
+  );
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (initialData) {
+      setName(initialData.name);
+      setMaintenanceKm(initialData.maintenanceKm?.toString() ?? '');
+      setMaintenanceMonth(initialData.maintenanceMonth?.toString() ?? '');
+    }
+  }, [initialData]);
 
   const handleSave = async () => {
     if (!name) return Alert.alert('정비 항목명을 입력하세요');
-    if (editingId) {
-      const collection = database.get<MaintenanceItem>('maintenance_items');
-      const item = await collection.find(editingId);
-      await database.write(async () => {
-        await item.update((i) => {
-          i.name = name;
-          i.maintenanceKm = maintenanceKm ? Number(maintenanceKm) : undefined;
-          i.maintenanceMonth = maintenanceMonth
-            ? Number(maintenanceMonth)
-            : undefined;
-        });
-      });
-      setEditingId(null);
-    } else {
-      await database.write(async () => {
-        await database.get<MaintenanceItem>('maintenance_items').create((i) => {
-          i.name = name;
-          if (maintenanceKm) i.maintenanceKm = Number(maintenanceKm);
-          if (maintenanceMonth) i.maintenanceMonth = Number(maintenanceMonth);
-        });
-      });
-    }
+
     setName('');
     setMaintenanceKm('');
     setMaintenanceMonth('');
-    fetchItems();
+    onSave({
+      name,
+      maintenanceKm: maintenanceKm ? Number(maintenanceKm) : undefined,
+      maintenanceMonth: maintenanceMonth ? Number(maintenanceMonth) : undefined,
+    });
   };
 
+  return (
+    <FormControl className="flex flex-col gap-2">
+      <FormControlLabel>
+        <Text>정비 항목명</Text>
+      </FormControlLabel>
+      <Input>
+        <InputField
+          value={name}
+          onChangeText={setName}
+          placeholder="정비 항목명"
+        />
+      </Input>
+      <FormControlLabel>
+        <Text>정비 주기(km)</Text>
+      </FormControlLabel>
+      <Input>
+        <InputField
+          value={maintenanceKm}
+          onChangeText={setMaintenanceKm}
+          placeholder="정비 주기(km)"
+          keyboardType="numeric"
+        />
+      </Input>
+      <FormControlLabel>
+        <Text>정비 주기(개월)</Text>
+      </FormControlLabel>
+      <Input>
+        <InputField
+          value={maintenanceMonth}
+          onChangeText={setMaintenanceMonth}
+          placeholder="정비 주기(개월)"
+          keyboardType="numeric"
+        />
+      </Input>
+      <Button onPress={handleSave}>
+        <ButtonText>저장</ButtonText>
+      </Button>
+    </FormControl>
+  );
+};
+
+export function SettingsMaintenanceItemPage() {
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const { data: items, isLoading } = useMaintenanceQueries();
+  const { data: item } = useMaintenanceItemQueries(editingId ?? '');
+
+  useEffect(() => {
+    console.log(items);
+  }, [items]);
+
+  const { mutateAsync: createMaintenanceItem } =
+    useCreateMaintenanceItemMutation();
+  const { mutateAsync: updateMaintenanceItem } =
+    useUpdateMaintenanceItemMutation();
+  const { mutateAsync: deleteMaintenanceItem } =
+    useDeleteMaintenanceItemMutation();
+
   const handleDelete = async (id: string) => {
-    const collection = database.get<MaintenanceItem>('maintenance_items');
-    const item = await collection.find(id);
-    await database.write(async () => {
-      await item.markAsDeleted();
-      await item.destroyPermanently();
-    });
-    fetchItems();
+    await deleteMaintenanceItem(id);
   };
 
   const handleEdit = (item: MaintenanceItem) => {
     setEditingId(item.id);
-    setName(item.name);
-    setMaintenanceKm(item.maintenanceKm ? String(item.maintenanceKm) : '');
-    setMaintenanceMonth(
-      item.maintenanceMonth ? String(item.maintenanceMonth) : '',
-    );
+  };
+
+  const handleSave = async (formData: CreateMaintenanceItemData) => {
+    if (editingId) {
+      await updateMaintenanceItem({ id: editingId, data: formData });
+    } else {
+      await createMaintenanceItem(formData);
+    }
+    setEditingId(null);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>정비 항목 CRUD 테스트</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="정비 항목명"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="정비 주기(km)"
-          value={maintenanceKm}
-          onChangeText={setMaintenanceKm}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="정비 주기(개월)"
-          value={maintenanceMonth}
-          onChangeText={setMaintenanceMonth}
-          keyboardType="numeric"
-        />
-        <Button title={editingId ? '수정' : '추가'} onPress={handleSave} />
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text>
-                {item.name}{' '}
-                {item.maintenanceKm ? `(${item.maintenanceKm}km)` : ''}{' '}
-                {item.maintenanceMonth ? `/${item.maintenanceMonth}개월` : ''}
-              </Text>
-              <View style={styles.row}>
-                <Button title="수정" onPress={() => handleEdit(item)} />
-                <Button
-                  title="삭제"
-                  color="red"
-                  onPress={() => handleDelete(item.id)}
-                />
-              </View>
-            </View>
-          )}
-        />
-      </View>
+    <SafeAreaView className="bg-white flex-1">
+      <Box className="p-4">
+        <MaintenanceItemForm initialData={item} onSave={handleSave} />
+      </Box>
+      <FlatList
+        style={{ flex: 1 }}
+        contentContainerClassName="p-4 flex flex-col gap-4 bg-white"
+        data={items ?? []}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Button
+            className="h-12 w-full flex flex-row justify-between items-center border-b border-gray-200 rounded-none px-4 bg-white"
+            style={{ borderBottomWidth: 1 }}
+            onPress={() => handleEdit(item)}
+          >
+            <ButtonText className="text-gray-800">
+              {item.name}
+              {item.maintenanceKm ? ` (${item.maintenanceKm}km)` : ''}
+              {item.maintenanceMonth ? ` / ${item.maintenanceMonth}개월` : ''}
+            </ButtonText>
+          </Button>
+        )}
+      />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 20 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 8,
-    marginBottom: 8,
-  },
-  row: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-  item: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-    marginBottom: 8,
-  },
-});

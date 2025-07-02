@@ -36,3 +36,12 @@ export {
   type CreateStationData,
   type UpdateStationData,
 } from './StationRepository';
+
+// MaintenanceItem Repository
+export {
+  MaintenanceItemRepository,
+  maintenanceItemRepository,
+  type IMaintenanceItemRepository,
+  type CreateMaintenanceItemData,
+  type UpdateMaintenanceItemData,
+} from './MaintenanceItemRepository';

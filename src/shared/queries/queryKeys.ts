@@ -81,6 +81,15 @@ export const queryKeys = {
     recent: (limit?: number) =>
       [...queryKeys.stations.lists(), 'recent', limit] as const,
   },
+
+  // MaintenanceItem 관련 쿼리
+  maintenanceItems: {
+    all: () => ['maintenanceItems'] as const,
+    lists: () => [...queryKeys.maintenanceItems.all(), 'list'] as const,
+    details: () => [...queryKeys.maintenanceItems.all(), 'detail'] as const,
+    detail: (id: string) =>
+      [...queryKeys.maintenanceItems.details(), id] as const,
+  },
 } as const;
 
 /**
@@ -101,4 +110,7 @@ export const invalidationHelpers = {
 
   // 주유소 관련 모든 캐시 무효화
   invalidateStations: () => queryKeys.stations.all(),
+
+  // 정비 항목 관련 모든 캐시 무효화
+  invalidateMaintenanceItems: () => queryKeys.maintenanceItems.all(),
 };

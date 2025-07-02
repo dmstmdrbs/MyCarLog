@@ -1,6 +1,9 @@
 import PaymentMethod from '@shared/models/PaymentMethod';
 import { database } from '@/database';
-import MaintenanceItem from '@shared/models/MaintenanceItem';
+import {
+  maintenanceItemRepository,
+  paymentMethodRepository,
+} from '@/shared/repositories';
 
 export const defaultMaintenanceItems = [
   {
@@ -31,25 +34,17 @@ export const defaultPaymentMethods = [
 ] as const;
 
 export async function seedDefaultMaintenanceItems() {
-  const collection = database.get<MaintenanceItem>('maintenance_items');
-  const existing = await collection.query().fetch();
+  const existing = await maintenanceItemRepository.findAll();
 
   if (existing.length === 0) {
     await database.write(async () => {
       for (const item of defaultMaintenanceItems) {
-        await collection.create((record) => {
-          record.name = item.name;
-
-          if ('maintenance_km' in item) {
-            record.maintenanceKm = item.maintenance_km;
-          } else {
-            record.maintenanceKm = undefined;
-          }
-          if ('maintenance_month' in item) {
-            record.maintenanceMonth = item.maintenance_month;
-          } else {
-            record.maintenanceMonth = undefined;
-          }
+        await maintenanceItemRepository.create({
+          name: item.name,
+          maintenanceKm:
+            'maintenance_km' in item ? item.maintenance_km : undefined,
+          maintenanceMonth:
+            'maintenance_month' in item ? item.maintenance_month : undefined,
         });
       }
     });
@@ -57,15 +52,14 @@ export async function seedDefaultMaintenanceItems() {
 }
 
 export async function seedDefaultPaymentMethods() {
-  const collection = database.get<PaymentMethod>('payment_methods');
-  const existing = await collection.query().fetch();
+  const existing = await paymentMethodRepository.findAll();
 
   if (existing.length === 0) {
     await database.write(async () => {
       for (const item of defaultPaymentMethods) {
-        await collection.create((record) => {
-          record.name = item.name;
-          record.type = item.type as PaymentMethod['type'];
+        await paymentMethodRepository.create({
+          name: item.name,
+          type: item.type as PaymentMethod['type'],
         });
       }
     });
