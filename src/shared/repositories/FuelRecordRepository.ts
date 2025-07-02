@@ -26,6 +26,49 @@ export interface IFuelRecordRepository {
     recordCount: number;
     avgUnitPrice: number;
   }>;
+  getPaymentStatsByMonth(
+    vehicleId: string,
+    year: number,
+    month: number,
+  ): Promise<
+    Array<{ paymentType: string; totalCost: number; usageCount: number }>
+  >;
+  getMonthlyStatsWithComparisons(
+    vehicleId: string,
+    year: number,
+    month: number,
+  ): Promise<{
+    current: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+    prevMonth: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+    prevYear: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+  }>;
+  getYearlyStats(
+    vehicleId: string,
+    year: number,
+  ): Promise<
+    Array<{
+      month: number;
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    }>
+  >;
 }
 
 export interface CreateFuelRecordData {
@@ -293,6 +336,116 @@ export class FuelRecordRepository
       );
       throw error;
     }
+  }
+
+  /**
+   * 월별 결제 수단별 지출 통계
+   */
+  async getPaymentStatsByMonth(
+    vehicleId: string,
+    year: number,
+    month: number,
+  ): Promise<
+    Array<{ paymentType: string; totalCost: number; usageCount: number }>
+  > {
+    const records = await this.findByMonth(vehicleId, year, month);
+    const stats: Record<string, { totalCost: number; usageCount: number }> = {};
+    records.forEach((record) => {
+      if (!stats[record.paymentType]) {
+        stats[record.paymentType] = { totalCost: 0, usageCount: 0 };
+      }
+      stats[record.paymentType].totalCost += record.totalCost;
+      stats[record.paymentType].usageCount += 1;
+    });
+    return Object.entries(stats).map(
+      ([paymentType, { totalCost, usageCount }]) => ({
+        paymentType,
+        totalCost,
+        usageCount,
+      }),
+    );
+  }
+
+  /**
+   * 기준 월, 전월, 전년 동월 통계 반환 (비교용)
+   */
+  async getMonthlyStatsWithComparisons(
+    vehicleId: string,
+    year: number,
+    month: number,
+  ): Promise<{
+    current: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+    prevMonth: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+    prevYear: {
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    };
+  }> {
+    const current = await this.getMonthlyStats(vehicleId, year, month);
+    // 전월 계산
+    let prevMonthYear = year;
+    let prevMonth = month - 1;
+    if (prevMonth < 1) {
+      prevMonth = 12;
+      prevMonthYear -= 1;
+    }
+    const prevMonthStats = await this.getMonthlyStats(
+      vehicleId,
+      prevMonthYear,
+      prevMonth,
+    );
+    // 전년 동월
+    const prevYearStats = await this.getMonthlyStats(
+      vehicleId,
+      year - 1,
+      month,
+    );
+    return {
+      current,
+      prevMonth: prevMonthStats,
+      prevYear: prevYearStats,
+    };
+  }
+
+  /**
+   * 연간 통계 (월별 배열)
+   */
+  async getYearlyStats(
+    vehicleId: string,
+    year: number,
+  ): Promise<
+    Array<{
+      month: number;
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    }>
+  > {
+    const stats: Array<{
+      month: number;
+      totalCost: number;
+      totalAmount: number;
+      recordCount: number;
+      avgUnitPrice: number;
+    }> = [];
+    for (let m = 1; m <= 12; m++) {
+      const monthly = await this.getMonthlyStats(vehicleId, year, m);
+      stats.push({ month: m, ...monthly });
+    }
+    return stats;
   }
 }
 

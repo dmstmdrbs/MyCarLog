@@ -53,7 +53,9 @@ export const FuelManagementPage = () => {
           onDateChange={setCurrentDate}
         />
       )}
-      {selectedTab === 'statistics' && <FuelStatisticsView />}
+      {selectedTab === 'statistics' && (
+        <FuelStatisticsView vehicleId={vehicle.id} />
+      )}
     </PageLayout>
   );
 };
