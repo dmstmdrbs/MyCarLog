@@ -30,6 +30,13 @@ export const queryKeys = {
       [...queryKeys.fuelRecords.lists(), vehicleId] as const,
     byMonth: (vehicleId: string, year: number, month: number) =>
       [...queryKeys.fuelRecords.list(vehicleId), 'month', year, month] as const,
+    byDateRange: (vehicleId: string, startDate: number, endDate: number) =>
+      [
+        ...queryKeys.fuelRecords.list(vehicleId),
+        'dateRange',
+        startDate,
+        endDate,
+      ] as const,
     details: () => [...queryKeys.fuelRecords.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.fuelRecords.details(), id] as const,
 

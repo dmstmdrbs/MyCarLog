@@ -6,7 +6,7 @@ import { useSelectedVehicle } from '@features/vehicle';
 
 export type FuelStackParamList = {
   FuelMain: { vehicleId: string };
-  FuelRecord: { vehicleId: string };
+  FuelRecord: { vehicleId: string; targetDate: string };
 };
 
 const FuelStack = createNativeStackNavigator<FuelStackParamList>();

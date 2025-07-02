@@ -39,6 +39,20 @@ export const useFuelRecordsByMonth = (
   });
 };
 
+export const useFuelRecordsByDateRange = (
+  vehicleId: string,
+  startDate: number,
+  endDate: number,
+) => {
+  return useQuery({
+    queryKey: queryKeys.fuelRecords.byDateRange(vehicleId, startDate, endDate),
+    queryFn: () =>
+      fuelRecordRepository.findByDateRange(vehicleId, startDate, endDate),
+    enabled: !!vehicleId && !!startDate && !!endDate,
+    staleTime: 1000 * 60 * 10, // 10분간 fresh
+  });
+};
+
 /**
  * 특정 연료 기록을 조회하는 Query Hook
  */

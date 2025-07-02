@@ -1,10 +1,10 @@
-import { FuelManagement } from '@widgets/fuelManagement';
 import PageLayout from '@shared/components/layout/PageLayout';
 
 import { useVehicle } from '@features/vehicle/hooks/useVehicleQueries';
 import { useSelectedVehicle } from '@features/vehicle';
 import { Box } from '@/shared/components/ui/box';
 import { Spinner } from '@/shared/components/ui/spinner';
+import { FuelCalendarView } from '@/widgets/fuelManagement/FuelCalendarView';
 
 export const FuelManagementPage = () => {
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
@@ -26,7 +26,7 @@ export const FuelManagementPage = () => {
 
   return (
     <PageLayout>
-      <FuelManagement vehicleId={vehicle.id} />
+      <FuelCalendarView vehicleId={vehicle.id} />
     </PageLayout>
   );
 };

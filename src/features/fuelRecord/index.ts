@@ -16,4 +16,5 @@ export {
   useUpdateFuelRecord,
   useDeleteFuelRecord,
   useRecentStations,
+  useFuelRecordsByDateRange,
 } from './hooks/useFuelRecordQueries';

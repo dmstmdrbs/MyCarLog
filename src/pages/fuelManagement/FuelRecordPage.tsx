@@ -15,15 +15,16 @@ import {
   // useDeleteFuelRecord,
 } from '@features/fuelRecord/hooks/useFuelRecordQueries';
 import { Spinner } from '@/shared/components/ui/spinner';
+import { formatDate } from 'date-fns';
 
 type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 
 export function FuelRecordPage({ route }: Props) {
-  const { vehicleId } = route.params;
+  const { vehicleId, targetDate } = route.params;
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(vehicleId);
 
   const [energyRecord, setEnergyRecord] = useState<EnergyRecordFormData>({
-    date: new Date().toISOString().split('T')[0], // 오늘 날짜를 YYYY-MM-DD 형식으로
+    date: formatDate(targetDate, 'yyyy-MM-dd'),
     totalCost: 0,
     unitPrice: 0,
     amount: 0,
