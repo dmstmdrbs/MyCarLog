@@ -6,14 +6,14 @@ import {
 } from '@shared/repositories';
 import { queryKeys } from '@/shared/queries/queryKeys';
 
-export const useMaintenanceQueries = () => {
+export const useMaintenanceItemQueries = () => {
   return useQuery({
     queryKey: queryKeys.maintenanceItems.lists(),
     queryFn: () => maintenanceItemRepository.findAll(),
   });
 };
 
-export const useMaintenanceItemQueries = (id: string) => {
+export const useMaintenanceItemDetailQueries = (id: string) => {
   return useQuery({
     queryKey: queryKeys.maintenanceItems.detail(id),
     queryFn: () => maintenanceItemRepository.findById(id),

@@ -8,7 +8,7 @@ export default class MaintenanceRecord extends Model {
   @field('vehicle_id') vehicleId!: string;
   @field('date') date!: number;
   @field('odometer') odometer!: number;
-  @field('item_id') itemId!: string; // MaintenanceItem 모델 참조
+  @field('maintenance_item_id') maintenanceItemId!: string; // MaintenanceItem 모델 참조
   @field('cost') cost!: number;
   @field('shop_name') shopName!: string;
   @field('memo') memo!: string;
@@ -21,7 +21,7 @@ export const maintenanceRecordSchema: TableSchemaSpec = {
     { name: 'vehicle_id', type: 'string' },
     { name: 'date', type: 'number' },
     { name: 'odometer', type: 'number' },
-    { name: 'item_id', type: 'string' },
+    { name: 'maintenance_item_id', type: 'string' },
     { name: 'cost', type: 'number' },
     { name: 'shop_name', type: 'string', isOptional: true },
     { name: 'memo', type: 'string', isOptional: true },

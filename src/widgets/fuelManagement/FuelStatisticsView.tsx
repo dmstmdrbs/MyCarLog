@@ -4,7 +4,6 @@ import { ScrollView } from 'react-native';
 import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 
 import { Button, ButtonText } from '@shared/components/ui/button';
-import { formatNumber } from '@shared/utils/format';
 import { ChevronDownIcon, Icon } from '@shared/components/ui/icon';
 import { Menu, MenuItem, MenuItemLabel } from '@shared/components/ui/menu';
 import { Box } from '@shared/components/ui/box';
@@ -48,7 +47,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
       <Box className="flex-row justify-end">
         <Box className="flex-row mb-2 space-x-2 gap-1 h-12 w-full items-center justify-end">
           <Menu
-            trigger={(_props, _state) => (
+            trigger={(_props) => (
               <Button
                 {..._props}
                 className="px-3 py-2 border-b rounded h-12 w-18"
@@ -78,7 +77,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
           </Menu>
           <Menu
             placement="bottom right"
-            trigger={(_props, _state) => (
+            trigger={(_props) => (
               <Button
                 {..._props}
                 className="px-3 py-2 border-b rounded h-12 w-18"

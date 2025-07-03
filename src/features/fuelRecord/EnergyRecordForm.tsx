@@ -1,16 +1,12 @@
 import { Box } from '@shared/components/ui/box';
 import { Text } from '@shared/components/ui/text';
-import {
-  FormControl,
-  FormControlLabel,
-  FormControlLabelText,
-} from '@shared/components/ui/form-control';
+import { FormControl } from '@shared/components/ui/form-control';
 import { Input, InputField } from '@shared/components/ui/input';
 import { Button, ButtonText } from '@shared/components/ui/button';
 import { Textarea, TextareaInput } from '@shared/components/ui/textarea';
 import { useMemo, useState } from 'react';
 import { Alert, FlatList } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+
 import { formatDate } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import {
@@ -22,7 +18,7 @@ import {
 } from '@shared/components/ui/modal';
 import { Divider } from '@shared/components/ui/divider';
 import { useStations, useCreateStation } from '@features/station';
-import PaymentMethod from '@shared/models/PaymentMethod';
+import type { PaymentMethodType } from '@shared/models/PaymentMethod';
 
 import { PaymentMethodForm } from './PaymentMethodForm';
 import { PaymentMethodList } from './PaymentMethodList';
@@ -30,6 +26,10 @@ import {
   usePaymentMethods,
   useCreatePaymentMethod,
 } from '@features/paymentMethods';
+import { formatDateForDisplay } from '@/shared/utils/format';
+import { Calendar } from '@/shared/components/Calendar';
+import { FormCard } from '@/shared/components/form/FormCard';
+import { FormLabel } from '@/shared/components/form/FormLabel';
 
 interface EnergyRecordFormData {
   date: string; // YYYY-MM-DD 형식
@@ -60,8 +60,8 @@ export function EnergyRecordForm({
   const [showStationPicker, setShowStationPicker] = useState(false);
   const [showPaymentTypePicker, setShowPaymentTypePicker] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState<{
-    name: PaymentMethod['name'];
-    type: Exclude<PaymentMethod['type'], 'cash'>;
+    name: PaymentMethodType['name'];
+    type: Exclude<PaymentMethodType['type'], 'cash'>;
   }>({
     name: '',
     type: 'credit',
@@ -134,13 +134,6 @@ export function EnergyRecordForm({
     onEnergyRecordChange({ ...energyRecord, amount: numericValue });
   };
 
-  const handlePaymentTypeChange = (value: string) => {
-    onEnergyRecordChange({
-      ...energyRecord,
-      paymentType: value as 'card' | 'cash' | 'giftcard',
-    });
-  };
-
   const handleMemoChange = (value: string) => {
     onEnergyRecordChange({ ...energyRecord, memo: value });
   };
@@ -159,27 +152,6 @@ export function EnergyRecordForm({
   const displayValue = (value: number) => (value === 0 ? '' : value.toString());
   const displayCurrency = (value: number) =>
     value === 0 ? '' : value.toLocaleString();
-
-  // 날짜 표시 함수
-  const formatDateForDisplay = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return '오늘';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return '어제';
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    }
-  };
 
   const handleAddPaymentMethod = async () => {
     if (newPaymentMethod?.type) {
@@ -216,218 +188,174 @@ export function EnergyRecordForm({
   return (
     <FormControl className="flex-1">
       {/* 에너지 정보 카드 - 동적 */}
-      <Box className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
-        <FormControlLabel className="mb-2">
-          <FormControlLabelText>
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              {config.icon} {config.energyType} 정보
-            </Text>
-          </FormControlLabelText>
-        </FormControlLabel>
-
-        <Box className="space-y-4">
-          <Box>
-            <FormControlLabel className="mb-2">
-              <FormControlLabelText>
-                <Text className="text-sm font-medium text-gray-700">
-                  📅 날짜
-                </Text>
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Button
-              onPress={() => setShowDatePicker(true)}
-              className="rounded-xl border-2 border-gray-200 bg-gray-50 active:border-blue-500 active:bg-white transition-all w-full justify-start"
-            >
-              <ButtonText className="font-medium text-gray-900">
-                {formatDateForDisplay(energyRecord.date) ||
-                  '날짜를 선택해주세요'}
-              </ButtonText>
-            </Button>
-
-            <Modal
-              isOpen={showDatePicker}
-              onClose={() => setShowDatePicker(false)}
-            >
-              <ModalBackdrop />
-              <ModalContent>
-                <Calendar
-                  monthFormat="yyyy년 MM월"
-                  initialDate={energyRecord.date}
-                  onDayPress={(day) => {
-                    handleDateChange(day.dateString);
-                  }}
-                  enableSwipeMonths={true}
-                  markedDates={{
-                    [energyRecord.date]: {
-                      selected: true,
-                      selectedColor: '#222222',
-                    },
-                  }}
-                />
-              </ModalContent>
-            </Modal>
-          </Box>
-
-          <Box>
-            <FormControlLabel className="mb-2">
-              <FormControlLabelText>
-                <Text className="text-sm font-medium text-gray-700">
-                  총 비용
-                </Text>
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-blue-500 focus:bg-white transition-all">
-              <InputField
-                placeholder="예: 50,000"
-                value={displayCurrency(energyRecord.totalCost)}
-                className="text-lg font-medium"
-                keyboardType="numeric"
-                onChangeText={handleTotalCostChange}
-                onBlur={calculateAmount}
-              />
-            </Input>
-          </Box>
-
-          <Box>
-            <FormControlLabel className="mb-2">
-              <FormControlLabelText>
-                <Text className="text-sm font-medium text-gray-700">
-                  단가 ({config.unitPrice})
-                </Text>
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-              <InputField
-                placeholder={config.unitPricePlaceholder}
-                value={displayCurrency(energyRecord.unitPrice)}
-                className="text-lg font-medium"
-                keyboardType="numeric"
-                onChangeText={handleUnitPriceChange}
-                onBlur={() => {
-                  // 단가 변경 시 총 비용이 있으면 주유/충전량 계산, 주유/충전량이 있으면 총 비용 계산
-                  if (energyRecord.totalCost > 0) {
-                    calculateAmount();
-                  } else if (energyRecord.amount > 0) {
-                    calculateTotalCost();
-                  }
-                }}
-              />
-            </Input>
-          </Box>
-
-          <Box>
-            <FormControlLabel className="mb-2">
-              <FormControlLabelText>
-                <Text className="text-sm font-medium text-gray-700">
-                  {config.energyType}량 ({config.unit})
-                </Text>
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-              <InputField
-                placeholder={config.amountPlaceholder}
-                value={displayValue(energyRecord.amount)}
-                className="text-lg font-medium"
-                keyboardType="numeric"
-                onChangeText={handleAmountChange}
-                onBlur={calculateTotalCost}
-              />
-            </Input>
-          </Box>
-
-          <Box>
-            <FormControlLabel className="mb-2">
-              <FormControlLabelText>
-                <Text className="text-sm font-medium text-gray-700">
-                  {config.station}
-                </Text>
-              </FormControlLabelText>
-            </FormControlLabel>
-            <Button
-              onPress={() => setShowStationPicker(true)}
-              className="w-full rounded-xl border-2 border-gray-200 bg-gray-50 justify-start px-3"
-            >
-              <ButtonText className="text-lg font-medium text-gray-700">
-                {selectedStation?.name || config.stationPlaceholder}
-              </ButtonText>
-            </Button>
-            <Modal
-              isOpen={showStationPicker}
-              onClose={() => setShowStationPicker(false)}
-            >
-              <ModalBackdrop />
-              <ModalContent>
-                <ModalHeader>
-                  <Text className="text-lg font-semibold text-gray-900">
-                    {config.station} 선택
-                  </Text>
-                </ModalHeader>
-
-                <Box className="h-80 py-2 bg-white">
-                  <FlatList
-                    data={stations}
-                    keyExtractor={(item) => item.id}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={({ item, index }) => (
-                      <Box className="flex flex-col gap-0.5">
-                        <Button
-                          className="bg-white justify-start rounded-xl w-full focus:border-primary-500 focus:bg-white transition-all"
-                          onPress={() => {
-                            onEnergyRecordChange({
-                              ...energyRecord,
-                              stationId: item.id,
-                              stationName: item.name,
-                            });
-                            setShowStationPicker(false);
-                          }}
-                        >
-                          <ButtonText className="text-lg font-medium text-gray-700">
-                            {item.name}
-                          </ButtonText>
-                        </Button>
-                        {index !== stations.length - 1 && (
-                          <Divider className="my-2" orientation="horizontal" />
-                        )}
-                      </Box>
-                    )}
-                  />
-                </Box>
-                <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                  <InputField
-                    placeholder={`새로운 ${config.station} 이름`}
-                    value={newStationName}
-                    onChangeText={(text) => {
-                      setNewStationName(text);
-                    }}
-                  />
-                </Input>
-                <Button onPress={handleAddStation}>
-                  <ButtonText>새로운 {config.station} 추가</ButtonText>
-                </Button>
-              </ModalContent>
-            </Modal>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* 결제 정보 카드 */}
-      <Box className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
-        <FormControlLabel className="mb-2">
-          <FormControlLabelText>
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              💳 결제 정보
-            </Text>
-          </FormControlLabelText>
-        </FormControlLabel>
+      <FormCard>
+        <FormLabel
+          name={`${config.icon} ${config.energyType} 정보`}
+          size="lg"
+        />
 
         <Box>
-          <FormControlLabel className="mb-2">
-            <FormControlLabelText>
-              <Text className="text-sm font-medium text-gray-700">
-                결제 방법
-              </Text>
-            </FormControlLabelText>
-          </FormControlLabel>
+          <FormLabel name="날짜" size="sm" />
+          <Button
+            onPress={() => setShowDatePicker(true)}
+            className="rounded-xl border-2 border-gray-200 bg-gray-50 active:border-primary-500 active:bg-white transition-all w-full justify-start"
+          >
+            <ButtonText className="font-medium text-gray-900">
+              {formatDateForDisplay(new Date(energyRecord.date)) ||
+                '날짜를 선택해주세요'}
+            </ButtonText>
+          </Button>
+
+          <Modal
+            isOpen={showDatePicker}
+            onClose={() => setShowDatePicker(false)}
+          >
+            <ModalBackdrop />
+            <ModalContent>
+              <Calendar
+                currentDate={new Date(energyRecord.date)}
+                onDayPress={(day) => {
+                  handleDateChange(day.dateString);
+                }}
+                enableSwipeMonths={true}
+                markedDates={{
+                  [energyRecord.date]: {
+                    selected: true,
+                    selectedColor: '#0A4D68',
+                    color: '#0A4D68',
+                  },
+                }}
+              />
+            </ModalContent>
+          </Modal>
+        </Box>
+
+        <Box>
+          <FormLabel name="총 비용" size="sm" />
+          <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
+            <InputField
+              placeholder="예: 50,000"
+              value={displayCurrency(energyRecord.totalCost)}
+              className="text-lg font-medium"
+              keyboardType="numeric"
+              onChangeText={handleTotalCostChange}
+              onBlur={calculateAmount}
+            />
+          </Input>
+        </Box>
+
+        <Box>
+          <FormLabel name={`단가 (${config.unitPrice})`} size="sm" />
+          <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
+            <InputField
+              placeholder={config.unitPricePlaceholder}
+              value={displayCurrency(energyRecord.unitPrice)}
+              className="text-lg font-medium"
+              keyboardType="numeric"
+              onChangeText={handleUnitPriceChange}
+              onBlur={() => {
+                // 단가 변경 시 총 비용이 있으면 주유/충전량 계산, 주유/충전량이 있으면 총 비용 계산
+                if (energyRecord.totalCost > 0) {
+                  calculateAmount();
+                } else if (energyRecord.amount > 0) {
+                  calculateTotalCost();
+                }
+              }}
+            />
+          </Input>
+        </Box>
+
+        <Box>
+          <FormLabel
+            name={`${config.energyType}량 (${config.unit})`}
+            size="sm"
+          />
+          <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
+            <InputField
+              placeholder={config.amountPlaceholder}
+              value={displayValue(energyRecord.amount)}
+              className="text-lg font-medium"
+              keyboardType="numeric"
+              onChangeText={handleAmountChange}
+              onBlur={calculateTotalCost}
+            />
+          </Input>
+        </Box>
+
+        <Box>
+          <FormLabel name={config.station} size="sm" />
+          <Button
+            onPress={() => setShowStationPicker(true)}
+            className="w-full rounded-xl border-2 border-gray-200 bg-gray-50 justify-start px-3"
+          >
+            <ButtonText className="text-lg font-medium text-gray-700">
+              {selectedStation?.name || config.stationPlaceholder}
+            </ButtonText>
+          </Button>
+          <Modal
+            isOpen={showStationPicker}
+            onClose={() => setShowStationPicker(false)}
+          >
+            <ModalBackdrop />
+            <ModalContent>
+              <ModalHeader>
+                <Text className="text-lg font-semibold text-gray-900">
+                  {config.station} 선택
+                </Text>
+              </ModalHeader>
+
+              <Box className="h-80 py-2 bg-white">
+                <FlatList
+                  data={stations}
+                  keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item, index }) => (
+                    <Box className="flex flex-col gap-0.5">
+                      <Button
+                        className="bg-white justify-start rounded-xl w-full focus:border-primary-500 focus:bg-white transition-all"
+                        onPress={() => {
+                          onEnergyRecordChange({
+                            ...energyRecord,
+                            stationId: item.id,
+                            stationName: item.name,
+                          });
+                          setShowStationPicker(false);
+                        }}
+                      >
+                        <ButtonText className="text-lg font-medium text-gray-700">
+                          {item.name}
+                        </ButtonText>
+                      </Button>
+                      {index !== stations.length - 1 && (
+                        <Divider className="my-2" orientation="horizontal" />
+                      )}
+                    </Box>
+                  )}
+                />
+              </Box>
+              <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
+                <InputField
+                  placeholder={`새로운 ${config.station} 이름`}
+                  value={newStationName}
+                  onChangeText={(text) => {
+                    setNewStationName(text);
+                  }}
+                />
+              </Input>
+              <Button onPress={handleAddStation}>
+                <ButtonText>새로운 {config.station} 추가</ButtonText>
+              </Button>
+            </ModalContent>
+          </Modal>
+        </Box>
+      </FormCard>
+
+      {/* 결제 정보 카드 */}
+      <FormCard>
+        <FormLabel name="결제 정보" />
+
+        <Box>
+          <FormLabel name="결제 방법" size="sm" />
           <Button
             variant="outline"
             onPress={() => setShowPaymentTypePicker(true)}
@@ -489,17 +417,11 @@ export function EnergyRecordForm({
             </ModalContent>
           </Modal>
         </Box>
-      </Box>
+      </FormCard>
 
       {/* 메모 카드 - 공통 */}
-      <Box className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 h-fit">
-        <FormControlLabel className="mb-2">
-          <FormControlLabelText>
-            <Text className="text-lg font-semibold text-gray-900 mb-4">
-              📝 메모
-            </Text>
-          </FormControlLabelText>
-        </FormControlLabel>
+      <FormCard>
+        <FormLabel name="메모" />
 
         <Textarea className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all ">
           <TextareaInput
@@ -512,7 +434,7 @@ export function EnergyRecordForm({
             textAlignVertical="top"
           />
         </Textarea>
-      </Box>
+      </FormCard>
     </FormControl>
   );
 }

@@ -14,9 +14,9 @@ import {
   useCreateMaintenanceItemMutation,
   useUpdateMaintenanceItemMutation,
   useDeleteMaintenanceItemMutation,
-  useMaintenanceQueries,
   useMaintenanceItemQueries,
-} from '@/features/maintenance/hooks/useMaintenanceQueries';
+  useMaintenanceItemDetailQueries,
+} from '@/features/maintenance/hooks/useMaintenanceItemQueries';
 import { Icon } from '@/shared/components/ui/icon';
 import { ListIcon } from 'lucide-react-native';
 
@@ -117,8 +117,8 @@ const MaintenanceItemList = ({
 export function SettingsMaintenanceItemPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { data: items } = useMaintenanceQueries();
-  const { data: item } = useMaintenanceItemQueries(editingId ?? '');
+  const { data: items } = useMaintenanceItemQueries();
+  const { data: item } = useMaintenanceItemDetailQueries(editingId ?? '');
 
   useEffect(() => {
     console.log(items);

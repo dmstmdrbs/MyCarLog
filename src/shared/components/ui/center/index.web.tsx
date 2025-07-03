@@ -8,7 +8,7 @@ type ICenterProps = React.ComponentPropsWithoutRef<'div'> &
 
 const Center = React.forwardRef<HTMLDivElement, ICenterProps>(function Center(
   { className, ...props },
-  ref
+  ref,
 ) {
   return (
     <div className={centerStyle({ class: className })} {...props} ref={ref} />

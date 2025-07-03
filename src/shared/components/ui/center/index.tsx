@@ -14,7 +14,7 @@ const Center = React.forwardRef<React.ComponentRef<typeof View>, ICenterProps>(
         ref={ref}
       />
     );
-  }
+  },
 );
 
 Center.displayName = 'Center';

@@ -45,6 +45,7 @@ const AppNavigator = () => {
           name="정비"
           component={MaintenanceStackScreen}
           options={{
+            popToTopOnBlur: true,
             headerShown: false,
             tabBarIcon: () => <Icon as={WrenchIcon} />,
           }}
@@ -63,6 +64,7 @@ const AppNavigator = () => {
           component={DriveStackScreen}
           options={{
             headerShown: false,
+            popToTopOnBlur: true,
             tabBarIcon: () => <Icon as={CarIcon} />,
           }}
         />

@@ -21,7 +21,7 @@ const Spinner = React.forwardRef<
     'aria-label': ariaLabel = 'loading',
     ...props
   },
-  ref
+  ref,
 ) {
   return (
     <ActivityIndicator

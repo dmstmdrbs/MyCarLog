@@ -13,11 +13,12 @@ import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 
 import { MonthlyStatsCard } from './ui/MonthlyStatsCard';
 import { FuelRecordList } from './ui/FuelRecordList';
-import { FuelCalendar } from './ui/FuelCalendar';
+import { Calendar } from '@shared/components/Calendar';
 import { paymentMethodMap } from './constants/paymentMethodMap';
 import { getFuelUnit, getFuelUnitPrice } from './utils/unitUtils';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { MarkingProps } from 'react-native-calendars/src/calendar/day/marking';
+import { calendarTheme } from '../../shared/constants/calendar';
 
 type Props = {
   vehicleId: string;
@@ -58,11 +59,10 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
   }, [fuelRecords]);
 
   const markedDates: MarkedDates = useMemo(() => {
-    const selectedColor = '#E8F1F3';
-    const dotColor = '#0A4D68';
+    const selectedColor = calendarTheme.selectedColor;
+    const dotColor = calendarTheme.accentColor1;
     return {
       [format(currentDate, 'yyyy-MM-dd')]: {
-        color: '#0A4D68',
         selected: true,
         selectedColor,
       },
@@ -75,14 +75,14 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
         acc[record] = {
           dots: [dot],
           selected: currentDate.getTime() === new Date(record).getTime(),
-          selectedColor: '#C8E0E6',
+          selectedColor,
         };
         return acc;
       }, {} as MarkedDates) ?? ({} as MarkedDates)),
     };
   }, [currentDate, records]);
 
-  const handleDayPress = (day: any) => {
+  const handleDayPress = (day: DateData) => {
     setCurrentDate(new Date(day.dateString));
     onDateChange?.(new Date(day.dateString));
   };
@@ -132,7 +132,7 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
       />
 
       {/* 캘린더 */}
-      <FuelCalendar
+      <Calendar
         currentDate={currentDate}
         onDayPress={handleDayPress}
         onMonthChange={handleMonthChange}

@@ -257,11 +257,11 @@ const buttonGroupStyle = tva({
   base: '',
   variants: {
     space: {
-      'xs': 'gap-1',
-      'sm': 'gap-2',
-      'md': 'gap-3',
-      'lg': 'gap-4',
-      'xl': 'gap-5',
+      xs: 'gap-1',
+      sm: 'gap-2',
+      md: 'gap-3',
+      lg: 'gap-4',
+      xl: 'gap-5',
       '2xl': 'gap-6',
       '3xl': 'gap-7',
       '4xl': 'gap-8',
@@ -270,8 +270,8 @@ const buttonGroupStyle = tva({
       true: 'gap-0',
     },
     flexDirection: {
-      'row': 'flex-row',
-      'column': 'flex-col',
+      row: 'flex-row',
+      column: 'flex-col',
       'row-reverse': 'flex-row-reverse',
       'column-reverse': 'flex-col-reverse',
     },
@@ -289,7 +289,7 @@ const Button = React.forwardRef<
   IButtonProps
 >(function Button(
   { className, variant = 'solid', size = 'md', action = 'primary', ...props },
-  ref
+  ref,
 ) {
   return (
     <UIButton
@@ -405,7 +405,7 @@ const ButtonGroup = React.forwardRef<
     flexDirection = 'column',
     ...props
   },
-  ref
+  ref,
 ) {
   return (
     <UIButton.Group

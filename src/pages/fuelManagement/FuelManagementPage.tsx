@@ -10,7 +10,7 @@ import { Icon } from '@/shared/components/ui/icon';
 import { CalendarDaysIcon, ChartBarIcon } from 'lucide-react-native';
 import { Fragment, useCallback, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
-import { FloatingAddButton } from '@/widgets/fuelManagement/ui/FloatingAddButton';
+import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
 import { format } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

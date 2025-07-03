@@ -3,25 +3,31 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import json from '@eslint/json';
 import css from '@eslint/css';
-import { defineConfig } from 'eslint/config';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import prettier from 'eslint-plugin-prettier';
 
 export default defineConfig([
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['src/**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js },
     extends: ['js/recommended'],
   },
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['src/**/*.{js,mjs,cjs,ts,mts,cts}'],
     languageOptions: { globals: globals.browser },
   },
   tseslint.configs.recommended,
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['src/**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { prettier },
     rules: { 'prettier/prettier': 'error' },
-    extends: ['plugin:prettier/recommended'],
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { prettier },
+    rules: {
+      'prettier/prettier': 'error',
+    },
   },
   {
     files: ['**/*.json'],
@@ -41,4 +47,15 @@ export default defineConfig([
     language: 'css/css',
     extends: ['css/recommended'],
   },
+  globalIgnores([
+    'node_modules',
+    'dist',
+    'build',
+    'public',
+    'ios',
+    'android',
+    'package-lock.json',
+    'metro.config.js',
+    'tailwind.config.js',
+  ]),
 ]);

@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "DARK_MODE=media EXPO_OS=android expo run:android",
     "ios": "DARK_MODE=media EXPO_OS=ios expo run:ios",
-    "web": "DARK_MODE=media expo start --web"
+    "web": "DARK_MODE=media expo start --web",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@expo/html-elements": "^0.4.2",

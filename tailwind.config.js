@@ -1,4 +1,5 @@
 import gluestackPlugin from '@gluestack-ui/nativewind-utils/tailwind-plugin';
+import nativeWindPreset from 'nativewind/preset';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
     'index.{tsx,jsx,ts,js}',
     'src/**/*.{tsx,jsx,ts,js}',
   ],
-  presets: [require('nativewind/preset')],
+  presets: [nativeWindPreset],
   safelist: [
     {
       pattern:

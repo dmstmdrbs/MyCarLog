@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, SafeAreaView } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { database } from '../../database';
 import Vehicle from '@shared/models/Vehicle';
 import { Box } from '@shared/components/ui/box';
@@ -20,8 +20,8 @@ import {
 
 export function VehicleProfileFormPage() {
   const navigation = useNavigation();
-  const route = useRoute();
-  // @ts-ignore
+  const route =
+    useRoute<RouteProp<{ params: { vehicleId: string } }, 'params'>>();
   const { vehicleId } = route.params || {};
 
   const [nickname, setNickname] = useState('');

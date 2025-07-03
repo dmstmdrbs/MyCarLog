@@ -41,7 +41,7 @@ export const ComparisonStatsCard = ({
 
   return (
     <Box className="flex-row justify-between mb-4">
-      {stats.map((stat, idx) => (
+      {stats.map((stat) => (
         <Box
           key={stat.label}
           className="flex-1 mx-1 bg-gray-50 rounded-lg p-3 items-center"

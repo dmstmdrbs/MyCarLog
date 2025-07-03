@@ -2,7 +2,6 @@ import PageLayout from '@shared/components/layout/PageLayout';
 import { Text } from '@shared/components/ui/text';
 import { useVehicle } from '@features/vehicle';
 import { useState } from 'react';
-import { Button, ButtonText } from '@shared/components/ui/button';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { FuelStackParamList } from './navigator';
 import { Box } from '@shared/components/ui/box';
@@ -17,6 +16,7 @@ import {
 import { Spinner } from '@/shared/components/ui/spinner';
 import { formatDate } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
+import { FloatingSubmitButton } from '@/shared/components/FloatingSubmitButton';
 
 type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 
@@ -98,24 +98,11 @@ export function FuelRecordPage({ route }: Props) {
         </ScrollView>
 
         {/* 하단 고정 저장 버튼 영역 - 동적 */}
-        <Box className="absolute bottom-0 left-0 right-0 border-gray-100 shadow-xs">
-          <Box className="px-4 pt-4 pb-5">
-            <Button
-              onPress={() => handleAddFuelRecord(energyRecord)}
-              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl active:shadow-lg active:scale-95 transform transition-all duration-150"
-            >
-              <Box className="flex-row items-center justify-center space-x-2">
-                <Text className="text-2xl">{buttonIcon}</Text>
-                <ButtonText className="text-white font-bold text-lg ml-2">
-                  {buttonText}
-                </ButtonText>
-              </Box>
-            </Button>
-
-            {/* 안전 영역을 위한 추가 여백 */}
-            <Box className="h-2" />
-          </Box>
-        </Box>
+        <FloatingSubmitButton
+          onSubmit={() => handleAddFuelRecord(energyRecord)}
+          buttonIcon={buttonIcon}
+          buttonText={buttonText}
+        />
       </Box>
     </PageLayout>
   );

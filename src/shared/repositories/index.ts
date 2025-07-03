@@ -45,3 +45,9 @@ export {
   type CreateMaintenanceItemData,
   type UpdateMaintenanceItemData,
 } from './MaintenanceItemRepository';
+
+// MaintenanceRecord Repository
+export {
+  maintenanceRecordRepository,
+  type IMaintenanceRecordRepository,
+} from './MaintenanceRecordRepository';

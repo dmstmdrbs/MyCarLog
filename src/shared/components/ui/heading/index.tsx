@@ -31,7 +31,7 @@ const MappedHeading = memo(
         highlight,
         ...props
       },
-      ref
+      ref,
     ) {
       switch (size) {
         case '5xl':
@@ -171,14 +171,14 @@ const MappedHeading = memo(
             />
           );
       }
-    }
-  )
+    },
+  ),
 );
 
 const Heading = memo(
   forwardRef<React.ComponentRef<typeof H1>, IHeadingProps>(function Heading(
     { className, size = 'lg', as: AsComp, ...props },
-    ref
+    ref,
   ) {
     const {
       isTruncated,
@@ -212,7 +212,7 @@ const Heading = memo(
     return (
       <MappedHeading className={className} size={size} ref={ref} {...props} />
     );
-  })
+  }),
 );
 
 Heading.displayName = 'Heading';
