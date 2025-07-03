@@ -8,20 +8,40 @@ import { FuelCalendarView } from '@/widgets/fuelManagement/FuelCalendarView';
 import { FuelStatisticsView, Tab, TabItem } from '@/widgets/fuelManagement';
 import { Icon } from '@/shared/components/ui/icon';
 import { CalendarDaysIcon, ChartBarIcon } from 'lucide-react-native';
-import { useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
+import { FloatingAddButton } from '@/widgets/fuelManagement/ui/FloatingAddButton';
+import { format } from 'date-fns';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FuelStackParamList } from './navigator';
 
 export const FuelManagementPage = () => {
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<FuelStackParamList, 'FuelRecord'>
+    >();
+
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',
   );
-  const [currentDate, setCurrentDate] = useState(new Date());
 
   const { selectedVehicle } = useSelectedVehicle();
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(
     selectedVehicle?.id || '',
   );
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const navigateToFuelRecord = useCallback(() => {
+    if (!vehicle) return;
+
+    navigation.navigate('FuelRecord', {
+      vehicleId: vehicle.id,
+      targetDate: format(currentDate, 'yyyy-MM-dd'),
+    });
+  }, [navigation, vehicle, currentDate]);
 
   if (vehicleLoading || !vehicle) {
     return (
@@ -64,11 +84,14 @@ export const FuelManagementPage = () => {
         />
       </Tab>
       {selectedTab === 'calendar' && (
-        <FuelCalendarView
-          vehicleId={vehicle.id}
-          currentDate={currentDate}
-          onDateChange={setCurrentDate}
-        />
+        <Fragment>
+          <FuelCalendarView
+            vehicleId={vehicle.id}
+            onDateChange={setCurrentDate}
+          />
+
+          <FloatingAddButton onPress={navigateToFuelRecord} />
+        </Fragment>
       )}
       {selectedTab === 'statistics' && (
         <FuelStatisticsView vehicleId={vehicle.id} />
