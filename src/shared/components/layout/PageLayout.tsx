@@ -1,7 +1,7 @@
 import { Box } from '@shared/components/ui/box';
 
 const PageLayout = ({ children }: { children: React.ReactNode }) => {
-  return <Box className="flex-1">{children}</Box>;
+  return <Box className="flex-1 bg-background-light">{children}</Box>;
 };
 
 export default PageLayout;

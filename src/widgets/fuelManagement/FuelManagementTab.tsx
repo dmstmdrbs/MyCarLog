@@ -16,7 +16,7 @@ export const TabItem = ({
   return (
     <Button
       className={cn(
-        'flex-1 py-3 flex flex-row items-center gap-2 justify-center bg-white',
+        'flex-1 py-3 flex flex-row items-center gap-2 justify-center bg-white rounded-none',
         isActive ? 'bg-primary-500' : 'bg-white',
       )}
       onPress={onPress}

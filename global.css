@@ -3,16 +3,35 @@
 @tailwind utilities;
 
 :root {
-  --color-primary-0: 232, 245, 253;
-  --color-primary-50: 227, 242, 253;
-  --color-primary-100: 187, 222, 251;
-  --color-primary-200: 144, 202, 249;
-  --color-primary-300: 100, 181, 246;
-  --color-primary-400: 66, 165, 245;
-  --color-primary-500: 33, 150, 243;
-  --color-primary-600: 30, 136, 229;
-  --color-primary-700: 25, 118, 210; /* #1976D2 */
-  --color-primary-800: 21, 101, 192;
-  --color-primary-900: 13, 71, 161;
-  --color-primary-950: 8, 48, 107;
+  /* Primary (Deep Teal Blue) */
+  --color-primary-50: 232, 241, 243;
+  --color-primary-100: 200, 224, 230;
+  --color-primary-200: 154, 200, 213;
+  --color-primary-300: 104, 170, 194;
+  --color-primary-400: 45, 120, 156;
+  --color-primary-500: 10, 77, 104; /* #0A4D68 */
+  --color-primary-600: 9, 69, 94;
+  --color-primary-700: 8, 60, 82;
+  --color-primary-800: 7, 51, 70;
+  --color-primary-900: 5, 36, 49;
+
+  /* Accent (Muted Amber) */
+  --color-accent-500: 245, 166, 35; /* #F5A623 */
+
+  /* Background/Surface */
+  --color-background-light: 244, 246, 248; /* #F4F6F8 */
+  --color-background-dark: 30, 32, 34; /* #1E2022 */
+
+  /* Text */
+  --color-text-light: 33, 33, 33; /* #212121 */
+  --color-text-dark: 224, 224, 224; /* #E0E0E0 */
+}
+[data-theme='dark'] {
+  --color-background: var(--color-background-dark);
+  --color-text: var(--color-text-dark);
+}
+[data-theme='light'],
+:root {
+  --color-background: var(--color-background-light);
+  --color-text: var(--color-text-light);
 }

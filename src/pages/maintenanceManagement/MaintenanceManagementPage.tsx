@@ -5,8 +5,8 @@ import { Box } from '@shared/components/ui/box';
 export const MaintenanceManagementPage = () => {
   return (
     <PageLayout>
-      <Box>
-        <Text>정비 기록</Text>
+      <Box className="flex-1 justify-center items-center">
+        <Text className="text-2xl font-bold">준비중입니다</Text>
       </Box>
     </PageLayout>
   );

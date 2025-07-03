@@ -19,18 +19,29 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          0: 'rgb(var(--color-primary-0)/<alpha-value>)',
-          50: 'rgb(var(--color-primary-50)/<alpha-value>)',
-          100: 'rgb(var(--color-primary-100)/<alpha-value>)',
-          200: 'rgb(var(--color-primary-200)/<alpha-value>)',
-          300: 'rgb(var(--color-primary-300)/<alpha-value>)',
-          400: 'rgb(var(--color-primary-400)/<alpha-value>)',
-          500: 'rgb(var(--color-primary-500)/<alpha-value>)',
-          600: 'rgb(var(--color-primary-600)/<alpha-value>)',
-          700: 'rgb(var(--color-primary-700)/<alpha-value>)',
-          800: 'rgb(var(--color-primary-800)/<alpha-value>)',
-          900: 'rgb(var(--color-primary-900)/<alpha-value>)',
-          950: 'rgb(var(--color-primary-950)/<alpha-value>)',
+          50: '#E8F1F3',
+          100: '#C8E0E6',
+          200: '#9AC8D5',
+          300: '#68AAC2',
+          400: '#2D789C',
+          500: '#0A4D68', // 메인
+          600: '#09455E',
+          700: '#083C52',
+          800: '#073346',
+          900: '#052431',
+        },
+        accent: {
+          500: '#F5A623', // 포인트
+        },
+        background: {
+          light: '#F4F6F8',
+          dark: '#1E2022',
+          DEFAULT: '#F4F6F8',
+        },
+        text: {
+          light: '#212121',
+          dark: '#E0E0E0',
+          DEFAULT: '#212121',
         },
         secondary: {
           0: 'rgb(var(--color-secondary-0)/<alpha-value>)',
