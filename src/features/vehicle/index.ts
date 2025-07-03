@@ -7,7 +7,6 @@ export {
   useVehicle,
   useVehicles,
   useDefaultVehicle,
-  useVehicleStats,
   useCreateVehicle,
   useUpdateVehicle,
   useDeleteVehicle,

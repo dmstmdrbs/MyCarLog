@@ -13,13 +13,10 @@ const vehicleRepository = new VehicleRepository();
 /**
  * 모든 차량 목록을 조회하는 Query Hook
  */
-export const useVehicles = (filters?: { type?: 'ICE' | 'EV' }) => {
+export const useVehicles = () => {
   return useQuery({
-    queryKey: queryKeys.vehicles.list(filters),
+    queryKey: queryKeys.vehicles.vehicles(),
     queryFn: async () => {
-      if (filters?.type) {
-        return vehicleRepository.findByType(filters.type);
-      }
       return vehicleRepository.findAll();
     },
     staleTime: 0,
@@ -44,28 +41,9 @@ export const useDefaultVehicle = () => {
  */
 export const useVehicle = (vehicleId: string) => {
   return useQuery({
-    queryKey: queryKeys.vehicles.detail(vehicleId),
+    queryKey: queryKeys.vehicles.vehicle(vehicleId),
     queryFn: () => vehicleRepository.findById(vehicleId),
     enabled: !!vehicleId, // vehicleId가 있을 때만 실행
-    staleTime: 0,
-  });
-};
-
-/**
- * 차량 통계를 조회하는 Query Hook
- */
-export const useVehicleStats = () => {
-  return useQuery({
-    queryKey: queryKeys.vehicles.stats(),
-    queryFn: async () => {
-      const vehicles = await vehicleRepository.findAll();
-      return {
-        vehicles,
-        total: vehicles.length,
-        iceCount: vehicles.filter((v) => v.type === 'ICE').length,
-        evCount: vehicles.filter((v) => v.type === 'EV').length,
-      };
-    },
     staleTime: 0,
   });
 };
@@ -95,7 +73,7 @@ export const useCreateVehicle = () => {
 
       // 새 차량을 개별 캐시에 설정
       queryClient.setQueryData(
-        queryKeys.vehicles.detail(newVehicle.id),
+        queryKeys.vehicles.vehicle(newVehicle.id),
         newVehicle,
       );
     },
@@ -114,15 +92,20 @@ export const useUpdateVehicle = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateVehicleData }) =>
       vehicleRepository.updateVehicle(id, data),
-    onSuccess: (updatedVehicle) => {
+    onSuccess: async (updatedVehicle, { id }) => {
       // 차량 목록 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: invalidationHelpers.invalidateVehicles(),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateVehicle(id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateVehicles(),
+        }),
+      ]);
 
       // 수정된 차량의 개별 캐시 업데이트
       queryClient.setQueryData(
-        queryKeys.vehicles.detail(updatedVehicle.id),
+        queryKeys.vehicles.vehicle(updatedVehicle.id),
         updatedVehicle,
       );
 
@@ -152,7 +135,7 @@ export const useDeleteVehicle = () => {
     onSuccess: (_, deletedVehicleId) => {
       // 삭제된 차량의 개별 캐시 제거
       queryClient.removeQueries({
-        queryKey: queryKeys.vehicles.detail(deletedVehicleId),
+        queryKey: queryKeys.vehicles.vehicle(deletedVehicleId),
       });
 
       // 삭제된 차량과 관련된 연료 기록 캐시도 무효화
@@ -192,7 +175,7 @@ export const useSetDefaultVehicle = () => {
       );
 
       queryClient.setQueryData(
-        queryKeys.vehicles.detail(updatedVehicle.id),
+        queryKeys.vehicles.vehicle(updatedVehicle.id),
         updatedVehicle,
       );
     },
@@ -217,19 +200,19 @@ export const useOptimisticUpdateVehicle = () => {
     onMutate: async ({ id, data }) => {
       // 진행 중인 쿼리들을 취소하여 낙관적 업데이트를 덮어쓰지 않도록 함
       await queryClient.cancelQueries({
-        queryKey: queryKeys.vehicles.detail(id),
+        queryKey: queryKeys.vehicles.vehicle(id),
       });
 
       // 이전 값을 백업
       const previousVehicle = queryClient.getQueryData<VehicleType>(
-        queryKeys.vehicles.detail(id),
+        queryKeys.vehicles.vehicle(id),
       );
 
       // 낙관적으로 새 값을 설정
       if (previousVehicle) {
         const optimisticVehicle = { ...previousVehicle, ...data };
         queryClient.setQueryData(
-          queryKeys.vehicles.detail(id),
+          queryKeys.vehicles.vehicle(id),
           optimisticVehicle,
         );
       }
@@ -242,7 +225,7 @@ export const useOptimisticUpdateVehicle = () => {
     onError: (error, { id }, context) => {
       if (context?.previousVehicle) {
         queryClient.setQueryData(
-          queryKeys.vehicles.detail(id),
+          queryKeys.vehicles.vehicle(id),
           context.previousVehicle,
         );
       }
@@ -252,7 +235,7 @@ export const useOptimisticUpdateVehicle = () => {
     // 성공 시 최신 데이터로 갱신
     onSettled: (data, error, { id }) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.vehicles.detail(id),
+        queryKey: queryKeys.vehicles.vehicle(id),
       });
     },
   });

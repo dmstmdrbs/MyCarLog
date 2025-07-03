@@ -12,14 +12,10 @@
 export const queryKeys = {
   // Vehicle 관련 쿼리
   vehicles: {
-    all: () => ['vehicles'] as const,
-    lists: () => [...queryKeys.vehicles.all(), 'list'] as const,
-    list: (filters?: { type?: 'ICE' | 'EV' }) =>
-      [...queryKeys.vehicles.lists(), filters] as const,
-    details: () => [...queryKeys.vehicles.all(), 'detail'] as const,
-    detail: (id: string) => [...queryKeys.vehicles.details(), id] as const,
-    defaultVehicle: () => [...queryKeys.vehicles.all(), 'default'] as const,
-    stats: () => [...queryKeys.vehicles.all(), 'stats'] as const,
+    vehicles: () => ['vehicles'],
+    vehicle: (id: string) => ['vehicle', id],
+    defaultVehicle: () => ['vehicles', 'default'],
+    stats: (vehicleId: string) => ['vehicle', vehicleId, 'stats'],
   },
 
   // FuelRecord 관련 쿼리
@@ -104,7 +100,10 @@ export const queryKeys = {
  */
 export const invalidationHelpers = {
   // 차량 관련 모든 캐시 무효화
-  invalidateVehicles: () => queryKeys.vehicles.all(),
+  invalidateVehicles: () => queryKeys.vehicles.vehicles(),
+
+  invalidateVehicle: (vehicleId: string) =>
+    queryKeys.vehicles.vehicle(vehicleId),
 
   // 특정 차량의 연료 기록 관련 캐시 무효화
   invalidateFuelRecords: (vehicleId?: string) =>
