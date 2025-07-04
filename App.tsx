@@ -14,6 +14,7 @@ import { SettingsStackScreen } from '@pages/settings';
 import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppStatusProvider } from 'AppStatusProvider';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // 각 Stack Navigator 정의
 
@@ -103,16 +104,18 @@ const AppNavigator = () => {
 
 export default function App() {
   return (
-    <AppStatusProvider>
-      <QueryProvider>
-        <SelectedVehicleProvider>
-          <GluestackUIProvider>
-            <NavigationContainer>
-              <AppNavigator />
-            </NavigationContainer>
-          </GluestackUIProvider>
-        </SelectedVehicleProvider>
-      </QueryProvider>
-    </AppStatusProvider>
+    <SafeAreaProvider>
+      <AppStatusProvider>
+        <QueryProvider>
+          <SelectedVehicleProvider>
+            <GluestackUIProvider>
+              <NavigationContainer>
+                <AppNavigator />
+              </NavigationContainer>
+            </GluestackUIProvider>
+          </SelectedVehicleProvider>
+        </QueryProvider>
+      </AppStatusProvider>
+    </SafeAreaProvider>
   );
 }

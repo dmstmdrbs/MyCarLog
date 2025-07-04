@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Alert, SafeAreaView, ListRenderItem } from 'react-native';
+import { FlatList, Alert, ListRenderItem } from 'react-native';
 import MaintenanceItem from '@shared/models/MaintenanceItem';
 import {
   FormControl,
@@ -21,6 +21,7 @@ import { Icon } from '@/shared/components/ui/icon';
 import { ListIcon } from 'lucide-react-native';
 import { SettingsStackParamList } from './navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import PageLayout from '@/shared/components/layout/PageLayout';
 
 const MaintenanceItemForm = ({
   initialData,
@@ -160,7 +161,7 @@ export function SettingsMaintenanceItemPage({}: SettingsMaintenanceItemPageProps
   };
 
   return (
-    <SafeAreaView className="bg-white flex-1">
+    <PageLayout>
       <Box className="p-4">
         <MaintenanceItemForm initialData={item ?? null} onSave={handleSave} />
       </Box>
@@ -185,6 +186,6 @@ export function SettingsMaintenanceItemPage({}: SettingsMaintenanceItemPageProps
           </Button>
         )}
       />
-    </SafeAreaView>
+    </PageLayout>
   );
 }

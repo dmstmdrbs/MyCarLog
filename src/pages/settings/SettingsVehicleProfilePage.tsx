@@ -1,5 +1,4 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { SafeAreaView } from 'react-native';
 import Vehicle from '@shared/models/Vehicle';
 import { Box } from '@shared/components/ui/box';
 import { useDefaultVehicle, VehicleList } from '@features/vehicle';
@@ -9,6 +8,7 @@ import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
 import { SettingsStackParamList } from './navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useIsFocused } from '@react-navigation/native';
+import PageLayout from '@/shared/components/layout/PageLayout';
 
 type SettingsVehicleProfilePageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -51,11 +51,11 @@ export function SettingsVehicleProfilePage({
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <PageLayout>
       <Box className="flex-1 bg-white relative">
         <VehicleList vehicles={vehicles} onEdit={handleEdit} />
         <FloatingAddButton onPress={handleAdd} />
       </Box>
-    </SafeAreaView>
+    </PageLayout>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, SafeAreaView } from 'react-native';
+import { Alert } from 'react-native';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
 
@@ -22,6 +22,7 @@ import {
 } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
+import PageLayout from '@/shared/components/layout/PageLayout';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -161,7 +162,7 @@ export function VehicleProfileFormPage({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <PageLayout>
       <Box className="flex-1 bg-white p-4 flex flex-col gap-3">
         <Box className="flex-1 bg-white">
           <VehicleForm
@@ -203,6 +204,6 @@ export function VehicleProfileFormPage({
           </>
         )}
       </Box>
-    </SafeAreaView>
+    </PageLayout>
   );
 }
