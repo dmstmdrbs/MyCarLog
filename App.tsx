@@ -6,16 +6,10 @@ import { GluestackUIProvider } from '@shared/components/ui/gluestack-ui-provider
 import { QueryProvider } from '@shared/providers/QueryProvider';
 
 import { Icon } from '@/shared/components/ui/icon';
-import {
-  CarIcon,
-  FuelIcon,
-  SettingsIcon,
-  WrenchIcon,
-} from 'lucide-react-native';
+import { FuelIcon, SettingsIcon, WrenchIcon } from 'lucide-react-native';
 
 import { MaintenanceStackScreen } from '@pages/maintenanceManagement';
 import { FuelStackScreen } from '@pages/fuelManagement';
-import { DriveStackScreen } from '@pages/driveManagement';
 import { SettingsStackScreen } from '@pages/settings';
 import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -72,7 +66,7 @@ const HomeTab = () => {
           tabBarIcon: () => <Icon as={FuelIcon} />,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="운행"
         component={DriveStackScreen}
         options={{
@@ -80,7 +74,7 @@ const HomeTab = () => {
           popToTopOnBlur: true,
           tabBarIcon: () => <Icon as={CarIcon} />,
         }}
-      />
+      /> */}
       <Tab.Screen
         name="설정"
         component={SettingsStackScreen}

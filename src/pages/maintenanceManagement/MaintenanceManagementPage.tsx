@@ -64,7 +64,7 @@ const MaintenanceRecordItem = ({
   }, [recordItem.id, onPressDelete]);
 
   return (
-    <Box className="py-3 flex-row items-center justify-between">
+    <Box className="py-3 flex-row items-center justify-between border-b border-gray-200">
       <Box>
         <Text className="font-bold">
           {format(new Date(recordItem.date), 'yyyy년 MM월 dd일')}
@@ -149,8 +149,6 @@ export const MaintenanceManagementPage = ({
     error,
   } = useMaintenanceRecordsByDate(vehicleId, firstDayOfMonth, lastDayOfMonth);
 
-  console.log(firstDayOfMonth, lastDayOfMonth);
-  console.log(records);
   const deleteMutation = useDeleteMaintenanceRecord(vehicleId);
 
   // 삭제 다이얼로그 상태
@@ -218,7 +216,9 @@ export const MaintenanceManagementPage = ({
       />
       <Divider orientation="horizontal" />
       <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
-        <Heading size="md">정비 기록</Heading>
+        <Heading size="sm">
+          {format(currentDate, 'yyyy-MM-dd')} 정비 기록
+        </Heading>
         {isLoading && (
           <Box className="items-center justify-center flex-1">
             <Spinner />

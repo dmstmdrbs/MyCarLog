@@ -4,6 +4,7 @@ import type {
   CreateMaintenanceRecordData,
   UpdateMaintenanceRecordData,
 } from '@/shared/repositories/MaintenanceRecordRepository';
+import { getMonth, getYear } from 'date-fns';
 
 // 쿼리 키 생성 함수
 const maintenanceRecordsKey = (vehicleId: string) => [
@@ -11,6 +12,11 @@ const maintenanceRecordsKey = (vehicleId: string) => [
   vehicleId,
 ];
 
+const maintenanceRecordsByDateKey = (
+  vehicleId: string,
+  year: number,
+  month: number,
+) => ['maintenanceRecords', 'maintenanceRecordsByDate', vehicleId, year, month];
 // 차량별 정비 기록 목록 조회
 export function useMaintenanceRecords(vehicleId: string) {
   return useQuery({
@@ -27,7 +33,11 @@ export function useMaintenanceRecordsByDate(
   endDate: Date,
 ) {
   return useQuery({
-    queryKey: maintenanceRecordsKey(vehicleId),
+    queryKey: maintenanceRecordsByDateKey(
+      vehicleId,
+      getYear(endDate),
+      getMonth(endDate),
+    ),
     queryFn: () =>
       maintenanceRecordRepository.findByDateRange(
         vehicleId,
@@ -48,7 +58,14 @@ export function useCreateMaintenanceRecord(vehicleId: string) {
         ...data,
         vehicleId,
       }),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: maintenanceRecordsByDateKey(
+          vehicleId,
+          getYear(data.date),
+          getMonth(data.date),
+        ),
+      });
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsKey(vehicleId),
       });

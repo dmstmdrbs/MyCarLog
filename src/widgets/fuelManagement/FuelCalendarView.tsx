@@ -1,25 +1,20 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { DateData } from 'react-native-calendars';
 
 import { Box } from '@/shared/components/ui/box';
 import { Text } from '@/shared/components/ui/text';
-import {
-  useFuelRecordsByDateRange,
-  useFuelRecordsByMonth,
-} from '@/features/fuelRecord';
-import { useVehicle } from '@features/vehicle';
+import { useFuelRecordsByMonth } from '@/features/fuelRecord';
+
 import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 
 import { MonthlyStatsCard } from './ui/MonthlyStatsCard';
-import { FuelRecordList } from './ui/FuelRecordList';
+
 import { Calendar } from '@shared/components/Calendar';
-import { paymentMethodMap } from './constants/paymentMethodMap';
-import { getFuelUnit, getFuelUnitPrice } from './utils/unitUtils';
+
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { MarkingProps } from 'react-native-calendars/src/calendar/day/marking';
 import { calendarTheme } from '../../shared/constants/calendar';
-import { Heading } from '@/shared/components/ui/heading';
 
 type Props = {
   vehicleId: string;
@@ -32,19 +27,12 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
-  const { data: vehicle } = useVehicle(vehicleId);
   const { monthlyStatsQuery } = useFuelStatisticQueries({
     vehicleId,
     year: currentYear,
     month: currentMonth,
   });
   const { data: monthlyStats } = monthlyStatsQuery;
-
-  const { data: fuelRecordsByDate } = useFuelRecordsByDateRange(
-    vehicleId,
-    currentDate.getTime(),
-    currentDate.getTime(),
-  );
 
   const { data: fuelRecords } = useFuelRecordsByMonth(
     vehicleId,
@@ -117,12 +105,9 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
     );
   }
 
-  const unit = getFuelUnit(vehicle?.type);
-  const unitPrice = getFuelUnitPrice(vehicle?.type);
-
   return (
     // 월별 캘린더 뷰
-    <Box className="flex-1">
+    <Fragment>
       {/* 월별 통계 카드 */}
       <MonthlyStatsCard
         totalCost={monthlyStats.totalCost ?? 0}
@@ -139,17 +124,6 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
         onMonthChange={handleMonthChange}
         markedDates={markedDates}
       />
-      <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
-        <Heading size="md">
-          {format(currentDate, 'yyyy-MM-dd')} 주유 내역
-        </Heading>
-        <FuelRecordList
-          fuelRecords={fuelRecordsByDate ?? []}
-          unit={unit}
-          unitPrice={unitPrice}
-          paymentMethodMap={paymentMethodMap}
-        />
-      </Box>
-    </Box>
+    </Fragment>
   );
 };

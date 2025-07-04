@@ -1,6 +1,7 @@
 import { Model } from '@nozbe/watermelondb';
 import { field, readonly } from '@nozbe/watermelondb/decorators';
 import { TableSchemaSpec } from '@nozbe/watermelondb/Schema';
+import { PaymentMethodType } from './PaymentMethod';
 
 export default class FuelRecord extends Model {
   static table = 'fuel_records';
@@ -12,7 +13,7 @@ export default class FuelRecord extends Model {
   @field('amount') amount!: number;
   @field('payment_method_id') paymentMethodId!: string;
   @field('payment_name') paymentName!: string;
-  @field('payment_type') paymentType!: string;
+  @field('payment_type') paymentType!: PaymentMethodType['type'];
   @field('station_id') stationId!: string;
   @field('station_name') stationName!: string;
   @field('memo') memo!: string;
@@ -31,7 +32,7 @@ export interface CreateFuelRecordData {
   amount: number;
   paymentMethodId: string;
   paymentName: string;
-  paymentType: string;
+  paymentType: PaymentMethodType['type'];
   stationId: string;
   stationName: string;
   memo?: string;
@@ -46,7 +47,7 @@ export interface UpdateFuelRecordData {
   amount?: number;
   paymentMethodId?: string;
   paymentName?: string;
-  paymentType?: string;
+  paymentType?: PaymentMethodType['type'];
   stationId?: string;
   stationName?: string;
   memo?: string;

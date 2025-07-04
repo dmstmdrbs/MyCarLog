@@ -8,12 +8,16 @@ import { FuelCalendarView } from '@/widgets/fuelManagement/FuelCalendarView';
 import { FuelStatisticsView, Tab, TabItem } from '@/widgets/fuelManagement';
 import { Icon } from '@/shared/components/ui/icon';
 import { CalendarDaysIcon, ChartBarIcon } from 'lucide-react-native';
-import { Fragment, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
 import { format } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FuelStackParamList } from './navigator';
+import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
+import { useFuelRecordsByDateRange } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
+import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
+import { Heading } from '@/shared/components/ui/heading';
 
 type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -21,6 +25,7 @@ type FuelManagementPageProps = NativeStackScreenProps<
 >;
 
 export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',
@@ -30,8 +35,11 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(
     selectedVehicle?.id || '',
   );
-
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { data: fuelRecordsByDate } = useFuelRecordsByDateRange(
+    vehicle?.id || '',
+    currentDate.getTime(),
+    currentDate.getTime(),
+  );
 
   const navigateToFuelRecord = useCallback(() => {
     if (!vehicle) return;
@@ -51,6 +59,9 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
       </PageLayout>
     );
   }
+
+  const unit = getFuelUnit(vehicle?.type);
+  const unitPrice = getFuelUnitPrice(vehicle?.type);
 
   return (
     <PageLayout>
@@ -83,14 +94,23 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
         />
       </Tab>
       {selectedTab === 'calendar' && (
-        <Fragment>
+        <Box className="flex-1">
           <FuelCalendarView
             vehicleId={vehicle.id}
             onDateChange={setCurrentDate}
           />
-
+          <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
+            <Heading size="sm">
+              {format(currentDate, 'yyyy-MM-dd')} 주유 내역
+            </Heading>
+            <FuelRecordList
+              fuelRecords={fuelRecordsByDate ?? []}
+              unit={unit}
+              unitPrice={unitPrice}
+            />
+          </Box>
           <FloatingAddButton onPress={navigateToFuelRecord} />
-        </Fragment>
+        </Box>
       )}
       {selectedTab === 'statistics' && (
         <FuelStatisticsView vehicleId={vehicle.id} />

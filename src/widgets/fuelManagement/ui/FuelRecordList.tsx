@@ -1,35 +1,26 @@
 import { Box } from '@/shared/components/ui/box';
 import { Text } from '@/shared/components/ui/text';
-import { formatDate } from 'date-fns';
+import { format } from 'date-fns';
 import { formatNumber } from '@/shared/utils/format';
 import { FlatList } from 'react-native';
-
-interface FuelRecord {
-  id: string | number;
-  date: string | number | Date;
-  totalCost: number;
-  unitPrice: number;
-  amount: number;
-  paymentType: string;
-}
+import { paymentMethodMap } from '@shared/constants/paymentMethodMap';
+import { FuelRecordType } from '@/shared/models/FuelRecord';
 
 interface FuelRecordListProps {
-  fuelRecords: FuelRecord[];
+  fuelRecords: FuelRecordType[];
   unit: string;
   unitPrice: string;
-  paymentMethodMap: Record<string, string>;
 }
 
 export const FuelRecordList = ({
   fuelRecords,
   unit,
   unitPrice,
-  paymentMethodMap,
 }: FuelRecordListProps) => {
-  const renderItem = ({ item }: { item: FuelRecord }) => (
+  const renderItem = ({ item }: { item: FuelRecordType }) => (
     <Box className="flex flex-row justify-between items-center p-4 border-b border-gray-200">
       <Text className="text-sm text-gray-500">
-        {formatDate(item.date, 'yyyy-MM-dd')}
+        {format(item.date, 'yyyy-MM-dd')}
       </Text>
       <Text className="text-sm text-gray-500">
         {formatNumber(item.totalCost)}
@@ -48,9 +39,18 @@ export const FuelRecordList = ({
     </Box>
   );
 
+  if (fuelRecords.length === 0) {
+    return (
+      <Box className="flex-1 items-center justify-center bg-background-light">
+        <Text className="text-typography-500 text-center">
+          주유 기록이 없습니다.
+        </Text>
+      </Box>
+    );
+  }
   return (
     <FlatList
-      contentContainerClassName="flex-1 bg-white"
+      contentContainerClassName="flex-1"
       data={fuelRecords}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
