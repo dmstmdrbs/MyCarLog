@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
@@ -23,6 +23,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
 import PageLayout from '@/shared/components/layout/PageLayout';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -161,49 +162,52 @@ export function VehicleProfileFormPage({
     }
   };
 
+  const WrapperComponent = isInitial ? Fragment : SafeAreaView;
   return (
-    <PageLayout>
-      <Box className="flex-1 bg-white p-4 flex flex-col gap-3">
-        <Box className="flex-1 bg-white">
-          <VehicleForm
-            nickname={nickname}
-            manufacturer={manufacturer}
-            model={model}
-            type={type}
-            onChange={handleFormChange}
-            onTypeChange={setType}
-            onSubmit={handleSave}
-            editingId={vehicleId ?? null}
-            isDefault={isDefault}
-            setDefaultProfile={handleSetDefaultProfile}
-          />
-        </Box>
-        {vehicleId && (
-          <>
-            <Box className="flex flex-row">
-              <Button
-                onPress={() => setIsConfirmModalOpen(true)}
-                className="flex-1"
-                variant="link"
-                action="negative"
-              >
-                <ButtonText className="text-red-500 opacity-70 text-sm">
-                  삭제하기
-                </ButtonText>
-              </Button>
-            </Box>
-            <ConfirmModal
-              isOpen={isConfirmModalOpen}
-              onClose={() => setIsConfirmModalOpen(false)}
-              onConfirm={handleDelete}
-              title="삭제하기"
-              description="해당 차량 프로필을 삭제하시겠습니까?"
-              confirmText="확인"
-              cancelText="취소"
+    <WrapperComponent>
+      <PageLayout>
+        <Box className="flex-1 bg-white p-4 flex flex-col gap-3">
+          <Box className="flex-1 bg-white">
+            <VehicleForm
+              nickname={nickname}
+              manufacturer={manufacturer}
+              model={model}
+              type={type}
+              onChange={handleFormChange}
+              onTypeChange={setType}
+              onSubmit={handleSave}
+              editingId={vehicleId ?? null}
+              isDefault={isDefault}
+              setDefaultProfile={handleSetDefaultProfile}
             />
-          </>
-        )}
-      </Box>
-    </PageLayout>
+          </Box>
+          {vehicleId && (
+            <>
+              <Box className="flex flex-row">
+                <Button
+                  onPress={() => setIsConfirmModalOpen(true)}
+                  className="flex-1"
+                  variant="link"
+                  action="negative"
+                >
+                  <ButtonText className="text-red-500 opacity-70 text-sm">
+                    삭제하기
+                  </ButtonText>
+                </Button>
+              </Box>
+              <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handleDelete}
+                title="삭제하기"
+                description="해당 차량 프로필을 삭제하시겠습니까?"
+                confirmText="확인"
+                cancelText="취소"
+              />
+            </>
+          )}
+        </Box>
+      </PageLayout>
+    </WrapperComponent>
   );
 }

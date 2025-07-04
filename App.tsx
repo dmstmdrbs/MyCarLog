@@ -16,6 +16,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppStatusProvider } from 'AppStatusProvider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import 'react-native-gesture-handler';
+
 // 각 Stack Navigator 정의
 
 const Tab = createBottomTabNavigator();
