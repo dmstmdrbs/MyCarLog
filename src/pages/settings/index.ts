@@ -3,7 +3,7 @@ import { SettingsMaintenanceItemPage } from './SettingsMaintenanceItemPage';
 import { SettingsDataBackupPage } from './SettingsDataBackupPage';
 import { VehicleProfileFormPage } from './VehicleProfileFormPage';
 import { SettingsMainPage } from './SettingsMainPage';
-import { SettingsStackScreen } from './navigator';
+import { SettingsStackScreen, useSettingsNavigation } from './navigator';
 
 export {
   SettingsMainPage,
@@ -12,4 +12,5 @@ export {
   SettingsDataBackupPage,
   VehicleProfileFormPage,
   SettingsStackScreen,
+  useSettingsNavigation,
 };

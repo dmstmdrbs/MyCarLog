@@ -19,6 +19,8 @@ import {
 } from '@/features/maintenance/hooks/useMaintenanceItemQueries';
 import { Icon } from '@/shared/components/ui/icon';
 import { ListIcon } from 'lucide-react-native';
+import { SettingsStackParamList } from './navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 const MaintenanceItemForm = ({
   initialData,
@@ -114,15 +116,17 @@ const MaintenanceItemList = ({
     />
   );
 };
-export function SettingsMaintenanceItemPage() {
+
+type SettingsMaintenanceItemPageProps = NativeStackScreenProps<
+  SettingsStackParamList,
+  'SettingsMaintenanceItem'
+>;
+
+export function SettingsMaintenanceItemPage({}: SettingsMaintenanceItemPageProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const { data: items } = useMaintenanceItemQueries();
   const { data: item } = useMaintenanceItemDetailQueries(editingId ?? '');
-
-  useEffect(() => {
-    console.log(items);
-  }, [items]);
 
   const { mutateAsync: createMaintenanceItem } =
     useCreateMaintenanceItemMutation();

@@ -17,7 +17,25 @@ export function useMaintenanceRecords(vehicleId: string) {
     queryKey: maintenanceRecordsKey(vehicleId),
     queryFn: () => maintenanceRecordRepository.findByVehicleId(vehicleId),
     enabled: !!vehicleId,
-    staleTime: 1000 * 60 * 5, // 5분
+    staleTime: 0, // 5분
+  });
+}
+
+export function useMaintenanceRecordsByDate(
+  vehicleId: string,
+  startDate: Date,
+  endDate: Date,
+) {
+  return useQuery({
+    queryKey: maintenanceRecordsKey(vehicleId),
+    queryFn: () =>
+      maintenanceRecordRepository.findByDateRange(
+        vehicleId,
+        startDate,
+        endDate,
+      ),
+    enabled: !!vehicleId && !!startDate && !!endDate,
+    staleTime: 1000 * 60, // 1분
   });
 }
 
@@ -25,8 +43,11 @@ export function useMaintenanceRecords(vehicleId: string) {
 export function useCreateMaintenanceRecord(vehicleId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateMaintenanceRecordData) =>
-      maintenanceRecordRepository.create(data),
+    mutationFn: (data: Omit<CreateMaintenanceRecordData, 'vehicleId'>) =>
+      maintenanceRecordRepository.create({
+        ...data,
+        vehicleId,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsKey(vehicleId),

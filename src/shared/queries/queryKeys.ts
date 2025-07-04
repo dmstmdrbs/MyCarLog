@@ -105,6 +105,8 @@ export const invalidationHelpers = {
   invalidateVehicle: (vehicleId: string) =>
     queryKeys.vehicles.vehicle(vehicleId),
 
+  invalidateDefaultVehicle: () => queryKeys.vehicles.defaultVehicle(),
+
   // 특정 차량의 연료 기록 관련 캐시 무효화
   invalidateFuelRecords: (vehicleId?: string) =>
     vehicleId

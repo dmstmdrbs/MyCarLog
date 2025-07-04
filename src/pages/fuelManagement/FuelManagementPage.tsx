@@ -12,16 +12,15 @@ import { Fragment, useCallback, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
 import { format } from 'date-fns';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FuelStackParamList } from './navigator';
 
-export const FuelManagementPage = () => {
-  const navigation =
-    useNavigation<
-      NativeStackNavigationProp<FuelStackParamList, 'FuelRecord'>
-    >();
+type FuelManagementPageProps = NativeStackScreenProps<
+  FuelStackParamList,
+  'FuelMain'
+>;
 
+export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',

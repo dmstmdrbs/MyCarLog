@@ -15,15 +15,13 @@ import {
 } from '@features/fuelRecord/hooks/useFuelRecordQueries';
 import { Spinner } from '@/shared/components/ui/spinner';
 import { formatDate } from 'date-fns';
-import { useNavigation } from '@react-navigation/native';
 import { FloatingSubmitButton } from '@/shared/components/FloatingSubmitButton';
 
 type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 
-export function FuelRecordPage({ route }: Props) {
+export function FuelRecordPage({ route, navigation }: Props) {
   const { vehicleId, targetDate } = route.params;
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(vehicleId);
-  const navigation = useNavigation();
 
   const [energyRecord, setEnergyRecord] = useState<EnergyRecordFormData>({
     date: formatDate(targetDate, 'yyyy-MM-dd'),

@@ -39,7 +39,7 @@ export class VehicleRepository
     if (data.manufacturer !== undefined)
       record.manufacturer = data.manufacturer;
     if (data.model !== undefined) record.model = data.model;
-    if (data.isDefault !== undefined) record.isDefault = data.isDefault;
+    record.isDefault = data.isDefault || false;
   }
 
   async findByType(type: 'ICE' | 'EV'): Promise<Vehicle[]> {
@@ -87,13 +87,15 @@ export class VehicleRepository
         .query(Q.where('is_default', true))
         .fetch();
 
-      await Promise.all(
-        defaultVehicles.map((vehicle: Vehicle) =>
-          vehicle.update((v: Vehicle) => {
-            v.isDefault = false;
-          }),
-        ),
-      );
+      if (defaultVehicles.length > 0) {
+        await Promise.all(
+          defaultVehicles.map((vehicle: Vehicle) =>
+            vehicle.update((v: Vehicle) => {
+              v.isDefault = false;
+            }),
+          ),
+        );
+      }
     } catch (error) {
       console.error('Error unsetting all default vehicles:', error);
       throw error;
@@ -102,33 +104,31 @@ export class VehicleRepository
 
   async createVehicle(data: CreateVehicleData): Promise<Vehicle> {
     try {
-      return await this.database.write(async () => {
-        const stats = await this.getVehicleStats();
-        // 차량이 없으면 첫 차량을 기본 차량으로 설정
-        console.log('stats', stats);
-        if (stats.total === 0) {
-          data.isDefault = true;
-        }
+      // 차량이 없으면 첫 차량을 기본 차량으로 설정
+      const stats = await this.getVehicleStats();
 
-        // 기본 차량으로 설정되는 경우 다른 모든 차량의 기본값 해제
-        if (data.isDefault) {
-          await this.unsetAllDefaults();
-        }
-
-        console.log('data', data);
+      if (stats.total === 0) {
+        data.isDefault = true;
+      }
+      const newVehicle = await this.database.write(async () => {
         return await this.collection.create((vehicle) => {
-          vehicle.type = data.type;
-          vehicle.nickname = data.nickname;
-          vehicle.manufacturer = data.manufacturer || '';
-          vehicle.model = data.model || '';
-          vehicle.isDefault = data.isDefault || false;
+          this.assignData(vehicle, data);
         });
       });
+
+      if (data.isDefault) {
+        await this.database.write(async () => {
+          await this.unsetAllDefaults();
+        });
+        await this.setAsDefault(newVehicle.id);
+      }
+      return newVehicle;
     } catch (error) {
-      console.error('Error creating vehicle:', error);
+      console.error('Error creating vehicle - createVehicle:', error);
       throw error;
     }
   }
+
   async deleteVehicle(id: string): Promise<void> {
     try {
       await this.database.write(async () => {

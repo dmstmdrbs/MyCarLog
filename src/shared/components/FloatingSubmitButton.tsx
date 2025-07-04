@@ -1,4 +1,4 @@
-import { FormSubmitButton } from '@/pages/fuelManagement/FormSubmitButton';
+import { FormSubmitButton } from '@/shared/components/form/FormSubmitButton';
 import { Box } from './ui/box';
 
 type FloatingSubmitButtonProps = {

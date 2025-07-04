@@ -1,31 +1,50 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Vehicle from '@shared/models/Vehicle';
 import { Box } from '@shared/components/ui/box';
-import { VehicleList } from '@features/vehicle';
+import { useDefaultVehicle, VehicleList } from '@features/vehicle';
 import { useVehicles } from '@features/vehicle';
 import { useInvalidateOnFocus } from '@shared/hooks/useInvalidateOnFocus';
 import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
+import { SettingsStackParamList } from './navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useIsFocused } from '@react-navigation/native';
 
-export function SettingsVehicleProfilePage() {
+type SettingsVehicleProfilePageProps = NativeStackScreenProps<
+  SettingsStackParamList,
+  'SettingsVehicleProfile'
+>;
+export function SettingsVehicleProfilePage({
+  navigation,
+}: SettingsVehicleProfilePageProps) {
+  const { data: defaultVehicle, isLoading: isDefaultVehicleLoading } =
+    useDefaultVehicle();
+  const isFocused = useIsFocused();
   const { data: vehicles, refetch } = useVehicles();
-  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    if (isFocused && !isDefaultVehicleLoading && !defaultVehicle) {
+      navigation.replace('SettingsVehicleProfileForm', {
+        isInitial: true,
+      });
+    }
+  }, [defaultVehicle, isDefaultVehicleLoading, isFocused]);
 
   useInvalidateOnFocus(refetch);
 
   // 차량 추가 페이지 이동
   const handleAdd = useCallback(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigation as any).navigate('SettingsVehicleProfileForm', {});
+    navigation.navigate('SettingsVehicleProfileForm', {
+      isInitial: false,
+    });
   }, [navigation]);
 
   // 차량 수정 페이지 이동
   const handleEdit = useCallback(
     (vehicle: Vehicle) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigation as any).navigate('SettingsVehicleProfileForm', {
+      navigation.navigate('SettingsVehicleProfileForm', {
         vehicleId: vehicle.id,
+        isInitial: false,
       });
     },
     [navigation],

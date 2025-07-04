@@ -9,9 +9,30 @@ import {
   WrenchIcon,
 } from 'lucide-react-native';
 import { Icon } from '@/shared/components/ui/icon';
+import PageLayout from '@/shared/components/layout/PageLayout';
+import { useLayoutEffect } from 'react';
+import { SettingsStackParamList } from './navigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useDefaultVehicle } from '@/features/vehicle';
+import { useIsFocused } from '@react-navigation/native';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function SettingsMainPage({ navigation }: { navigation: any }) {
+type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsMain'>;
+
+export function SettingsMainPage({ route, navigation }: Props) {
+  const isFocused = useIsFocused();
+  const { data: defaultVehicle, isLoading: isDefaultVehicleLoading } =
+    useDefaultVehicle();
+  const params = route.params;
+
+  useLayoutEffect(() => {
+    if (isFocused && !isDefaultVehicleLoading && !defaultVehicle) {
+      console.log('navigate to SettingsVehicleProfileForm');
+      navigation.replace('SettingsVehicleProfileForm', {
+        isInitial: true,
+      });
+    }
+  }, [params, defaultVehicle, isDefaultVehicleLoading, isFocused]);
+
   const menu = [
     {
       key: 'vehicle',
@@ -34,7 +55,7 @@ export function SettingsMainPage({ navigation }: { navigation: any }) {
   ];
 
   return (
-    <Box className="flex-1 bg-white">
+    <PageLayout>
       <FlatList
         className="flex-1"
         data={menu}
@@ -54,6 +75,6 @@ export function SettingsMainPage({ navigation }: { navigation: any }) {
         keyExtractor={(item) => item.key}
         contentContainerStyle={{ paddingTop: 8 }}
       />
-    </Box>
+    </PageLayout>
   );
 }

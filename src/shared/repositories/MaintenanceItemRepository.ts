@@ -115,6 +115,24 @@ export class MaintenanceItemRepository
       throw error;
     }
   }
+
+  bulkCreate(data: CreateMaintenanceItemData[]): Promise<void> {
+    try {
+      return this.database.write(async () => {
+        await Promise.all(
+          data.map((item) =>
+            this.collection.create((record) => {
+              this.assignData(record, item);
+            }),
+          ),
+        );
+        return;
+      });
+    } catch (error) {
+      console.error(`Error bulk creating maintenance items:`, error);
+      throw error;
+    }
+  }
 }
 
 // 싱글톤 인스턴스

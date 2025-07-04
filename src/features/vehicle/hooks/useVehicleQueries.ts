@@ -57,25 +57,28 @@ export const useCreateVehicle = () => {
   return useMutation({
     mutationFn: (data: CreateVehicleData) =>
       vehicleRepository.createVehicle(data),
-    onSuccess: (newVehicle) => {
+    onSuccess: async (newVehicle) => {
+      console.log('newVehicle', newVehicle);
       // 차량 목록 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: invalidationHelpers.invalidateVehicles(),
-      });
+      await Promise.all([
+        // 차량 목록 캐시 무효화 (다른 차량들의 isDefault가 변경되므로)
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateVehicles(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateVehicle(newVehicle.id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateDefaultVehicle(),
+        }),
+      ]);
 
-      // 새로 생성된 차량이 기본 차량이라면 기본 차량 캐시도 업데이트
       if (newVehicle.isDefault) {
         queryClient.setQueryData(
           queryKeys.vehicles.defaultVehicle(),
           newVehicle,
         );
       }
-
-      // 새 차량을 개별 캐시에 설정
-      queryClient.setQueryData(
-        queryKeys.vehicles.vehicle(newVehicle.id),
-        newVehicle,
-      );
     },
     onError: (error) => {
       console.error('차량 생성 실패:', error);
@@ -92,14 +95,18 @@ export const useUpdateVehicle = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateVehicleData }) =>
       vehicleRepository.updateVehicle(id, data),
-    onSuccess: async (updatedVehicle, { id }) => {
+    onSuccess: async (updatedVehicle) => {
       // 차량 목록 캐시 무효화
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: invalidationHelpers.invalidateVehicle(id),
-        }),
+        // 차량 목록 캐시 무효화 (다른 차량들의 isDefault가 변경되므로)
         queryClient.invalidateQueries({
           queryKey: invalidationHelpers.invalidateVehicles(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateVehicle(updatedVehicle.id),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: invalidationHelpers.invalidateDefaultVehicle(),
         }),
       ]);
 
@@ -166,6 +173,12 @@ export const useSetDefaultVehicle = () => {
       // 차량 목록 캐시 무효화 (다른 차량들의 isDefault가 변경되므로)
       queryClient.invalidateQueries({
         queryKey: invalidationHelpers.invalidateVehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: invalidationHelpers.invalidateVehicle(updatedVehicle.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: invalidationHelpers.invalidateDefaultVehicle(),
       });
 
       // 새 기본 차량 캐시 설정

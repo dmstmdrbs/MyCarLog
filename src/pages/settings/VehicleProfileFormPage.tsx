@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, SafeAreaView } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { database } from '../../database';
-import Vehicle from '@shared/models/Vehicle';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
 
@@ -17,12 +14,27 @@ import {
   useDeleteVehicle,
   VehicleForm,
 } from '@features/vehicle';
+import { vehicleRepository } from '@/shared/repositories';
+import { SettingsStackParamList } from './navigator';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from 'App';
 
-export function VehicleProfileFormPage() {
-  const navigation = useNavigation();
-  const route =
-    useRoute<RouteProp<{ params: { vehicleId: string } }, 'params'>>();
-  const { vehicleId } = route.params || {};
+type VehicleProfileFormPageProps = NativeStackScreenProps<
+  SettingsStackParamList,
+  'SettingsVehicleProfileForm'
+>;
+
+export function VehicleProfileFormPage({
+  route,
+  navigation,
+}: VehicleProfileFormPageProps) {
+  const rootNavigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { vehicleId, isInitial } = route.params;
 
   const [nickname, setNickname] = useState('');
   const [manufacturer, setManufacturer] = useState('');
@@ -32,7 +44,7 @@ export function VehicleProfileFormPage() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const toast = useToast();
 
-  const { data: vehicle } = useVehicle(vehicleId);
+  const { data: vehicle } = useVehicle(vehicleId ?? '');
   const createVehicleMutation = useCreateVehicle();
   const updateVehicleMutation = useUpdateVehicle();
   const deleteVehicleMutation = useDeleteVehicle();
@@ -79,7 +91,20 @@ export function VehicleProfileFormPage() {
           isDefault,
         });
       }
-      navigation.goBack();
+
+      if (isInitial) {
+        rootNavigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: '정비',
+              state: { routes: [{ name: 'MaintenanceStackScreen' }] },
+            },
+          ],
+        });
+      } else {
+        navigation.goBack();
+      }
     } catch (error) {
       console.error(error);
       Alert.alert('저장 중 오류가 발생했습니다.');
@@ -87,25 +112,10 @@ export function VehicleProfileFormPage() {
   };
 
   const handleSetDefaultProfile = async () => {
-    const collection = database.get<Vehicle>('vehicles');
-    const allVehicles = await collection.query().fetch();
+    if (!vehicleId) return;
 
     try {
-      await database.write(async () => {
-        // 1. 모든 차량의 isDefault를 false로
-        for (const v of allVehicles) {
-          if (v.isDefault) {
-            await v.update((rec) => {
-              rec.isDefault = false;
-            });
-          }
-        }
-        // 2. 선택한 차량만 true로
-        const vehicle = await collection.find(vehicleId);
-        await vehicle.update((v) => {
-          v.isDefault = true;
-        });
-      });
+      await vehicleRepository.setAsDefault(vehicleId);
       toast.show({
         placement: 'bottom',
         duration: 2000,
@@ -139,6 +149,8 @@ export function VehicleProfileFormPage() {
   };
 
   const handleDelete = async () => {
+    if (!vehicleId) return;
+
     try {
       await deleteVehicleMutation.mutateAsync(vehicleId);
       navigation.goBack();
@@ -160,7 +172,7 @@ export function VehicleProfileFormPage() {
             onChange={handleFormChange}
             onTypeChange={setType}
             onSubmit={handleSave}
-            editingId={vehicleId}
+            editingId={vehicleId ?? null}
             isDefault={isDefault}
             setDefaultProfile={handleSetDefaultProfile}
           />

@@ -1,11 +1,33 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 import { SettingsMaintenanceItemPage } from './SettingsMaintenanceItemPage';
 import { SettingsVehicleProfilePage } from './SettingsVehicleProfilePage';
 import { SettingsDataBackupPage } from './SettingsDataBackupPage';
 import { VehicleProfileFormPage } from './VehicleProfileFormPage';
 import { SettingsMainPage } from './SettingsMainPage';
+import { useNavigation } from '@react-navigation/native';
 
-const SettingsStack = createNativeStackNavigator();
+export type SettingsStackParamList = {
+  SettingsMain: { isInitial?: boolean } | undefined;
+  SettingsVehicleProfile: undefined;
+  SettingsMaintenanceItem: undefined;
+  SettingsDataBackup: undefined;
+  SettingsVehicleProfileForm: {
+    isInitial?: boolean;
+    vehicleId?: string;
+  };
+};
+
+export const useSettingsNavigation = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<SettingsStackParamList>>();
+  return navigation;
+};
+
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
+
 export function SettingsStackScreen() {
   return (
     <SettingsStack.Navigator initialRouteName="SettingsMain">

@@ -4,7 +4,6 @@ import { ChevronDownIcon } from '../ui/icon';
 import { cn } from '@shared/utils/cn';
 import { Menu, MenuItem, MenuItemLabel } from '../ui/menu';
 import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
-import { useEffect } from 'react';
 
 const VehicleProfileHeaderMenu = () => {
   const { data: vehicles = [] } = useVehicles();
@@ -17,10 +16,6 @@ const VehicleProfileHeaderMenu = () => {
       setSelectedVehicle(vehicle);
     }
   };
-
-  useEffect(() => {
-    console.log('selectedVehicle', selectedVehicle?.id, selectedVehicle);
-  }, [selectedVehicle]);
 
   return (
     <Menu

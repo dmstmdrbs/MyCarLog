@@ -21,6 +21,7 @@ import PaymentMethod, {
   paymentMethodSchema,
 } from '@shared/models/PaymentMethod';
 import Station, { stationSchema } from '@/shared/models/Station';
+import Shop, { shopSchema } from '@/shared/models/Shop';
 
 const migrations = schemaMigrations({
   migrations: [
@@ -37,11 +38,23 @@ const migrations = schemaMigrations({
         }),
       ],
     },
+    {
+      toVersion: 5,
+      steps: [
+        createTable({
+          name: 'shops',
+          columns: [
+            { name: 'name', type: 'string' },
+            { name: 'created_at', type: 'number' },
+          ],
+        }),
+      ],
+    },
   ],
 });
 
 const schema = appSchema({
-  version: 4,
+  version: 5,
   tables: [
     tableSchema(vehicleSchema),
     tableSchema(fuelRecordSchema),
@@ -50,6 +63,7 @@ const schema = appSchema({
     tableSchema(maintenanceItemSchema),
     tableSchema(paymentMethodSchema),
     tableSchema(stationSchema),
+    tableSchema(shopSchema),
   ],
 });
 
@@ -68,5 +82,6 @@ export const database = new Database({
     MaintenanceItem,
     PaymentMethod,
     Station,
+    Shop,
   ],
 });

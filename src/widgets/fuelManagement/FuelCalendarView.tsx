@@ -19,6 +19,7 @@ import { getFuelUnit, getFuelUnitPrice } from './utils/unitUtils';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { MarkingProps } from 'react-native-calendars/src/calendar/day/marking';
 import { calendarTheme } from '../../shared/constants/calendar';
+import { Heading } from '@/shared/components/ui/heading';
 
 type Props = {
   vehicleId: string;
@@ -138,10 +139,10 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
         onMonthChange={handleMonthChange}
         markedDates={markedDates}
       />
-      <Box className="flex-1">
-        <Text className="text-md text-gray-500 mx-4 mt-4 mb-2 font-bold">
+      <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
+        <Heading size="md">
           {format(currentDate, 'yyyy-MM-dd')} 주유 내역
-        </Text>
+        </Heading>
         <FuelRecordList
           fuelRecords={fuelRecordsByDate ?? []}
           unit={unit}
