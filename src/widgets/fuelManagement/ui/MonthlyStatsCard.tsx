@@ -1,4 +1,5 @@
 import { HStack } from '@/shared/components/ui/hstack';
+import { Skeleton, SkeletonText } from '@/shared/components/ui/skeleton';
 import { Box } from '@shared/components/ui/box';
 import { Text } from '@shared/components/ui/text';
 import { formatNumber } from '@shared/utils/format';
@@ -45,6 +46,29 @@ export const MonthlyStatsCard = ({
           <Text className="text-xs text-gray-500">{item.label}</Text>
         </Box>
       ))}
+    </HStack>
+  );
+};
+
+export const MonthlyStatsCardSkeleton = () => {
+  return (
+    <HStack className="flex-row flex-wrap justify-evenly bg-background-100 rounded-lg p-2 w-full h-24">
+      <Box className="w-1/4 items-center justify-center gap-1">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <SkeletonText className="h-3 w-12 rounded-md" />
+      </Box>
+      <Box className="w-1/4 items-center justify-center gap-1">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <SkeletonText className="h-3 w-12 rounded-md" />
+      </Box>
+      <Box className="w-1/4 items-center justify-center gap-1">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <SkeletonText className="h-3 w-12 rounded-md" />
+      </Box>
+      <Box className="w-1/4 items-center justify-center gap-1">
+        <Skeleton className="h-6 w-6 rounded-full" />
+        <SkeletonText className="h-3 w-12 rounded-md" />
+      </Box>
     </HStack>
   );
 };

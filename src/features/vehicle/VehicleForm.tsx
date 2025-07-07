@@ -140,7 +140,7 @@ export const VehicleForm = ({
       </Box>
       <Box className="flex flex-row gap-2 mt-4">
         <Button onPress={onSubmit} className="flex-1" action="primary">
-          <ButtonText>{editingId ? '수정' : '추가'}</ButtonText>
+          <ButtonText>{editingId ? '완료' : '추가'}</ButtonText>
         </Button>
       </Box>
     </FormControl>

@@ -63,7 +63,7 @@ export function SettingsMainPage({ route, navigation }: Props) {
           <Button
             onPress={item.onPress}
             variant="link"
-            className="h-14 py-2 px-6 flex flex-row items-center justify-between border-b border-gray-200"
+            className="h-14 py-2 px-6 flex flex-row items-center justify-between border-b border-gray-200 bg-white"
           >
             <Box className="flex flex-row items-center justify-start">
               <Icon as={item.icon} size="md" color="#4a4a4a" className="mr-4" />

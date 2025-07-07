@@ -2,6 +2,10 @@ import { Box } from '@shared/components/ui/box';
 import { Text } from '@shared/components/ui/text';
 import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { Heading } from '@/shared/components/ui/heading';
+import { Skeleton, SkeletonText } from '@/shared/components/ui/skeleton';
+import { HStack } from '@/shared/components/ui/hstack';
+import { VStack } from '@/shared/components/ui/vstack';
 
 interface PaymentStat {
   paymentName: string;
@@ -22,11 +26,13 @@ export const PaymentStatsBarChart = ({ paymentStats }: Props) => {
   }
 
   return (
-    <Box className="mb-4">
-      <Text className="font-bold text-lg mb-2">결제 수단별 지출 통계</Text>
+    <Box className="bg-white p-2">
+      <Heading size="sm" className="font-bold text-lg mb-2">
+        결제 수단별 지출 통계
+      </Heading>
       <BarChart
         data={{
-          labels: paymentStats.map((s) => s.paymentName),
+          labels: paymentStats.map((s) => s.paymentName ?? '기타'),
           datasets: [
             {
               data: paymentStats.map((s) => s.totalCost),
@@ -50,5 +56,14 @@ export const PaymentStatsBarChart = ({ paymentStats }: Props) => {
         style={{ borderRadius: 12 }}
       />
     </Box>
+  );
+};
+
+export const PaymentStatsBarChartSkeleton = () => {
+  return (
+    <VStack className="rounded-lg p-2 w-full bg-background-light" space="md">
+      <SkeletonText className="h-4 w-24 rounded-md background-50" />
+      <Skeleton className="h-48 w-full rounded-md background-50" />
+    </VStack>
   );
 };

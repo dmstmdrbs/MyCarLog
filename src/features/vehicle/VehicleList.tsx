@@ -16,7 +16,7 @@ export const VehicleList = ({ vehicles, onEdit }: VehicleListProps) => {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity onPress={() => onEdit(item)} activeOpacity={0.8}>
-          <Box className="flex flex-row justify-between items-center p-4 border-b border-gray-200">
+          <Box className=" bg-white flex flex-row justify-between items-center p-4 border-b border-gray-200">
             <VehicleCard vehicle={item} />
           </Box>
         </TouchableOpacity>

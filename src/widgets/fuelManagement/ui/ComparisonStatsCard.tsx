@@ -1,3 +1,5 @@
+import { HStack } from '@/shared/components/ui/hstack';
+import { Skeleton, SkeletonText } from '@/shared/components/ui/skeleton';
 import { Box } from '@shared/components/ui/box';
 import { Text } from '@shared/components/ui/text';
 import { formatNumber } from '@shared/utils/format';
@@ -70,5 +72,27 @@ export const ComparisonStatsCard = ({
         </Box>
       ))}
     </Box>
+  );
+};
+
+export const ComparisonStatsCardSkeleton = () => {
+  return (
+    <HStack className="rounded-lg p-2 w-full bg-white justify-evenly h-24">
+      <Box className="w-1/3 bg-background-light rounded-lg p-2 items-center justify-center gap-1 h-full">
+        <SkeletonText className="h-3 w-8 background-100" />
+        <Skeleton className="h-4 w-12 background-50" />
+        <SkeletonText className="h-2 w-5 background-50" />
+      </Box>
+      <Box className="w-1/3 bg-background-light rounded-lg p-2 items-center justify-center gap-1 h-full">
+        <SkeletonText className="h-3 w-8 background-100" />
+        <Skeleton className="h-4 w-12 background-50" />
+        <SkeletonText className="h-2 w-5 background-50" />
+      </Box>
+      <Box className="w-1/3 bg-background-light rounded-lg p-2 items-center justify-center gap-1 h-full">
+        <SkeletonText className="h-3 w-8 background-100" />
+        <Skeleton className="h-4 w-12 background-50" />
+        <SkeletonText className="h-2 w-5 background-50" />
+      </Box>
+    </HStack>
   );
 };

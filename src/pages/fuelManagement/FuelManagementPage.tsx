@@ -19,10 +19,12 @@ import { useFuelRecordsByDateRange } from '@/features/fuelRecord/hooks/useFuelRe
 import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
 import { Heading } from '@/shared/components/ui/heading';
 import { Pressable, Text } from 'react-native';
-import { MonthlyStatsCard } from '@/widgets/fuelManagement/ui/MonthlyStatsCard';
+import {
+  MonthlyStatsCard,
+  MonthlyStatsCardSkeleton,
+} from '@/widgets/fuelManagement/ui/MonthlyStatsCard';
 import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
-import { Divider } from '@/shared/components/ui/divider';
 
 type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -110,7 +112,13 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
         <VStack className="flex-1 gap-4">
           {/* 월별 통계 카드 */}
           <VStack>
-            {monthlyStats && (
+            {monthlyStatsQuery.isLoading ? (
+              <MonthlyStatsCardSkeleton />
+            ) : monthlyStatsQuery.isError ? (
+              <Box className="flex-1 justify-center items-center h-24">
+                <Text>Error</Text>
+              </Box>
+            ) : monthlyStats ? (
               <MonthlyStatsCard
                 totalCost={monthlyStats.totalCost ?? 0}
                 totalAmount={monthlyStats.totalAmount ?? 0}
@@ -118,17 +126,8 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
                 recordCount={monthlyStats.recordCount ?? 0}
                 hideIcon={true}
               />
-            )}
-            {monthlyStatsQuery.isLoading && (
-              <Box className="flex-1 justify-center items-center h-24">
-                <Spinner size="large" />
-              </Box>
-            )}
-            {monthlyStatsQuery.isError && (
-              <Box className="flex-1 justify-center items-center h-24">
-                <Text>Error</Text>
-              </Box>
-            )}
+            ) : null}
+
             <VStack className="max-h-1/2" space="sm">
               <Pressable
                 onPress={() => setCalendarCollapsed((prev) => !prev)}

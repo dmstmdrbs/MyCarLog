@@ -3,9 +3,12 @@ import { Alert } from 'react-native';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
 
-import { Toast, ToastTitle, useToast } from '@shared/components/ui/toast';
-import { CheckIcon, Icon } from '@shared/components/ui/icon';
-import { Divider } from '@shared/components/ui/divider';
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  useToast,
+} from '@shared/components/ui/toast';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
 import {
   useVehicle,
@@ -116,29 +119,21 @@ export function VehicleProfileFormPage({
     if (!vehicleId) return;
 
     try {
-      await vehicleRepository.setAsDefault(vehicleId);
+      const updatedVehicle = await vehicleRepository.setAsDefault(vehicleId);
       toast.show({
         placement: 'bottom',
+        containerStyle: {
+          marginBottom: 25,
+        },
         duration: 2000,
         render: ({ id }) => {
-          const toastId = 'toast-' + id;
+          const uniqueToastId = 'toast-' + id;
           return (
-            <Toast
-              nativeID={toastId}
-              className="px-5 py-3 gap-4 shadow-soft-1 items-center flex-row"
-            >
-              <Icon
-                as={CheckIcon}
-                size="xl"
-                className="fill-typography-100 stroke-none"
-              />
-              <Divider
-                orientation="vertical"
-                className="h-[30px] bg-outline-200"
-              />
-              <ToastTitle size="sm">
-                {nickname} 차량이 기본 프로필로 설정되었습니다.
-              </ToastTitle>
+            <Toast nativeID={uniqueToastId} action="muted" variant="solid">
+              <ToastTitle>설정 완료!</ToastTitle>
+              <ToastDescription>
+                {updatedVehicle.nickname} 차량이 기본 프로필로 설정되었습니다.
+              </ToastDescription>
             </Toast>
           );
         },
