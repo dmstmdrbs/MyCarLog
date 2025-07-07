@@ -7,17 +7,20 @@ export const TabItem = ({
   label,
   icon,
   onPress,
+  className,
 }: {
   isActive: boolean;
   label: string;
   icon: React.ReactNode;
   onPress: () => void;
+  className?: string;
 }) => {
   return (
     <Button
       className={cn(
-        'flex-1 py-3 flex flex-row items-center gap-2 justify-center bg-white rounded-none',
+        'flex-1 flex flex-row items-center justify-center gap-2 rounded-none bg-white h-12',
         isActive ? 'bg-primary-500' : 'bg-white',
+        className,
       )}
       onPress={onPress}
     >
@@ -33,7 +36,7 @@ export const TabItem = ({
 
 export const Tab = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box className="w-full flex-row bg-white border-b border-gray-200">
+    <Box className="w-full flex-row border-b border-gray-200 bg-white">
       {children}
     </Box>
   );

@@ -13,7 +13,7 @@ import { FuelStackScreen } from '@pages/fuelManagement';
 import { SettingsStackScreen } from '@pages/settings';
 import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AppStatusProvider } from 'AppStatusProvider';
+import { AppStatusProvider } from '@/shared/providers/AppStatusProvider';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import 'react-native-gesture-handler';
@@ -46,9 +46,24 @@ const HomeTab = () => {
   return (
     <Tab.Navigator
       detachInactiveScreens={true}
+      backBehavior="none"
       screenOptions={{
-        tabBarStyle: !selectedVehicle ? { display: 'none' } : undefined,
+        tabBarStyle: !selectedVehicle
+          ? { display: 'none' }
+          : {
+              height: 56,
+            },
         popToTopOnBlur: true,
+        tabBarActiveTintColor: '#0A4D68',
+        tabBarIconStyle: {
+          height: 28,
+        },
+        tabBarLabelStyle: {
+          fontSize: 14,
+        },
+        tabBarItemStyle: {
+          height: 36,
+        },
       }}
     >
       <Tab.Screen
@@ -57,7 +72,7 @@ const HomeTab = () => {
         options={{
           popToTopOnBlur: true,
           headerShown: false,
-          tabBarIcon: () => <Icon as={WrenchIcon} />,
+          tabBarIcon: ({ color }) => <Icon as={WrenchIcon} color={color} />,
         }}
       />
       <Tab.Screen
@@ -66,7 +81,7 @@ const HomeTab = () => {
         options={{
           headerShown: false,
           popToTopOnBlur: true,
-          tabBarIcon: () => <Icon as={FuelIcon} />,
+          tabBarIcon: ({ color }) => <Icon as={FuelIcon} color={color} />,
         }}
       />
       {/* <Tab.Screen
@@ -84,7 +99,7 @@ const HomeTab = () => {
         options={{
           headerShown: false,
           popToTopOnBlur: true,
-          tabBarIcon: () => <Icon as={SettingsIcon} />,
+          tabBarIcon: ({ color }) => <Icon as={SettingsIcon} color={color} />,
         }}
       />
     </Tab.Navigator>

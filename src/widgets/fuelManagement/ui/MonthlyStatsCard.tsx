@@ -1,3 +1,4 @@
+import { HStack } from '@/shared/components/ui/hstack';
 import { Box } from '@shared/components/ui/box';
 import { Text } from '@shared/components/ui/text';
 import { formatNumber } from '@shared/utils/format';
@@ -36,7 +37,7 @@ export const MonthlyStatsCard = ({
   ];
 
   return (
-    <Box className="flex-row flex-wrap justify-between bg-gray-50 rounded-lg p-4 mb-4">
+    <HStack className="flex-row flex-wrap justify-between bg-white rounded-lg p-4 h-24">
       {stats.map((item) => (
         <Box key={item.label} className="w-1/4 items-center justify-center">
           {!hideIcon && <Text className="text-2xl mb-1">{item.icon}</Text>}
@@ -44,6 +45,6 @@ export const MonthlyStatsCard = ({
           <Text className="text-xs text-gray-500">{item.label}</Text>
         </Box>
       ))}
-    </Box>
+    </HStack>
   );
 };

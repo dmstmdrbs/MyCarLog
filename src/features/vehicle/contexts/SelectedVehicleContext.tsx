@@ -23,6 +23,7 @@ export const SelectedVehicleProvider = ({
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   useEffect(() => {
+    console.log('vehicles', vehicles);
     if (vehicles.length > 0) {
       const defaultProfile =
         vehicles.find((v: Vehicle) => v.isDefault) || vehicles[0];

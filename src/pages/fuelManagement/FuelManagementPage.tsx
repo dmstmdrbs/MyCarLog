@@ -18,6 +18,11 @@ import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
 import { useFuelRecordsByDateRange } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
 import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
 import { Heading } from '@/shared/components/ui/heading';
+import { Pressable, Text } from 'react-native';
+import { MonthlyStatsCard } from '@/widgets/fuelManagement/ui/MonthlyStatsCard';
+import { useFuelStatisticQueries } from '@/features/fuelStatistics';
+import { VStack } from '@/shared/components/ui/vstack';
+import { Divider } from '@/shared/components/ui/divider';
 
 type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -30,11 +35,19 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',
   );
+  const [calendarCollapsed, setCalendarCollapsed] = useState(false);
 
   const { selectedVehicle } = useSelectedVehicle();
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(
     selectedVehicle?.id || '',
   );
+  const { monthlyStatsQuery } = useFuelStatisticQueries({
+    vehicleId: vehicle?.id || '',
+    year: currentDate.getFullYear(),
+    month: currentDate.getMonth() + 1,
+  });
+  const { data: monthlyStats } = monthlyStatsQuery;
+
   const { data: fuelRecordsByDate } = useFuelRecordsByDateRange(
     vehicle?.id || '',
     currentDate.getTime(),
@@ -94,13 +107,50 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
         />
       </Tab>
       {selectedTab === 'calendar' && (
-        <Box className="flex-1">
-          <FuelCalendarView
-            vehicleId={vehicle.id}
-            onDateChange={setCurrentDate}
-          />
-          <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
-            <Heading size="sm">
+        <VStack className="flex-1 gap-4">
+          {/* 월별 통계 카드 */}
+          <VStack>
+            {monthlyStats && (
+              <MonthlyStatsCard
+                totalCost={monthlyStats.totalCost ?? 0}
+                totalAmount={monthlyStats.totalAmount ?? 0}
+                avgUnitPrice={monthlyStats.avgUnitPrice ?? 0}
+                recordCount={monthlyStats.recordCount ?? 0}
+                hideIcon={true}
+              />
+            )}
+            {monthlyStatsQuery.isLoading && (
+              <Box className="flex-1 justify-center items-center h-24">
+                <Spinner size="large" />
+              </Box>
+            )}
+            {monthlyStatsQuery.isError && (
+              <Box className="flex-1 justify-center items-center h-24">
+                <Text>Error</Text>
+              </Box>
+            )}
+            <VStack className="max-h-1/2" space="sm">
+              <Pressable
+                onPress={() => setCalendarCollapsed((prev) => !prev)}
+                className=" self-end px-4 py-1"
+              >
+                <Text>
+                  {calendarCollapsed ? '캘린더 펼치기 ▲' : '캘린더 접기 ▼'}
+                </Text>
+              </Pressable>
+              {!calendarCollapsed && (
+                <FuelCalendarView
+                  vehicleId={vehicle.id}
+                  onDateChange={setCurrentDate}
+                />
+              )}
+            </VStack>
+          </VStack>
+          <Box className="flex flex-col px-4 flex-1 ">
+            <Heading
+              size="sm"
+              className="bg-white py-3 border-b border-gray-200"
+            >
               {format(currentDate, 'yyyy-MM-dd')} 주유 내역
             </Heading>
             <FuelRecordList
@@ -110,7 +160,7 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
             />
           </Box>
           <FloatingAddButton onPress={navigateToFuelRecord} />
-        </Box>
+        </VStack>
       )}
       {selectedTab === 'statistics' && (
         <FuelStatisticsView vehicleId={vehicle.id} />

@@ -2,13 +2,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { DateData } from 'react-native-calendars';
 
-import { Box } from '@/shared/components/ui/box';
-import { Text } from '@/shared/components/ui/text';
 import { useFuelRecordsByMonth } from '@/features/fuelRecord';
-
-import { useFuelStatisticQueries } from '@/features/fuelStatistics';
-
-import { MonthlyStatsCard } from './ui/MonthlyStatsCard';
 
 import { Calendar } from '@shared/components/Calendar';
 
@@ -26,13 +20,6 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
-
-  const { monthlyStatsQuery } = useFuelStatisticQueries({
-    vehicleId,
-    year: currentYear,
-    month: currentMonth,
-  });
-  const { data: monthlyStats } = monthlyStatsQuery;
 
   const { data: fuelRecords } = useFuelRecordsByMonth(
     vehicleId,
@@ -81,42 +68,9 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
     onDateChange?.(new Date(date.dateString));
   };
 
-  if (monthlyStatsQuery.isLoading) {
-    return (
-      <Box className="flex-1 justify-center items-center">
-        <Text>Loading...</Text>
-      </Box>
-    );
-  }
-
-  if (monthlyStatsQuery.isError) {
-    return (
-      <Box className="flex-1 justify-center items-center">
-        <Text>Error</Text>
-      </Box>
-    );
-  }
-
-  if (!monthlyStats) {
-    return (
-      <Box className="flex-1 justify-center items-center">
-        <Text>No data</Text>
-      </Box>
-    );
-  }
-
   return (
     // 월별 캘린더 뷰
     <Fragment>
-      {/* 월별 통계 카드 */}
-      <MonthlyStatsCard
-        totalCost={monthlyStats.totalCost ?? 0}
-        totalAmount={monthlyStats.totalAmount ?? 0}
-        avgUnitPrice={monthlyStats.avgUnitPrice ?? 0}
-        recordCount={monthlyStats.recordCount ?? 0}
-        hideIcon={true}
-      />
-
       {/* 캘린더 */}
       <Calendar
         currentDate={currentDate}

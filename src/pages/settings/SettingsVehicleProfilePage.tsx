@@ -1,6 +1,5 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import Vehicle from '@shared/models/Vehicle';
-import { Box } from '@shared/components/ui/box';
 import { useDefaultVehicle, VehicleList } from '@features/vehicle';
 import { useVehicles } from '@features/vehicle';
 import { useInvalidateOnFocus } from '@shared/hooks/useInvalidateOnFocus';
@@ -52,10 +51,8 @@ export function SettingsVehicleProfilePage({
 
   return (
     <PageLayout>
-      <Box className="flex-1 bg-white relative">
-        <VehicleList vehicles={vehicles} onEdit={handleEdit} />
-        <FloatingAddButton onPress={handleAdd} />
-      </Box>
+      <VehicleList vehicles={vehicles} onEdit={handleEdit} />
+      <FloatingAddButton onPress={handleAdd} />
     </PageLayout>
   );
 }

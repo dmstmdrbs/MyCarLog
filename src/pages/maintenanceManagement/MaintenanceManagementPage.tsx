@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useLayoutEffect } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, ScrollView } from 'react-native';
 import {
   useDeleteMaintenanceRecord,
   useMaintenanceRecordsByDate,
@@ -219,38 +219,42 @@ export const MaintenanceManagementPage = ({
         <Heading size="sm">
           {format(currentDate, 'yyyy-MM-dd')} 정비 기록
         </Heading>
-        {isLoading && (
-          <Box className="items-center justify-center flex-1">
-            <Spinner />
-          </Box>
-        )}
-        {error && (
-          <Text className="text-error-600 mb-2">
-            에러가 발생했습니다: {String(error)}
-          </Text>
-        )}
-        {!isLoading && !error && (!records || records.length === 0) && (
-          <Box className="flex-1 items-center justify-center bg-background-light">
-            <Text className="text-typography-500 text-center">
-              정비 기록이 없습니다.
+        <ScrollView>
+          {isLoading && (
+            <Box className="items-center justify-center flex-1">
+              <Spinner />
+            </Box>
+          )}
+          {error && (
+            <Text className="text-error-600 mb-2">
+              에러가 발생했습니다: {String(error)}
             </Text>
-          </Box>
-        )}
-        {Array.isArray(dayRecords) && dayRecords.length > 0 && (
-          <FlatList
-            className="bg-white"
-            data={Array.isArray(dayRecords) ? dayRecords : []}
-            keyExtractor={(item) => String(item.id)}
-            ItemSeparatorComponent={() => <Divider />}
-            renderItem={({ item }) => (
-              <MemoizedMaintenanceRecordItem
-                recordItem={item}
-                onPressDelete={openDeleteDialog}
+          )}
+          {!isLoading && !error && (!records || records.length === 0) && (
+            <Box className="flex-1 items-center justify-center bg-background-light min-h-56">
+              <Text className="text-typography-500 text-center">
+                정비 기록이 없습니다.
+              </Text>
+            </Box>
+          )}
+          {Array.isArray(dayRecords) && dayRecords.length > 0 && (
+            <ScrollView>
+              <FlatList
+                className="bg-white"
+                data={Array.isArray(dayRecords) ? dayRecords : []}
+                keyExtractor={(item) => String(item.id)}
+                ItemSeparatorComponent={() => <Divider />}
+                renderItem={({ item }) => (
+                  <MemoizedMaintenanceRecordItem
+                    recordItem={item}
+                    onPressDelete={openDeleteDialog}
+                  />
+                )}
+                ListFooterComponent={<Box style={{ height: 24 }} />}
               />
-            )}
-            ListFooterComponent={<Box style={{ height: 24 }} />}
-          />
-        )}
+            </ScrollView>
+          )}
+        </ScrollView>
       </Box>
       {/* 삭제 확인 다이얼로그 */}
       <AlertDialog isOpen={!!deleteId} onClose={() => setDeleteId(null)}>

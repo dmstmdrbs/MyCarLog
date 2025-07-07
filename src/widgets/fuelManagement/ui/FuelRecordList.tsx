@@ -18,7 +18,7 @@ export const FuelRecordList = ({
   unitPrice,
 }: FuelRecordListProps) => {
   const renderItem = ({ item }: { item: FuelRecordType }) => (
-    <Box className="flex flex-row justify-between items-center p-4 border-b border-gray-200">
+    <Box className="flex flex-row justify-between items-center p-4 border-b border-gray-200 bg-white">
       <Text className="text-sm text-gray-500">
         {format(item.date, 'yyyy-MM-dd')}
       </Text>
@@ -50,7 +50,7 @@ export const FuelRecordList = ({
   }
   return (
     <FlatList
-      contentContainerClassName="flex-1"
+      contentContainerClassName="h-fullbg-white"
       data={fuelRecords}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}

@@ -38,7 +38,7 @@ interface EnergyRecordFormData {
   amount: number;
   paymentMethodId: string;
   paymentName: string;
-  paymentType: string;
+  paymentType: PaymentMethodType['type'];
   stationId: string;
   stationName: string;
   memo: string;

@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native-stack';
 import { MaintenanceManagementPage } from './MaintenanceManagementPage';
 import { MaintenanceRecordPage } from './MaintenanceRecordPage';
-import { useAppStatus } from 'AppStatusProvider';
+import { useAppStatus } from '@/shared/providers/AppStatusProvider';
 import { useDefaultVehicle } from '@/features/vehicle';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
