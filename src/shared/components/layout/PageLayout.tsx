@@ -1,11 +1,7 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Box } from '@shared/components/ui/box';
 
 const PageLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <SafeAreaView className="bg-background-light relative flex-1">
-      {children}
-    </SafeAreaView>
-  );
+  return <Box className="bg-background-light relative flex-1">{children}</Box>;
 };
 
 export default PageLayout;

@@ -18,13 +18,14 @@ import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
 import { useFuelRecordsByDateRange } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
 import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
 import { Heading } from '@/shared/components/ui/heading';
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
 import {
   MonthlyStatsCard,
   MonthlyStatsCardSkeleton,
 } from '@/widgets/fuelManagement/ui/MonthlyStatsCard';
 import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
+import { Text } from '@/shared/components/ui/text';
 
 type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -109,7 +110,7 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
         />
       </Tab>
       {selectedTab === 'calendar' && (
-        <VStack className="flex-1 gap-4">
+        <VStack className="flex-1">
           {/* 월별 통계 카드 */}
           <VStack>
             {monthlyStatsQuery.isLoading ? (
@@ -145,19 +146,18 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
               )}
             </VStack>
           </VStack>
-          <Box className="flex flex-col px-4 flex-1 ">
-            <Heading
-              size="sm"
-              className="bg-white py-3 border-b border-gray-200"
-            >
+          <VStack className="flex-1">
+            <Heading size="sm" className="px-4 py-2">
               {format(currentDate, 'yyyy-MM-dd')} 주유 내역
             </Heading>
-            <FuelRecordList
-              fuelRecords={fuelRecordsByDate ?? []}
-              unit={unit}
-              unitPrice={unitPrice}
-            />
-          </Box>
+            <Box className="py-0 flex-1 bg-white">
+              <FuelRecordList
+                fuelRecords={fuelRecordsByDate ?? []}
+                unit={unit}
+                unitPrice={unitPrice}
+              />
+            </Box>
+          </VStack>
           <FloatingAddButton onPress={navigateToFuelRecord} />
         </VStack>
       )}

@@ -41,7 +41,7 @@ export const FuelRecordList = ({
 
   if (fuelRecords.length === 0) {
     return (
-      <Box className="flex-1 items-center justify-center bg-background-light">
+      <Box className="flex-1 items-center justify-center bg-background-light h-full">
         <Text className="text-typography-500 text-center">
           주유 기록이 없습니다.
         </Text>
@@ -50,7 +50,7 @@ export const FuelRecordList = ({
   }
   return (
     <FlatList
-      contentContainerClassName="h-fullbg-white"
+      contentContainerClassName="h-full"
       data={fuelRecords}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}

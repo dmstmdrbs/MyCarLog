@@ -4,7 +4,6 @@ import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { Heading } from '@/shared/components/ui/heading';
 import { Skeleton, SkeletonText } from '@/shared/components/ui/skeleton';
-import { HStack } from '@/shared/components/ui/hstack';
 import { VStack } from '@/shared/components/ui/vstack';
 
 interface PaymentStat {

@@ -44,6 +44,7 @@ const SelectProfileModal = ({
             <ScrollView className="px-0 w-full">
               {vehicles.map((item) => (
                 <Button
+                  key={item.id}
                   onPress={() => handleClickProfile(item.id)}
                   className="w-full bg-white border-b-2"
                   variant="solid"

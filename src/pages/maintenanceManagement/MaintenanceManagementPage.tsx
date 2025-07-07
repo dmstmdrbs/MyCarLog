@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useLayoutEffect } from 'react';
-import { FlatList, ScrollView } from 'react-native';
+import { FlatList } from 'react-native';
 import {
   useDeleteMaintenanceRecord,
   useMaintenanceRecordsByDate,
@@ -39,6 +39,8 @@ import { startOfMonth, endOfMonth } from 'date-fns';
 import { Icon } from '@/shared/components/ui/icon';
 import { TrashIcon } from 'lucide-react-native';
 import MaintenanceRecord from '@/shared/models/MaintenanceRecord';
+import { VStack } from '@/shared/components/ui/vstack';
+import { HStack } from '@/shared/components/ui/hstack';
 
 type MaintenanceManagementPageProps = NativeStackScreenProps<
   MaintenanceStackParamList,
@@ -64,8 +66,8 @@ const MaintenanceRecordItem = ({
   }, [recordItem.id, onPressDelete]);
 
   return (
-    <Box className="py-3 flex-row items-center justify-between border-b border-gray-200">
-      <Box>
+    <HStack className="justify-between border-gray-200 p-2">
+      <VStack className="flex-1 p-2">
         <Text className="font-bold">
           {format(new Date(recordItem.date), 'yyyy년 MM월 dd일')}
         </Text>
@@ -91,28 +93,28 @@ const MaintenanceRecordItem = ({
             <Text className="text-typography-700">{recordItem.shopName}</Text>
           ) : null}
         </Box>
-        <Box>
-          <Heading size="sm" className="text-typography-500">
-            메모
-          </Heading>
-          <Box className="p-2">
-            {recordItem?.memo ? (
+        {recordItem?.memo ? (
+          <Box className="p-0">
+            <Heading size="sm" className="text-typography-500">
+              메모
+            </Heading>
+            <Box className="p-1">
               <Text className="text-typography-500">{recordItem.memo}</Text>
-            ) : null}
+            </Box>
           </Box>
-        </Box>
-      </Box>
+        ) : null}
+      </VStack>
       <Button
         action="negative"
         size="sm"
         onPress={handleDelete}
-        className="bg-transparent"
+        className="bg-transparent self-center"
       >
         <ButtonText className="text-gray-300">
           <Icon as={TrashIcon} size="md" color="gray" />
         </ButtonText>
       </Button>
-    </Box>
+    </HStack>
   );
 };
 
@@ -214,12 +216,11 @@ export const MaintenanceManagementPage = ({
         onMonthChange={handleDateChange}
         markedDates={markedDates}
       />
-      <Divider orientation="horizontal" />
-      <Box className="flex-1 mt-4 flex flex-col gap-2 px-4">
-        <Heading size="sm">
+      <VStack className="flex-1">
+        <Heading size="sm" className="px-4 py-2">
           {format(currentDate, 'yyyy-MM-dd')} 정비 기록
         </Heading>
-        <ScrollView>
+        <Box className="py-0 flex-1">
           {isLoading && (
             <Box className="items-center justify-center flex-1">
               <Spinner />
@@ -231,31 +232,30 @@ export const MaintenanceManagementPage = ({
             </Text>
           )}
           {!isLoading && !error && (!records || records.length === 0) && (
-            <Box className="flex-1 items-center justify-center bg-background-light min-h-56">
+            <Box className="flex-1 items-center justify-center bg-background-light h-full">
               <Text className="text-typography-500 text-center">
                 정비 기록이 없습니다.
               </Text>
             </Box>
           )}
           {Array.isArray(dayRecords) && dayRecords.length > 0 && (
-            <ScrollView>
-              <FlatList
-                className="bg-white"
-                data={Array.isArray(dayRecords) ? dayRecords : []}
-                keyExtractor={(item) => String(item.id)}
-                ItemSeparatorComponent={() => <Divider />}
-                renderItem={({ item }) => (
-                  <MemoizedMaintenanceRecordItem
-                    recordItem={item}
-                    onPressDelete={openDeleteDialog}
-                  />
-                )}
-                ListFooterComponent={<Box style={{ height: 24 }} />}
-              />
-            </ScrollView>
+            <FlatList
+              className="bg-white flex-1"
+              data={Array.isArray(dayRecords) ? dayRecords : []}
+              keyExtractor={(item) => String(item.id) + item.date}
+              ItemSeparatorComponent={() => (
+                <Divider orientation="horizontal" className="bg-gray-200" />
+              )}
+              renderItem={({ item }) => (
+                <MemoizedMaintenanceRecordItem
+                  recordItem={item}
+                  onPressDelete={openDeleteDialog}
+                />
+              )}
+            />
           )}
-        </ScrollView>
-      </Box>
+        </Box>
+      </VStack>
       {/* 삭제 확인 다이얼로그 */}
       <AlertDialog isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
         <AlertDialogBackdrop />

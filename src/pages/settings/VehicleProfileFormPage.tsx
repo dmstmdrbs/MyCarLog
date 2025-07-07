@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
@@ -11,7 +11,6 @@ import {
 } from '@shared/components/ui/toast';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
 import {
-  useVehicle,
   useCreateVehicle,
   useUpdateVehicle,
   useDeleteVehicle,
@@ -26,6 +25,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
 import PageLayout from '@/shared/components/layout/PageLayout';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { VehicleFormData } from '@/features/vehicle/VehicleForm';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -36,41 +37,22 @@ export function VehicleProfileFormPage({
   route,
   navigation,
 }: VehicleProfileFormPageProps) {
+  const [isInitialEnter] = useState(route.params?.isInitial ?? false);
+  const safeAreaInsets = useSafeAreaInsets();
+
   const rootNavigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { vehicleId, isInitial } = route.params;
 
-  const [nickname, setNickname] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
-  const [model, setModel] = useState('');
-  const [type, setType] = useState<'ICE' | 'EV'>('ICE');
-  const [isDefault, setIsDefault] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const toast = useToast();
 
-  const { data: vehicle } = useVehicle(vehicleId ?? '');
   const createVehicleMutation = useCreateVehicle();
   const updateVehicleMutation = useUpdateVehicle();
   const deleteVehicleMutation = useDeleteVehicle();
 
-  useEffect(() => {
-    if (vehicle) {
-      setNickname(vehicle.nickname);
-      setManufacturer(vehicle.manufacturer);
-      setModel(vehicle.model);
-      setType(vehicle.type);
-      setIsDefault(vehicle.isDefault);
-    }
-  }, [vehicle]);
-
-  const handleFormChange = (field: string, value: string) => {
-    if (field === 'nickname') setNickname(value);
-    if (field === 'manufacturer') setManufacturer(value);
-    if (field === 'model') setModel(value);
-  };
-
-  const handleSave = async () => {
-    if (!nickname) return Alert.alert('차량 별칭을 입력하세요');
+  const handleSave = async (formData: VehicleFormData) => {
+    if (!formData.nickname) return Alert.alert('차량 별칭을 입력하세요');
 
     try {
       if (vehicleId) {
@@ -78,21 +60,21 @@ export function VehicleProfileFormPage({
         await updateVehicleMutation.mutateAsync({
           id: vehicleId,
           data: {
-            nickname,
-            manufacturer,
-            model,
-            type,
-            isDefault,
+            nickname: formData.nickname.trim(),
+            manufacturer: formData.manufacturer.trim(),
+            model: formData.model.trim(),
+            type: formData.type,
+            isDefault: formData.isDefault,
           },
         });
       } else {
         // 추가
         await createVehicleMutation.mutateAsync({
-          nickname,
-          manufacturer,
-          model,
-          type,
-          isDefault,
+          nickname: formData.nickname.trim(),
+          manufacturer: formData.manufacturer.trim(),
+          model: formData.model.trim(),
+          type: formData.type,
+          isDefault: formData.isDefault,
         });
       }
 
@@ -156,20 +138,17 @@ export function VehicleProfileFormPage({
     }
   };
 
+  console.log(safeAreaInsets);
   return (
     <PageLayout>
-      <Box className="flex-1 bg-white p-4 flex flex-col gap-3">
+      <Box
+        className="flex-1 bg-white p-4 flex flex-col gap-3"
+        style={isInitialEnter ? { paddingBottom: safeAreaInsets.bottom } : {}}
+      >
         <Box className="flex-1 bg-white">
           <VehicleForm
-            nickname={nickname}
-            manufacturer={manufacturer}
-            model={model}
-            type={type}
-            onChange={handleFormChange}
-            onTypeChange={setType}
             onSubmit={handleSave}
             editingId={vehicleId ?? null}
-            isDefault={isDefault}
             setDefaultProfile={handleSetDefaultProfile}
           />
         </Box>

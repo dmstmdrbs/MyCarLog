@@ -17,34 +17,47 @@ import {
   RadioLabel,
 } from '@shared/components/ui/radio';
 import { Text } from '@shared/components/ui/text';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
+import { useVehicle } from './hooks/useVehicleQueries';
 
 interface VehicleFormProps {
+  setDefaultProfile: () => void;
+  onSubmit: (formData: VehicleFormData) => void;
+  editingId: string | null;
+}
+
+export type VehicleFormData = {
   nickname: string;
   manufacturer: string;
   model: string;
   type: 'ICE' | 'EV';
-  onChange: (field: string, value: string) => void;
-  onTypeChange: (type: 'ICE' | 'EV') => void;
-  setDefaultProfile: () => void;
-  onSubmit: () => void;
-  editingId: string | null;
   isDefault: boolean;
-}
+};
 
 export const VehicleForm = ({
-  nickname,
-  manufacturer,
-  model,
-  type,
-  onChange,
-  onTypeChange,
   setDefaultProfile,
   onSubmit,
   editingId,
 }: VehicleFormProps) => {
+  const { data: vehicle } = useVehicle(editingId ?? '');
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [nickname, setNickname] = useState('');
+  const [manufacturer, setManufacturer] = useState('');
+  const [model, setModel] = useState('');
+  const [type, setType] = useState<'ICE' | 'EV'>('ICE');
+  const [isDefault, setIsDefault] = useState(false);
+
+  useEffect(() => {
+    if (vehicle) {
+      setNickname(vehicle.nickname);
+      setManufacturer(vehicle.manufacturer);
+      setModel(vehicle.model);
+      setType(vehicle.type);
+      setIsDefault(vehicle.isDefault);
+    }
+  }, [vehicle]);
 
   return (
     <FormControl className="flex-1 flex flex-col justify-between">
@@ -68,7 +81,7 @@ export const VehicleForm = ({
             <Input>
               <InputField
                 value={nickname}
-                onChangeText={(text) => onChange('nickname', text)}
+                onChangeText={(text) => setNickname(text)}
                 placeholder="차량의 닉네임을 지정해주세요."
               />
             </Input>
@@ -78,7 +91,7 @@ export const VehicleForm = ({
             <Input>
               <InputField
                 value={manufacturer}
-                onChangeText={(text) => onChange('manufacturer', text)}
+                onChangeText={(text) => setManufacturer(text)}
                 placeholder="제조사를 입력해주세요."
               />
             </Input>
@@ -88,7 +101,7 @@ export const VehicleForm = ({
             <Input>
               <InputField
                 value={model}
-                onChangeText={(text) => onChange('model', text)}
+                onChangeText={(text) => setModel(text)}
                 placeholder="모델명을 입력해주세요."
               />
             </Input>
@@ -99,7 +112,7 @@ export const VehicleForm = ({
           <RadioGroup
             className="flex flex-row gap-2"
             value={type}
-            onChange={(value) => onTypeChange(value as 'ICE' | 'EV')}
+            onChange={(value) => setType(value as 'ICE' | 'EV')}
           >
             <Radio value="ICE" size="md" isInvalid={false} isDisabled={false}>
               <RadioIndicator>
@@ -139,7 +152,19 @@ export const VehicleForm = ({
         )}
       </Box>
       <Box className="flex flex-row gap-2 mt-4">
-        <Button onPress={onSubmit} className="flex-1" action="primary">
+        <Button
+          onPress={() =>
+            onSubmit({
+              nickname: nickname.trim(),
+              manufacturer: manufacturer.trim(),
+              model: model.trim(),
+              type,
+              isDefault,
+            })
+          }
+          className="flex-1"
+          action="primary"
+        >
           <ButtonText>{editingId ? '완료' : '추가'}</ButtonText>
         </Button>
       </Box>

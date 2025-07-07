@@ -14,9 +14,13 @@ import { SettingsStackScreen } from '@pages/settings';
 import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppStatusProvider } from '@/shared/providers/AppStatusProvider';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import 'react-native-gesture-handler';
+import { Box } from '@/shared/components/ui/box';
 
 // 각 Stack Navigator 정의
 
@@ -40,8 +44,11 @@ export type RootStackParamList = {
 };
 
 const HomeTab = () => {
+  const safeAreaInsets = useSafeAreaInsets();
   const { selectedVehicle } = useSelectedVehicle();
   const isEV = selectedVehicle?.type === 'EV';
+
+  console.log(safeAreaInsets);
 
   return (
     <Tab.Navigator
@@ -64,6 +71,20 @@ const HomeTab = () => {
         tabBarItemStyle: {
           height: 36,
         },
+      }}
+      safeAreaInsets={safeAreaInsets}
+      layout={({ children }) => {
+        return (
+          <Box
+            className="flex-1"
+            style={{
+              paddingBottom: safeAreaInsets.bottom,
+              backgroundColor: 'white',
+            }}
+          >
+            {children}
+          </Box>
+        );
       }}
     >
       <Tab.Screen
