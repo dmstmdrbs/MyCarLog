@@ -50,7 +50,6 @@ export const FuelRecordList = ({
   }
   return (
     <FlatList
-      contentContainerClassName="h-full"
       data={fuelRecords}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}
