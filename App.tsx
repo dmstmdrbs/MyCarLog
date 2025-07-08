@@ -48,8 +48,6 @@ const HomeTab = () => {
   const { selectedVehicle } = useSelectedVehicle();
   const isEV = selectedVehicle?.type === 'EV';
 
-  console.log(safeAreaInsets);
-
   return (
     <Tab.Navigator
       detachInactiveScreens={true}

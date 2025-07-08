@@ -16,7 +16,7 @@ const maintenanceRecordsByDateKey = (
   vehicleId: string,
   year: number,
   month: number,
-) => ['maintenanceRecords', 'maintenanceRecordsByDate', vehicleId, year, month];
+) => ['maintenanceRecords', vehicleId, 'maintenanceRecordsByDate', year, month];
 // 차량별 정비 기록 목록 조회
 export function useMaintenanceRecords(vehicleId: string) {
   return useQuery({
