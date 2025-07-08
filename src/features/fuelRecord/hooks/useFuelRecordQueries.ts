@@ -137,6 +137,15 @@ export const useCreateFuelRecord = () => {
         ),
       });
 
+      queryClient.invalidateQueries({
+        queryKey: [
+          'fuelStats',
+          newRecord.vehicleId,
+          recordDate.getFullYear(),
+          recordDate.getMonth() + 1,
+        ],
+      });
+
       // 최근 주유소 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.fuelRecords.recentStations(newRecord.vehicleId),

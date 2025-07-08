@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { Platform, ScrollView } from 'react-native';
 
 import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 
@@ -45,6 +45,7 @@ const useDebounce = (value: boolean, delay: number) => {
   return debouncedValue;
 };
 
+const menuOffset = Platform.OS === 'ios' ? 0 : -50;
 export const FuelStatisticsView = ({ vehicleId }: Props) => {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -73,10 +74,11 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
   const debouncedYearlyStatsLoading = useDebounce(yearlyStatsLoading, 300);
 
   return (
-    <VStack className="flex-1 h-full bg-background-light">
-      <HStack className="flex-row justify-end h-18 p-2">
-        <Box className="flex-row mb-2 space-x-2 gap-1 h-12 w-full items-center justify-end">
+    <VStack className="flex-1 bg-background-light">
+      <HStack className="flex-row justify-end p-2">
+        <Box className="flex-row mb-2 space-x-2 gap-1 w-full items-center justify-end">
           <Menu
+            placement="bottom"
             trigger={(_props) => (
               <Button
                 {..._props}
@@ -89,6 +91,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
                 <Icon as={ChevronDownIcon} className="text-gray-500" />
               </Button>
             )}
+            offset={menuOffset}
           >
             {years.map((y) => (
               <MenuItem
@@ -97,16 +100,16 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
                   setYear(y);
                 }}
                 textValue={`${y}년`}
-                className="min-w-16"
+                className="min-w-12"
               >
-                <MenuItemLabel className="w-16">
+                <MenuItemLabel>
                   <Text>{y}년</Text>
                 </MenuItemLabel>
               </MenuItem>
             ))}
           </Menu>
           <Menu
-            placement="bottom right"
+            placement="bottom"
             trigger={(_props) => (
               <Button
                 {..._props}
@@ -119,6 +122,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
                 <Icon as={ChevronDownIcon} className="text-gray-500" />
               </Button>
             )}
+            offset={menuOffset}
           >
             {months.map((m) => (
               <MenuItem
@@ -127,9 +131,9 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
                   setMonth(m);
                 }}
                 textValue={`${m}월`}
-                className="min-w-16"
+                className="min-w-12"
               >
-                <MenuItemLabel className="w-16">
+                <MenuItemLabel>
                   <Text>{m}월</Text>
                 </MenuItemLabel>
               </MenuItem>
@@ -138,7 +142,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
         </Box>
       </HStack>
 
-      <ScrollView className="flex-1 bg-white p-2">
+      <ScrollView contentContainerClassName="bg-white p-2">
         {/* 월별 주유 통계 카드 */}
         <Box className="h-24 w-full">
           {debouncedMonthlyStatsLoading || monthlyStatsQuery.error ? (
@@ -173,7 +177,15 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
           ) : null}
         </Box>
 
-        <Box className="h-24 w-full mb-2">
+        <Box className="w-full mb-2">
+          {/* 연간 통계 (월별) 라인차트 */}
+          {debouncedYearlyStatsLoading || yearlyStatsQuery.error ? (
+            <Skeleton className="h-56 rounded-xl w-full" />
+          ) : (
+            <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
+          )}
+        </Box>
+        <Box className="w-full mb-2">
           {/* 연간 통계 (월별) 라인차트 */}
           {debouncedYearlyStatsLoading || yearlyStatsQuery.error ? (
             <Skeleton className="h-56 rounded-xl w-full" />

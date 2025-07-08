@@ -4,6 +4,7 @@ import { FormControl } from '@/shared/components/ui/form-control';
 import { FormLabel } from '@/shared/components/form/FormLabel';
 import { useState } from 'react';
 import { useCreateStation } from '../hooks/useStationQueries';
+import { Alert } from 'react-native';
 
 export const StationAddForm = ({
   stationType,
@@ -18,10 +19,16 @@ export const StationAddForm = ({
     const trimmedNewStationName = newStationName.trim();
 
     if (trimmedNewStationName) {
-      await createStation.mutateAsync({
-        name: trimmedNewStationName,
-        type: stationType,
-      });
+      try {
+        await createStation.mutateAsync({
+          name: trimmedNewStationName,
+          type: stationType,
+        });
+        setNewStationName('');
+      } catch (error) {
+        Alert.alert('주유소 추가 실패', '주유소 추가에 실패했습니다.');
+        console.error(error);
+      }
     }
   };
 

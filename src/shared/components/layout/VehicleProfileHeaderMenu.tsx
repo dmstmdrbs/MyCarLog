@@ -32,7 +32,7 @@ const SelectProfileModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalBackdrop />
-      <ModalContent className="max-w-[305px] items-center">
+      <ModalContent className="max-w-96 min-w-64 items-center">
         <ModalBody className="mt-0 mb-4 px-0 w-full">
           <Heading size="md" className="text-typography-950 mb-2 text-center">
             차량 프로필 선택
