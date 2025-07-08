@@ -1,1 +1,1 @@
-export { MaintenanceRecordForm } from './ui/MaintenanceRecordForm';
+export { MaintenanceRecordForm } from './MaintenanceRecordForm';

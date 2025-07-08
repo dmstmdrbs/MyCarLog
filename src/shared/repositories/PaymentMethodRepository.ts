@@ -33,10 +33,14 @@ export class PaymentMethodRepository
     if (data.type !== undefined) record.type = data.type;
   }
 
+  async findAll(): Promise<PaymentMethod[]> {
+    return await this.collection.query(Q.sortBy('created_at', Q.desc)).fetch();
+  }
+
   async findByType(type: PaymentMethod['type']): Promise<PaymentMethod[]> {
     try {
       return await this.collection
-        .query(Q.where('type', type), Q.sortBy('name', Q.asc))
+        .query(Q.where('type', type), Q.sortBy('created_at', Q.desc))
         .fetch();
     } catch (error) {
       console.error(`Error finding payment methods by type ${type}:`, error);

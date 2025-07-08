@@ -51,9 +51,9 @@ export const VehicleForm = ({
 
   useEffect(() => {
     if (vehicle) {
-      setNickname(vehicle.nickname);
-      setManufacturer(vehicle.manufacturer);
-      setModel(vehicle.model);
+      setNickname(vehicle.nickname.trim());
+      setManufacturer(vehicle.manufacturer.trim());
+      setModel(vehicle.model.trim());
       setType(vehicle.type);
       setIsDefault(vehicle.isDefault);
     }
@@ -156,8 +156,8 @@ export const VehicleForm = ({
           onPress={() =>
             onSubmit({
               nickname: nickname.trim(),
-              manufacturer: manufacturer.trim(),
-              model: model.trim(),
+              manufacturer,
+              model,
               type,
               isDefault,
             })

@@ -24,9 +24,11 @@ class ShopRepository extends BaseRepository<Shop> implements IShopRepository {
     }
   }
 
-  findAll(): Promise<Shop[]> {
+  async findAll(): Promise<Shop[]> {
     try {
-      return this.collection.query().fetch();
+      return await this.collection
+        .query(Q.sortBy('created_at', Q.desc))
+        .fetch();
     } catch (error) {
       throw new Error('Failed to find all shops', { cause: error });
     }
@@ -45,20 +47,18 @@ class ShopRepository extends BaseRepository<Shop> implements IShopRepository {
 
   async createShop(shopName: Shop['name']): Promise<Shop> {
     try {
-      console.log(shopName);
       const existingShop = await this.collection
         .query(Q.where('name', shopName))
         .fetch();
 
       if (existingShop.length > 0) {
-        console.log('Shop already exists');
         throw new Error('Shop already exists');
       }
 
       const newShop = {
         name: shopName,
       };
-      console.log(newShop);
+
       return this.database.write(async () => {
         return await this.collection.create((record) => {
           this.assignData(record, newShop);

@@ -20,8 +20,8 @@ import { Divider } from '@shared/components/ui/divider';
 import { useStations, useCreateStation } from '@features/station';
 import type { PaymentMethodType } from '@shared/models/PaymentMethod';
 
-import { PaymentMethodForm } from './PaymentMethodForm';
-import { PaymentMethodList } from './PaymentMethodList';
+import { PaymentMethodForm } from '../../shared/components/PaymentMethodForm';
+import { PaymentMethodList } from '../../shared/components/PaymentMethodList';
 import {
   usePaymentMethods,
   useCreatePaymentMethod,

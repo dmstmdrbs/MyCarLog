@@ -26,7 +26,6 @@ export function SettingsMainPage({ route, navigation }: Props) {
 
   useLayoutEffect(() => {
     if (isFocused && !isDefaultVehicleLoading && !defaultVehicle) {
-      console.log('navigate to SettingsVehicleProfileForm');
       navigation.replace('SettingsVehicleProfileForm', {
         isInitial: true,
       });

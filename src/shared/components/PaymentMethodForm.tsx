@@ -1,4 +1,6 @@
-import { Box } from '@shared/components/ui/box';
+import { ButtonText, Button } from '@/shared/components/ui/button';
+import { VStack } from '@/shared/components/ui/vstack';
+import { PaymentMethodType } from '@/shared/models/PaymentMethod';
 import {
   FormControl,
   FormControlLabel,
@@ -14,20 +16,32 @@ import {
   RadioLabel,
 } from '@shared/components/ui/radio';
 import { Text } from '@shared/components/ui/text';
+import { useState } from 'react';
+import { Alert } from 'react-native';
 
 export const PaymentMethodForm = ({
-  name,
-  type,
-  onChangeName,
-  onChangeType,
+  onSubmit,
 }: {
-  name: string;
-  type: 'credit' | 'giftcard' | 'etc';
-  onChangeName: (name: string) => void;
-  onChangeType: (type: 'credit' | 'giftcard' | 'etc') => void;
+  onSubmit: (name: string, type: PaymentMethodType['type']) => void;
 }) => {
+  const [paymentType, setPaymentType] =
+    useState<PaymentMethodType['type']>('credit');
+  const [paymentName, setPaymentName] = useState<string>('');
+
+  const handleSubmit = () => {
+    const trimmedPaymentName = paymentName.trim();
+    if (trimmedPaymentName.length === 0) {
+      Alert.alert('결제 수단 추가', '결제 수단 이름을 입력해주세요.');
+      return;
+    }
+
+    onSubmit(trimmedPaymentName, paymentType);
+    setPaymentName('');
+    setPaymentType('credit');
+  };
+
   return (
-    <Box className="flex flex-row justify-start w-full gap-2">
+    <VStack className="gap-2">
       <FormControl className="w-full">
         <FormControlLabel>
           <FormControlLabelText>
@@ -36,9 +50,9 @@ export const PaymentMethodForm = ({
         </FormControlLabel>
         <RadioGroup
           className="flex flex-row gap-2"
-          value={type}
+          value={paymentType}
           onChange={(value: 'credit' | 'giftcard' | 'etc') =>
-            onChangeType(value)
+            setPaymentType(value)
           }
         >
           <Radio value="credit" size="md" isInvalid={false} isDisabled={false}>
@@ -76,12 +90,17 @@ export const PaymentMethodForm = ({
         <Input className="w-full rounded-xl border-2 border-gray-200 bg-gr">
           <InputField
             placeholder="결제 수단 이름"
-            value={name}
+            value={paymentName}
             className="text-lg font-medium"
-            onChangeText={onChangeName}
+            onChangeText={(text) => {
+              setPaymentName(text);
+            }}
           />
         </Input>
       </FormControl>
-    </Box>
+      <Button onPress={handleSubmit}>
+        <ButtonText>추가</ButtonText>
+      </Button>
+    </VStack>
   );
 };

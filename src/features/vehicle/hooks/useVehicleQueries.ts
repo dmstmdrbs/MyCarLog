@@ -58,7 +58,6 @@ export const useCreateVehicle = () => {
     mutationFn: (data: CreateVehicleData) =>
       vehicleRepository.createVehicle(data),
     onSuccess: async (newVehicle) => {
-      console.log('newVehicle', newVehicle);
       // 차량 목록 캐시 무효화
       await Promise.all([
         // 차량 목록 캐시 무효화 (다른 차량들의 isDefault가 변경되므로)

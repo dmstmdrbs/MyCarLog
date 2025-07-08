@@ -52,7 +52,14 @@ export function VehicleProfileFormPage({
   const deleteVehicleMutation = useDeleteVehicle();
 
   const handleSave = async (formData: VehicleFormData) => {
+    const trimmedNickname = formData.nickname.trim();
+    const trimmedManufacturer = formData.manufacturer.trim();
+    const trimmedModel = formData.model.trim();
+
     if (!formData.nickname) return Alert.alert('차량 별칭을 입력하세요');
+    if (!trimmedNickname) return Alert.alert('차량 별칭을 입력하세요');
+    if (!trimmedManufacturer) return Alert.alert('제조사를 입력하세요');
+    if (!trimmedModel) return Alert.alert('모델을 입력하세요');
 
     try {
       if (vehicleId) {
@@ -60,9 +67,9 @@ export function VehicleProfileFormPage({
         await updateVehicleMutation.mutateAsync({
           id: vehicleId,
           data: {
-            nickname: formData.nickname.trim(),
-            manufacturer: formData.manufacturer.trim(),
-            model: formData.model.trim(),
+            nickname: trimmedNickname,
+            manufacturer: trimmedManufacturer,
+            model: trimmedModel,
             type: formData.type,
             isDefault: formData.isDefault,
           },
@@ -70,9 +77,9 @@ export function VehicleProfileFormPage({
       } else {
         // 추가
         await createVehicleMutation.mutateAsync({
-          nickname: formData.nickname.trim(),
-          manufacturer: formData.manufacturer.trim(),
-          model: formData.model.trim(),
+          nickname: trimmedNickname,
+          manufacturer: trimmedManufacturer,
+          model: trimmedModel,
           type: formData.type,
           isDefault: formData.isDefault,
         });
@@ -138,7 +145,6 @@ export function VehicleProfileFormPage({
     }
   };
 
-  console.log(safeAreaInsets);
   return (
     <PageLayout>
       <Box

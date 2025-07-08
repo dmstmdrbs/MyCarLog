@@ -4,8 +4,8 @@ import type { EnergyRecordFormData } from './EnergyRecordForm';
 export { EnergyRecordForm };
 export type { EnergyRecordFormData };
 
-export { PaymentMethodForm } from './PaymentMethodForm';
-export { PaymentMethodList } from './PaymentMethodList';
+export { PaymentMethodForm } from '../../shared/components/PaymentMethodForm';
+export { PaymentMethodList } from '../../shared/components/PaymentMethodList';
 
 // 새로운 TanStack Query hooks
 export {

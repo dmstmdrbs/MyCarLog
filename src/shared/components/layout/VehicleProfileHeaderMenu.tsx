@@ -76,7 +76,7 @@ const VehicleProfileHeaderMenu = () => {
 
   const handleChangeSelectedProfile = async (vehicleId: string) => {
     const vehicle = vehicles.find((v) => v.id === vehicleId);
-    console.log('vehicle', vehicle);
+
     if (vehicle) {
       setSelectedVehicle(vehicle);
     }

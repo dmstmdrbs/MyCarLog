@@ -43,7 +43,7 @@ export class MaintenanceItemRepository
 
   async findAll(): Promise<MaintenanceItem[]> {
     try {
-      return await this.collection.query().fetch();
+      return await this.collection.query(Q.sortBy('name', Q.asc)).fetch();
     } catch (error) {
       console.error(`Error finding maintenance items:`, error);
       throw error;
