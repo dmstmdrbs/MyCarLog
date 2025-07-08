@@ -1,8 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { FuelManagementPage } from './FuelManagementPage';
 import VehicleProfileHeaderMenu from '@shared/components/layout/VehicleProfileHeaderMenu';
-import { FuelRecordPage } from './FuelRecordPage';
 import { useSelectedVehicle } from '@features/vehicle';
+
+import { FuelManagementPage } from './FuelManagementPage';
+import { FuelRecordPage } from './FuelRecordPage';
 
 export type FuelStackParamList = {
   FuelMain: { vehicleId: string };

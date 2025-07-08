@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useFuelStatistics } from '../useFuelStatistics';
+import { useFuelStatistics } from './useFuelStatistics';
 
 interface UseFuelStatisticQueriesProps {
   vehicleId: string;

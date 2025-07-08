@@ -1,11 +1,9 @@
 import { Box } from '@shared/components/ui/box';
-import { Text } from '@shared/components/ui/text';
 import { FormControl } from '@shared/components/ui/form-control';
 import { Input, InputField } from '@shared/components/ui/input';
 import { Button, ButtonText } from '@shared/components/ui/button';
 import { Textarea, TextareaInput } from '@shared/components/ui/textarea';
 import { useMemo, useState } from 'react';
-import { Alert, FlatList } from 'react-native';
 
 import { formatDate } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -13,23 +11,16 @@ import {
   Modal,
   ModalBackdrop,
   ModalContent,
-  ModalFooter,
-  ModalHeader,
 } from '@shared/components/ui/modal';
-import { Divider } from '@shared/components/ui/divider';
-import { useStations, useCreateStation } from '@features/station';
+import { useStations } from '@features/station';
 import type { PaymentMethodType } from '@shared/models/PaymentMethod';
 
-import { PaymentMethodForm } from '../../shared/components/PaymentMethodForm';
-import { PaymentMethodList } from '../../shared/components/PaymentMethodList';
-import {
-  usePaymentMethods,
-  useCreatePaymentMethod,
-} from '@features/paymentMethods';
 import { formatDateForDisplay } from '@/shared/utils/format';
 import { Calendar } from '@/shared/components/Calendar';
 import { FormCard } from '@/shared/components/form/FormCard';
 import { FormLabel } from '@/shared/components/form/FormLabel';
+import { PaymentMethodModal } from '../../features/paymentMethods/ui/PaymentMethodModal';
+import { StationPickerModal } from '../../features/station/ui/StationPickerModal';
 
 interface EnergyRecordFormData {
   date: string; // YYYY-MM-DD 형식
@@ -59,20 +50,9 @@ export function EnergyRecordForm({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showStationPicker, setShowStationPicker] = useState(false);
   const [showPaymentTypePicker, setShowPaymentTypePicker] = useState(false);
-  const [newPaymentMethod, setNewPaymentMethod] = useState<{
-    name: PaymentMethodType['name'];
-    type: Exclude<PaymentMethodType['type'], 'cash'>;
-  }>({
-    name: '',
-    type: 'credit',
-  });
-  const [newStationName, setNewStationName] = useState('');
 
   // 새로운 TanStack Query 방식 사용
-  const { data: paymentMethods = [] } = usePaymentMethods();
-  const { data: stations = [], refetch } = useStations();
-  const createPaymentMethod = useCreatePaymentMethod();
-  const createStation = useCreateStation();
+  const { data: stations = [] } = useStations();
 
   const selectedStation = useMemo(
     () => stations.find((s) => s.id === energyRecord.stationId),
@@ -152,38 +132,6 @@ export function EnergyRecordForm({
   const displayValue = (value: number) => (value === 0 ? '' : value.toString());
   const displayCurrency = (value: number) =>
     value === 0 ? '' : value.toLocaleString();
-
-  const handleAddPaymentMethod = async () => {
-    if (newPaymentMethod?.type) {
-      try {
-        await createPaymentMethod.mutateAsync({
-          name: newPaymentMethod.name,
-          type: newPaymentMethod.type,
-        });
-        setNewPaymentMethod({
-          name: '',
-          type: 'credit',
-        });
-      } catch (error) {
-        Alert.alert(
-          '결제 수단 추가 실패',
-          '결제 수단 추가 중 오류가 발생했습니다. 다시 시도해주세요.',
-        );
-        console.error(error);
-      }
-    }
-  };
-
-  const handleAddStation = async () => {
-    if (newStationName) {
-      await createStation.mutateAsync({
-        name: newStationName,
-        type: vehicleType === 'EV' ? 'ev' : 'gas',
-      });
-      await refetch();
-      setNewStationName('');
-    }
-  };
 
   return (
     <FormControl className="flex-1">
@@ -292,61 +240,17 @@ export function EnergyRecordForm({
               {selectedStation?.name || config.stationPlaceholder}
             </ButtonText>
           </Button>
-          <Modal
+          <StationPickerModal
             isOpen={showStationPicker}
             onClose={() => setShowStationPicker(false)}
-          >
-            <ModalBackdrop />
-            <ModalContent>
-              <ModalHeader>
-                <Text className="text-lg font-semibold text-gray-900">
-                  {config.station} 선택
-                </Text>
-              </ModalHeader>
-
-              <Box className="h-80 py-2 bg-white">
-                <FlatList
-                  data={stations}
-                  keyExtractor={(item) => item.id}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => (
-                    <Box className="flex flex-col gap-0.5">
-                      <Button
-                        className="bg-white justify-start rounded-xl w-full focus:border-primary-500 focus:bg-white transition-all"
-                        onPress={() => {
-                          onEnergyRecordChange({
-                            ...energyRecord,
-                            stationId: item.id,
-                            stationName: item.name,
-                          });
-                          setShowStationPicker(false);
-                        }}
-                      >
-                        <ButtonText className="text-lg font-medium text-gray-700">
-                          {item.name}
-                        </ButtonText>
-                      </Button>
-                      {index !== stations.length - 1 && (
-                        <Divider className="my-2" orientation="horizontal" />
-                      )}
-                    </Box>
-                  )}
-                />
-              </Box>
-              <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                <InputField
-                  placeholder={`새로운 ${config.station} 이름`}
-                  value={newStationName}
-                  onChangeText={(text) => {
-                    setNewStationName(text);
-                  }}
-                />
-              </Input>
-              <Button onPress={handleAddStation}>
-                <ButtonText>새로운 {config.station} 추가</ButtonText>
-              </Button>
-            </ModalContent>
-          </Modal>
+            onSelectStation={(station) => {
+              onEnergyRecordChange({
+                ...energyRecord,
+                stationId: station.id,
+                stationName: station.name,
+              });
+            }}
+          />
         </Box>
       </FormCard>
 
@@ -366,56 +270,18 @@ export function EnergyRecordForm({
             </ButtonText>
           </Button>
 
-          <Modal
+          <PaymentMethodModal
             isOpen={showPaymentTypePicker}
             onClose={() => setShowPaymentTypePicker(false)}
-          >
-            <ModalBackdrop />
-            <ModalContent>
-              <ModalHeader>
-                <Text className="text-lg font-semibold text-gray-900">
-                  결제 수단 선택
-                </Text>
-              </ModalHeader>
-
-              <Box className="h-80 py-2 bg-white">
-                <PaymentMethodList
-                  paymentMethods={paymentMethods}
-                  onClickPaymentMethodItem={(method) => {
-                    onEnergyRecordChange({
-                      ...energyRecord,
-                      paymentType: method.type,
-                      paymentMethodId: method.id,
-                      paymentName: method.name,
-                    });
-                    setShowPaymentTypePicker(false);
-                  }}
-                />
-                <Divider className="my-1" orientation="horizontal" />
-                <Text className="text-lg font-semibold text-gray-700">
-                  결제 수단 추가
-                </Text>
-                <PaymentMethodForm
-                  name={newPaymentMethod.name}
-                  type={newPaymentMethod.type}
-                  onChangeName={(name) =>
-                    setNewPaymentMethod({ ...newPaymentMethod, name })
-                  }
-                  onChangeType={(type) =>
-                    setNewPaymentMethod({ ...newPaymentMethod, type })
-                  }
-                />
-              </Box>
-              <ModalFooter>
-                <Button onPress={handleAddPaymentMethod}>
-                  <ButtonText>결제 수단 추가</ButtonText>
-                </Button>
-                <Button onPress={() => setShowPaymentTypePicker(false)}>
-                  <ButtonText>취소</ButtonText>
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
+            onSelectPaymentMethod={(paymentMethod) => {
+              onEnergyRecordChange({
+                ...energyRecord,
+                paymentMethodId: paymentMethod.id,
+                paymentName: paymentMethod.name,
+                paymentType: paymentMethod.type,
+              });
+            }}
+          />
         </Box>
       </FormCard>
 

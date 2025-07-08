@@ -6,8 +6,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { FuelStackParamList } from './navigator';
 import { Box } from '@shared/components/ui/box';
 import { ScrollView } from 'react-native';
-import { EnergyRecordForm } from '@/features/fuelRecord';
-import type { EnergyRecordFormData } from '@/features/fuelRecord';
+import {
+  EnergyRecordForm,
+  type EnergyRecordFormData,
+} from '@/widgets/fuelManagement';
 import {
   useCreateFuelRecord,
   // useUpdateFuelRecord,
