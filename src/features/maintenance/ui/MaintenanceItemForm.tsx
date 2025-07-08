@@ -1,0 +1,88 @@
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
+
+import { FormControl } from '@/shared/components/ui/form-control';
+import { Input, InputField } from '@/shared/components/ui/input';
+import { Button, ButtonText } from '@/shared/components/ui/button';
+
+import type { CreateMaintenanceItemData } from '@/shared/repositories/MaintenanceItemRepository';
+import type MaintenanceItem from '@/shared/models/MaintenanceItem';
+import { FormLabel } from '@/shared/components/form/FormLabel';
+import { VStack } from '@/shared/components/ui/vstack';
+
+export const MaintenanceItemForm = ({
+  initialData,
+  onSave,
+}: {
+  initialData: MaintenanceItem | null;
+  onSave: (formData: CreateMaintenanceItemData) => Promise<void>;
+}) => {
+  const [name, setName] = useState(initialData?.name ?? '');
+  const [maintenanceKm, setMaintenanceKm] = useState(
+    initialData?.maintenanceKm?.toString() ?? '',
+  );
+  const [maintenanceMonth, setMaintenanceMonth] = useState(
+    initialData?.maintenanceMonth?.toString() ?? '',
+  );
+
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setMaintenanceKm(initialData.maintenanceKm?.toString() ?? '');
+      setMaintenanceMonth(initialData.maintenanceMonth?.toString() ?? '');
+    }
+  }, [initialData]);
+
+  const handleSave = async () => {
+    if (!name) return Alert.alert('정비 항목명을 입력하세요');
+
+    setName('');
+    setMaintenanceKm('');
+    setMaintenanceMonth('');
+    onSave({
+      name,
+      maintenanceKm: maintenanceKm ? Number(maintenanceKm) : undefined,
+      maintenanceMonth: maintenanceMonth ? Number(maintenanceMonth) : undefined,
+    });
+  };
+
+  return (
+    <FormControl className="flex flex-col gap-4 bg-white w-full p-4">
+      <VStack space="xs">
+        <FormLabel name="정비 항목명" size="sm" />
+        <Input>
+          <InputField
+            value={name}
+            onChangeText={setName}
+            placeholder="정비 항목명"
+          />
+        </Input>
+      </VStack>
+      <VStack space="xs">
+        <FormLabel name="정비 주기(km)" size="sm" />
+        <Input>
+          <InputField
+            value={maintenanceKm}
+            onChangeText={setMaintenanceKm}
+            placeholder="정비 주기(km)"
+            keyboardType="numeric"
+          />
+        </Input>
+      </VStack>
+      <VStack space="xs">
+        <FormLabel name="정비 주기(개월)" size="sm" />
+        <Input>
+          <InputField
+            value={maintenanceMonth}
+            onChangeText={setMaintenanceMonth}
+            placeholder="정비 주기(개월)"
+            keyboardType="numeric"
+          />
+        </Input>
+      </VStack>
+      <Button onPress={handleSave}>
+        <ButtonText>저장</ButtonText>
+      </Button>
+    </FormControl>
+  );
+};
