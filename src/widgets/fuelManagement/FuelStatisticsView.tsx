@@ -185,14 +185,6 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
             <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
           )}
         </Box>
-        <Box className="w-full mb-2">
-          {/* 연간 통계 (월별) 라인차트 */}
-          {debouncedYearlyStatsLoading || yearlyStatsQuery.error ? (
-            <Skeleton className="h-56 rounded-xl w-full" />
-          ) : (
-            <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
-          )}
-        </Box>
       </ScrollView>
     </VStack>
   );
