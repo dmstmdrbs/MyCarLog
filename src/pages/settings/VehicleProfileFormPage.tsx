@@ -25,8 +25,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
 import PageLayout from '@/shared/components/layout/PageLayout';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VehicleFormData } from '@/features/vehicle/VehicleForm';
+import { HStack } from '@/shared/components/ui/hstack';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -37,9 +37,6 @@ export function VehicleProfileFormPage({
   route,
   navigation,
 }: VehicleProfileFormPageProps) {
-  const [isInitialEnter] = useState(route.params?.isInitial ?? false);
-  const safeAreaInsets = useSafeAreaInsets();
-
   const rootNavigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { vehicleId, isInitial } = route.params;
@@ -147,10 +144,7 @@ export function VehicleProfileFormPage({
 
   return (
     <PageLayout>
-      <Box
-        className="flex-1 bg-white p-4 flex flex-col gap-3"
-        style={isInitialEnter ? { paddingBottom: safeAreaInsets.bottom } : {}}
-      >
+      <HStack className="h-full p-4 gap-3">
         <Box className="flex-1 bg-white">
           <VehicleForm
             onSubmit={handleSave}
@@ -183,7 +177,7 @@ export function VehicleProfileFormPage({
             />
           </>
         )}
-      </Box>
+      </HStack>
     </PageLayout>
   );
 }

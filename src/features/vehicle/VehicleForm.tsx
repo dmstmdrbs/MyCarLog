@@ -151,7 +151,7 @@ export const VehicleForm = ({
           </>
         )}
       </Box>
-      <Box className="flex flex-row gap-2 mt-4">
+      <Box className="flex flex-row gap-2 mt-2 mb-4">
         <Button
           onPress={() =>
             onSubmit({
