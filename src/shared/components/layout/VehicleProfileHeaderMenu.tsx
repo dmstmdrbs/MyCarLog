@@ -3,14 +3,21 @@ import { ChevronDownIcon } from '../ui/icon';
 import { cn } from '@shared/utils/cn';
 import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
 import { Text } from '../ui/text';
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 import { Button, ButtonIcon, ButtonText } from '../ui/button';
-import { Modal, ModalBackdrop, ModalBody, ModalContent } from '../ui/modal';
-import { Box } from '../ui/box';
+import {
+  Modal,
+  ModalBackdrop,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+} from '../ui/modal';
 import { Heading } from '../ui/heading';
 import { ScrollView } from 'react-native';
 import { useModal } from '@/shared/hooks/useModal';
 import { HStack } from '../ui/hstack';
+import { VStack } from '../ui/vstack';
+import { Box } from '../ui/box';
 
 const SelectProfileModal = ({
   isOpen,
@@ -23,40 +30,39 @@ const SelectProfileModal = ({
 }) => {
   const { data: vehicles = [] } = useVehicles();
 
-  const handleClickProfile = useCallback(
-    (vehicleId: string) => {
-      onClickProfile(vehicleId);
-      onClose();
-    },
-    [onClickProfile, onClose],
-  );
-
+  console.log(vehicles);
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <ModalBackdrop />
-      <ModalContent className="max-w-96 min-w-64 items-center">
-        <ModalBody className="mt-0 mb-4 px-0 w-full">
-          <Heading size="md" className="text-typography-950 mb-2 text-center">
-            차량 프로필 선택
-          </Heading>
-          <Text size="sm" className="text-typography-500 text-center">
-            차계부를 관리 할 차량을 선택해주세요.
-          </Text>
-          <Box className="flex flex-col gap-2 mt-4 h-56 px-0 w-full">
-            <ScrollView className="px-0 w-full">
-              {vehicles.map((item) => (
+      <ModalContent>
+        <ModalHeader>
+          <VStack space="md">
+            <Heading size="md" className="text-typography-950">
+              차량 프로필 선택
+            </Heading>
+            <Text size="sm" className="text-typography-500">
+              관리 할 차량을 선택해주세요.
+            </Text>
+          </VStack>
+        </ModalHeader>
+        <ModalBody className="h-80" contentContainerClassName="flex-1">
+          <ScrollView className="flex-1">
+            {vehicles.map((item, idx) => (
+              <Box
+                className="border-b-2 border-typography-200"
+                key={item.id + item.nickname + idx}
+              >
                 <Button
-                  key={item.id}
-                  onPress={() => handleClickProfile(item.id)}
-                  className="w-full bg-white border-b-2"
+                  onPress={() => onClickProfile(item.id)}
+                  className="w-full bg-white"
                   variant="solid"
                   action="secondary"
                 >
                   <ButtonText>{item.nickname}</ButtonText>
                 </Button>
-              ))}
-            </ScrollView>
-          </Box>
+              </Box>
+            ))}
+          </ScrollView>
         </ModalBody>
       </ModalContent>
     </Modal>
@@ -68,20 +74,17 @@ const VehicleProfileHeaderMenu = () => {
 
   const { isOpen, open, close } = useModal();
 
-  const openSelectProfileModal = useCallback(() => {
-    open();
-  }, []);
-
-  const closeSelectProfileModal = useCallback(() => {
-    close();
-  }, []);
+  const vehicleSet = useMemo(() => {
+    return new Map(vehicles.map((v) => [v.id, v]));
+  }, [vehicles]);
 
   const handleChangeSelectedProfile = async (vehicleId: string) => {
-    const vehicle = vehicles.find((v) => v.id === vehicleId);
+    const vehicle = vehicleSet.get(vehicleId);
 
     if (vehicle) {
       setSelectedVehicle(vehicle);
     }
+    close();
   };
 
   return (
@@ -89,7 +92,7 @@ const VehicleProfileHeaderMenu = () => {
       <Button
         className="px-4 flex flex-row items-center gap-2 data-[active=true]:bg-background-50"
         action="default"
-        onPress={openSelectProfileModal}
+        onPress={open}
       >
         <ButtonText
           className={cn(
@@ -102,7 +105,7 @@ const VehicleProfileHeaderMenu = () => {
       </Button>
       <SelectProfileModal
         isOpen={isOpen}
-        onClose={closeSelectProfileModal}
+        onClose={close}
         onClickProfile={handleChangeSelectedProfile}
       />
     </HStack>
