@@ -1,4 +1,4 @@
-import VehicleProfileHeaderMenu from '@shared/components/layout/VehicleProfileHeaderMenu';
+import { VehicleProfileHeaderMenu } from '@/widgets/vehicle';
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,

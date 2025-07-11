@@ -6,8 +6,6 @@ interface SelectedVehicleContextType {
   vehicles: Vehicle[];
   selectedVehicle: Vehicle | null;
   setSelectedVehicle: (vehicle: Vehicle) => void;
-  addVehicle: (vehicle: Vehicle) => void;
-  removeVehicle: (id: string) => void;
 }
 
 const SelectedVehicleContext = createContext<
@@ -19,7 +17,7 @@ export const SelectedVehicleProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { data: vehicles = [], refetch } = useVehicles();
+  const { data: vehicles = [] } = useVehicles();
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   useEffect(() => {
@@ -31,23 +29,12 @@ export const SelectedVehicleProvider = ({
     }
   }, [vehicles]);
 
-  const addVehicle = async (vehicle: Vehicle) => {
-    await refetch();
-    setSelectedVehicle(vehicle);
-  };
-  const removeVehicle = async (id: string) => {
-    await refetch();
-    if (selectedVehicle?.id === id) setSelectedVehicle(null);
-  };
-
   return (
     <SelectedVehicleContext.Provider
       value={{
         vehicles,
         selectedVehicle,
         setSelectedVehicle,
-        addVehicle,
-        removeVehicle,
       }}
     >
       {children}

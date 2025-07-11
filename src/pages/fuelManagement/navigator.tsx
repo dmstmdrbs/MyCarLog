@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import VehicleProfileHeaderMenu from '@shared/components/layout/VehicleProfileHeaderMenu';
+import { VehicleProfileHeaderMenu } from '@/widgets/vehicle';
 import { useSelectedVehicle } from '@features/vehicle';
 
 import { FuelManagementPage } from './FuelManagementPage';
@@ -11,6 +11,7 @@ export type FuelStackParamList = {
 };
 
 const FuelStack = createNativeStackNavigator<FuelStackParamList>();
+
 export function FuelStackScreen() {
   const { selectedVehicle } = useSelectedVehicle();
   const isEv = selectedVehicle?.type === 'EV';

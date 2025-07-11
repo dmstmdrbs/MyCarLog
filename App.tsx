@@ -140,18 +140,18 @@ const AppNavigator = () => {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <AppStatusProvider>
-        <QueryProvider>
-          <SelectedVehicleProvider>
-            <GluestackUIProvider>
-              <NavigationContainer>
+    <NavigationContainer>
+      <GluestackUIProvider>
+        <SafeAreaProvider>
+          <AppStatusProvider>
+            <QueryProvider>
+              <SelectedVehicleProvider>
                 <AppNavigator />
-              </NavigationContainer>
-            </GluestackUIProvider>
-          </SelectedVehicleProvider>
-        </QueryProvider>
-      </AppStatusProvider>
-    </SafeAreaProvider>
+              </SelectedVehicleProvider>
+            </QueryProvider>
+          </AppStatusProvider>
+        </SafeAreaProvider>
+      </GluestackUIProvider>
+    </NavigationContainer>
   );
 }

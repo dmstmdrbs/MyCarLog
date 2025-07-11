@@ -17,3 +17,4 @@ export {
   SelectedVehicleProvider,
   useSelectedVehicle,
 } from './contexts/SelectedVehicleContext';
+export { useVehicleProfileSelector } from './hooks/useVehicleProfileSelector';

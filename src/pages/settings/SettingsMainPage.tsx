@@ -13,8 +13,11 @@ import PageLayout from '@/shared/components/layout/PageLayout';
 import { useLayoutEffect } from 'react';
 import { SettingsStackParamList } from './navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useDefaultVehicle } from '@/features/vehicle';
+import { useDefaultVehicle, useSelectedVehicle } from '@/features/vehicle';
 import { useIsFocused } from '@react-navigation/native';
+import { VStack } from '@/shared/components/ui/vstack';
+import { ProfileCard } from '@/widgets/vehicle/ProfileCard';
+import { Center } from '@/shared/components/ui/center';
 
 type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsMain'>;
 
@@ -22,6 +25,7 @@ export function SettingsMainPage({ route, navigation }: Props) {
   const isFocused = useIsFocused();
   const { data: defaultVehicle, isLoading: isDefaultVehicleLoading } =
     useDefaultVehicle();
+  const { selectedVehicle } = useSelectedVehicle();
   const params = route.params;
 
   useLayoutEffect(() => {
@@ -55,25 +59,35 @@ export function SettingsMainPage({ route, navigation }: Props) {
 
   return (
     <PageLayout>
-      <FlatList
-        className="flex-1"
-        data={menu}
-        renderItem={({ item }) => (
-          <Button
-            onPress={item.onPress}
-            variant="link"
-            className="h-14 py-2 px-6 flex flex-row items-center justify-between border-b border-gray-200 bg-white"
-          >
-            <Box className="flex flex-row items-center justify-start">
-              <Icon as={item.icon} size="md" color="#4a4a4a" className="mr-4" />
-              <Text className="text-lg">{item.title}</Text>
-            </Box>
-            <Icon as={ChevronRightIcon} size="md" color="#b0b0b0" />
-          </Button>
-        )}
-        keyExtractor={(item) => item.key}
-        contentContainerStyle={{ paddingTop: 8 }}
-      />
+      <VStack space="sm" className="flex-1">
+        <Center className="mt-5 h-36 w-full px-4 py-2">
+          <ProfileCard vehicle={selectedVehicle} />
+        </Center>
+        <FlatList
+          className="flex-1"
+          data={menu}
+          renderItem={({ item }) => (
+            <Button
+              onPress={item.onPress}
+              variant="link"
+              className="h-14 py-2 px-6 flex flex-row items-center justify-between border-b border-gray-200 bg-white"
+            >
+              <Box className="flex flex-row items-center justify-start">
+                <Icon
+                  as={item.icon}
+                  size="md"
+                  color="#4a4a4a"
+                  className="mr-4"
+                />
+                <Text className="text-lg">{item.title}</Text>
+              </Box>
+              <Icon as={ChevronRightIcon} size="md" color="#b0b0b0" />
+            </Button>
+          )}
+          keyExtractor={(item) => item.key}
+          contentContainerStyle={{ paddingTop: 8 }}
+        />
+      </VStack>
     </PageLayout>
   );
 }
