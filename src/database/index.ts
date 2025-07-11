@@ -4,6 +4,7 @@ import { appSchema, tableSchema } from '@nozbe/watermelondb/Schema';
 import {
   schemaMigrations,
   createTable,
+  addColumns,
 } from '@nozbe/watermelondb/Schema/migrations';
 
 import Vehicle, { vehicleSchema } from '@shared/models/Vehicle';
@@ -50,11 +51,21 @@ const migrations = schemaMigrations({
         }),
       ],
     },
+    {
+      toVersion: 6,
+      steps: [
+        addColumns({
+          table: 'vehicles',
+
+          columns: [{ name: 'odometer', type: 'number', isOptional: true }],
+        }),
+      ],
+    },
   ],
 });
 
 const schema = appSchema({
-  version: 5,
+  version: 6,
   tables: [
     tableSchema(vehicleSchema),
     tableSchema(fuelRecordSchema),
