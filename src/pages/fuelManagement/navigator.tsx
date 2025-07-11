@@ -7,7 +7,7 @@ import { FuelRecordPage } from './FuelRecordPage';
 
 export type FuelStackParamList = {
   FuelMain: { vehicleId: string };
-  FuelRecord: { vehicleId: string; targetDate: string };
+  FuelRecord: { vehicleId: string; targetDate: string; recordId?: string };
 };
 
 const FuelStack = createNativeStackNavigator<FuelStackParamList>();

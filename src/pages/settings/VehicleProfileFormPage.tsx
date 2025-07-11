@@ -69,6 +69,7 @@ export function VehicleProfileFormPage({
             model: trimmedModel,
             type: formData.type,
             isDefault: formData.isDefault,
+            odometer: formData.odometer,
           },
         });
       } else {
@@ -79,6 +80,7 @@ export function VehicleProfileFormPage({
           model: trimmedModel,
           type: formData.type,
           isDefault: formData.isDefault,
+          odometer: formData.odometer,
         });
       }
 

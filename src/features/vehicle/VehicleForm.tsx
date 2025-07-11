@@ -20,6 +20,8 @@ import { Text } from '@shared/components/ui/text';
 import React, { useEffect, useState } from 'react';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
 import { useVehicle } from './hooks/useVehicleQueries';
+import { VStack } from '@/shared/components/ui/vstack';
+import { HStack } from '@/shared/components/ui/hstack';
 
 interface VehicleFormProps {
   setDefaultProfile: () => void;
@@ -33,6 +35,7 @@ export type VehicleFormData = {
   model: string;
   type: 'ICE' | 'EV';
   isDefault: boolean;
+  odometer: number;
 };
 
 export const VehicleForm = ({
@@ -48,6 +51,7 @@ export const VehicleForm = ({
   const [model, setModel] = useState('');
   const [type, setType] = useState<'ICE' | 'EV'>('ICE');
   const [isDefault, setIsDefault] = useState(false);
+  const [odometer, setOdometer] = useState(0);
 
   useEffect(() => {
     if (vehicle) {
@@ -56,12 +60,13 @@ export const VehicleForm = ({
       setModel(vehicle.model.trim());
       setType(vehicle.type);
       setIsDefault(vehicle.isDefault);
+      setOdometer(vehicle.odometer);
     }
   }, [vehicle]);
 
   return (
     <FormControl className="flex-1 flex flex-col justify-between">
-      <Box className="flex-1 flex flex-col">
+      <VStack space="md">
         <FormControlHelper>
           <FormControlLabel className="mr-2">
             <Text className="text-lg font-bold">
@@ -75,40 +80,63 @@ export const VehicleForm = ({
           </FormControlHelperText>
         </FormControlHelper>
 
-        <Box className="flex flex-col gap-2 mb-2">
-          <Box>
-            <Text className="text-sm font-bold mb-1">차량 닉네임</Text>
-            <Input>
-              <InputField
-                value={nickname}
-                onChangeText={(text) => setNickname(text)}
-                placeholder="차량의 닉네임을 지정해주세요."
-              />
-            </Input>
-          </Box>
-          <Box>
-            <Text className="text-sm font-bold mb-1">제조사</Text>
-            <Input>
-              <InputField
-                value={manufacturer}
-                onChangeText={(text) => setManufacturer(text)}
-                placeholder="제조사를 입력해주세요."
-              />
-            </Input>
-          </Box>
-          <Box>
-            <Text className="text-sm font-bold mb-1">모델명</Text>
-            <Input>
-              <InputField
-                value={model}
-                onChangeText={(text) => setModel(text)}
-                placeholder="모델명을 입력해주세요."
-              />
-            </Input>
-          </Box>
-        </Box>
+        <VStack space="sm">
+          <Text className="text-sm font-bold mb-1">차량 닉네임</Text>
+          <Input>
+            <InputField
+              value={nickname}
+              onChangeText={(text) => setNickname(text)}
+              placeholder="차량의 닉네임을 지정해주세요."
+            />
+          </Input>
+        </VStack>
+        <VStack space="sm">
+          <Text className="text-sm font-bold mb-1">제조사</Text>
+          <Input>
+            <InputField
+              value={manufacturer}
+              onChangeText={(text) => {
+                if (text.length === 0) {
+                  setManufacturer('');
+                  return;
+                }
+                setManufacturer(text);
+              }}
+              placeholder="제조사를 입력해주세요."
+            />
+          </Input>
+        </VStack>
+        <VStack space="sm">
+          <Text className="text-sm font-bold mb-1">모델명</Text>
+          <Input>
+            <InputField
+              value={model}
+              onChangeText={(text) => setModel(text)}
+              placeholder="모델명을 입력해주세요."
+            />
+          </Input>
+        </VStack>
+        <VStack space="sm">
+          <Text className="text-sm font-bold mb-1">총 주행거리</Text>
+          <Input>
+            <InputField
+              value={odometer.toString()}
+              onChangeText={(text) => {
+                if (text.length === 0) {
+                  setOdometer(0);
+                  return;
+                }
+                const numericValue = Number(parseFloat(text).toFixed(2));
+                if (!isNaN(numericValue)) {
+                  setOdometer(Number(numericValue));
+                }
+              }}
+              placeholder="주행거리를 입력해주세요."
+            />
+          </Input>
+        </VStack>
 
-        <Box className="mb-2">
+        <HStack>
           <RadioGroup
             className="flex flex-row gap-2"
             value={type}
@@ -127,7 +155,7 @@ export const VehicleForm = ({
               <RadioLabel>전기차</RadioLabel>
             </Radio>
           </RadioGroup>
-        </Box>
+        </HStack>
         {editingId && (
           <>
             <Box className="mb-2">
@@ -150,7 +178,7 @@ export const VehicleForm = ({
             />
           </>
         )}
-      </Box>
+      </VStack>
       <Box className="flex flex-row gap-2 mt-2 mb-4">
         <Button
           onPress={() =>
@@ -160,6 +188,7 @@ export const VehicleForm = ({
               model,
               type,
               isDefault,
+              odometer,
             })
           }
           className="flex-1"

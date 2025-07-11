@@ -3,12 +3,13 @@ import { ChevronDownIcon } from '../ui/icon';
 import { cn } from '@shared/utils/cn';
 import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
 import { Text } from '../ui/text';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Button, ButtonIcon, ButtonText } from '../ui/button';
 import { Modal, ModalBackdrop, ModalBody, ModalContent } from '../ui/modal';
 import { Box } from '../ui/box';
 import { Heading } from '../ui/heading';
 import { ScrollView } from 'react-native';
+import { useModalStore } from '@/shared/store/modalStore';
 
 const SelectProfileModal = ({
   isOpen,
@@ -64,14 +65,20 @@ const VehicleProfileHeaderMenu = () => {
   const { data: vehicles = [] } = useVehicles();
   const { selectedVehicle, setSelectedVehicle } = useSelectedVehicle();
 
-  const [selectProfileModalOpen, setSelectProfileModalOpen] = useState(false);
+  const { isOpen, openModal, closeModal } = useModalStore();
 
   const openSelectProfileModal = useCallback(() => {
-    setSelectProfileModalOpen(true);
+    openModal(
+      <SelectProfileModal
+        isOpen={isOpen}
+        onClose={closeSelectProfileModal}
+        onClickProfile={handleChangeSelectedProfile}
+      />,
+    );
   }, []);
 
   const closeSelectProfileModal = useCallback(() => {
-    setSelectProfileModalOpen(false);
+    closeModal();
   }, []);
 
   const handleChangeSelectedProfile = async (vehicleId: string) => {
@@ -98,11 +105,6 @@ const VehicleProfileHeaderMenu = () => {
         </ButtonText>
         <ButtonIcon as={ChevronDownIcon} color="black" />
       </Button>
-      <SelectProfileModal
-        isOpen={selectProfileModalOpen}
-        onClose={closeSelectProfileModal}
-        onClickProfile={handleChangeSelectedProfile}
-      />
     </>
   );
 };

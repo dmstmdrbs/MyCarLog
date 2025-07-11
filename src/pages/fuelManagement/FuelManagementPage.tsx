@@ -27,7 +27,7 @@ import { useFuelStatisticQueries } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
 import { Text } from '@/shared/components/ui/text';
 
-type FuelManagementPageProps = NativeStackScreenProps<
+export type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
   'FuelMain'
 >;

@@ -58,7 +58,7 @@ export const useFuelRecord = (recordId: string) => {
     queryKey: queryKeys.fuelRecords.detail(recordId),
     queryFn: () => fuelRecordRepository.findById(recordId),
     enabled: !!recordId,
-    staleTime: 1000 * 60 * 10, // 10분간 fresh
+    staleTime: 0,
   });
 };
 
@@ -174,7 +174,7 @@ export const useUpdateFuelRecord = () => {
         ),
       });
 
-      // 수정된 레코드의 개별 캐시 업데이트
+      // 새 레코드를 개별 캐시에 설정
       queryClient.setQueryData(
         queryKeys.fuelRecords.detail(updatedRecord.id),
         updatedRecord,
@@ -188,6 +188,20 @@ export const useUpdateFuelRecord = () => {
           recordDate.getFullYear(),
           recordDate.getMonth() + 1,
         ),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          'fuelStats',
+          updatedRecord.vehicleId,
+          recordDate.getFullYear(),
+          recordDate.getMonth() + 1,
+        ],
+      });
+
+      // 최근 주유소 캐시 무효화
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fuelRecords.recentStations(updatedRecord.vehicleId),
       });
     },
     onError: (error) => {

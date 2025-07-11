@@ -10,6 +10,7 @@ export default class Vehicle extends Model {
   @field('manufacturer') manufacturer!: string;
   @field('model') model!: string;
   @field('is_default') isDefault!: boolean;
+  @field('odometer') odometer!: number;
   @readonly @field('created_at') createdAt!: number;
 }
 
@@ -23,6 +24,7 @@ export interface CreateVehicleData {
   manufacturer: string;
   model: string;
   isDefault?: boolean;
+  odometer?: number;
 }
 
 // 차량 수정을 위한 데이터 타입
@@ -32,6 +34,7 @@ export interface UpdateVehicleData {
   manufacturer?: string;
   model?: string;
   isDefault?: boolean;
+  odometer?: number;
 }
 
 export const vehicleSchema: TableSchemaSpec = {
@@ -42,6 +45,7 @@ export const vehicleSchema: TableSchemaSpec = {
     { name: 'manufacturer', type: 'string' },
     { name: 'model', type: 'string' },
     { name: 'is_default', type: 'boolean' },
+    { name: 'odometer', type: 'number' },
     { name: 'created_at', type: 'number' },
   ],
 };

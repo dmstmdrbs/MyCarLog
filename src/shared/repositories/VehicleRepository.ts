@@ -23,6 +23,7 @@ export interface UpdateVehicleData {
   manufacturer?: string;
   model?: string;
   isDefault?: boolean;
+  odometer?: number;
 }
 
 export class VehicleRepository
@@ -40,6 +41,7 @@ export class VehicleRepository
       record.manufacturer = data.manufacturer;
     if (data.model !== undefined) record.model = data.model;
     record.isDefault = data.isDefault || false;
+    if (data.odometer !== undefined) record.odometer = data.odometer;
   }
 
   async findByType(type: 'ICE' | 'EV'): Promise<Vehicle[]> {
@@ -165,6 +167,7 @@ export class VehicleRepository
             v.manufacturer = data.manufacturer;
           if (data.model !== undefined) v.model = data.model;
           if (data.isDefault !== undefined) v.isDefault = data.isDefault;
+          if (data.odometer !== undefined) v.odometer = data.odometer;
         });
       });
     } catch (error) {
