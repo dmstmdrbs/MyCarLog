@@ -9,7 +9,8 @@ import { Modal, ModalBackdrop, ModalBody, ModalContent } from '../ui/modal';
 import { Box } from '../ui/box';
 import { Heading } from '../ui/heading';
 import { ScrollView } from 'react-native';
-import { useModalStore } from '@/shared/store/modalStore';
+import { useModal } from '@/shared/hooks/useModal';
+import { HStack } from '../ui/hstack';
 
 const SelectProfileModal = ({
   isOpen,
@@ -65,20 +66,14 @@ const VehicleProfileHeaderMenu = () => {
   const { data: vehicles = [] } = useVehicles();
   const { selectedVehicle, setSelectedVehicle } = useSelectedVehicle();
 
-  const { isOpen, openModal, closeModal } = useModalStore();
+  const { isOpen, open, close } = useModal();
 
   const openSelectProfileModal = useCallback(() => {
-    openModal(
-      <SelectProfileModal
-        isOpen={isOpen}
-        onClose={closeSelectProfileModal}
-        onClickProfile={handleChangeSelectedProfile}
-      />,
-    );
+    open();
   }, []);
 
   const closeSelectProfileModal = useCallback(() => {
-    closeModal();
+    close();
   }, []);
 
   const handleChangeSelectedProfile = async (vehicleId: string) => {
@@ -90,7 +85,7 @@ const VehicleProfileHeaderMenu = () => {
   };
 
   return (
-    <>
+    <HStack>
       <Button
         className="px-4 flex flex-row items-center gap-2 data-[active=true]:bg-background-50"
         action="default"
@@ -105,7 +100,12 @@ const VehicleProfileHeaderMenu = () => {
         </ButtonText>
         <ButtonIcon as={ChevronDownIcon} color="black" />
       </Button>
-    </>
+      <SelectProfileModal
+        isOpen={isOpen}
+        onClose={closeSelectProfileModal}
+        onClickProfile={handleChangeSelectedProfile}
+      />
+    </HStack>
   );
 };
 

@@ -21,7 +21,6 @@ import {
 
 import 'react-native-gesture-handler';
 import { Box } from '@/shared/components/ui/box';
-import { useModalStore } from '@/shared/store/modalStore';
 
 // 각 Stack Navigator 정의
 
@@ -140,7 +139,6 @@ const AppNavigator = () => {
 };
 
 export default function App() {
-  const { modal, isOpen } = useModalStore();
   return (
     <SafeAreaProvider>
       <AppStatusProvider>
@@ -149,7 +147,6 @@ export default function App() {
             <GluestackUIProvider>
               <NavigationContainer>
                 <AppNavigator />
-                {isOpen && modal}
               </NavigationContainer>
             </GluestackUIProvider>
           </SelectedVehicleProvider>
