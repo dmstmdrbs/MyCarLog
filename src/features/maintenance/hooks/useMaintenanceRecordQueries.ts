@@ -5,7 +5,25 @@ import type {
   UpdateMaintenanceRecordData,
 } from '@/shared/repositories/MaintenanceRecordRepository';
 import { getMonth, getYear } from 'date-fns';
+import MaintenanceRecord, {
+  MaintenanceRecordType,
+} from '@/shared/models/MaintenanceRecord';
 
+const recordToType = (record: MaintenanceRecord): MaintenanceRecordType => {
+  return {
+    id: record.id,
+    date: record.date,
+    odometer: record.odometer,
+    maintenanceItemId: record.maintenanceItemId,
+    cost: record.cost,
+    isDiy: record.isDiy,
+    shopId: record.shopId,
+    shopName: record.shopName,
+    memo: record.memo,
+    createdAt: record.createdAt,
+    vehicleId: record.vehicleId,
+  };
+};
 // 쿼리 키 생성 함수
 const maintenanceRecordsKey = (vehicleId: string) => [
   'maintenanceRecords',
@@ -24,6 +42,10 @@ export function useMaintenanceRecords(vehicleId: string) {
     queryFn: () => maintenanceRecordRepository.findByVehicleId(vehicleId),
     enabled: !!vehicleId,
     staleTime: 0, // 5분
+    select(data) {
+      if (!data) return [];
+      return data.map((record) => recordToType(record));
+    },
   });
 }
 
@@ -45,7 +67,11 @@ export function useMaintenanceRecordsByDate(
         endDate,
       ),
     enabled: !!vehicleId && !!startDate && !!endDate,
-    staleTime: 1000 * 60, // 1분
+    staleTime: 0, // 1분
+    select(data) {
+      if (!data) return [];
+      return data.map((record) => recordToType(record));
+    },
   });
 }
 

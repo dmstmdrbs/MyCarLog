@@ -60,7 +60,7 @@ export function SettingsMainPage({ route, navigation }: Props) {
   return (
     <PageLayout>
       <VStack space="sm" className="flex-1">
-        <Center className="mt-5 h-36 w-full px-4 py-2">
+        <Center className="mt-5 h-44 w-full px-4 py-2">
           <ProfileCard vehicle={selectedVehicle} />
         </Center>
         <FlatList

@@ -10,6 +10,7 @@ export const useMaintenanceItemQueries = () => {
   return useQuery({
     queryKey: queryKeys.maintenanceItems.lists(),
     queryFn: () => maintenanceItemRepository.findAll(),
+    staleTime: 0,
   });
 };
 

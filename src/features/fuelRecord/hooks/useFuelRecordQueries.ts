@@ -8,6 +8,23 @@ import {
   MonthlyFuelStats,
 } from '@shared/models/FuelRecord';
 
+const recordToType = (record: FuelRecordType) => {
+  return {
+    id: record.id,
+    date: record.date,
+    totalCost: record.totalCost,
+    unitPrice: record.unitPrice,
+    amount: record.amount,
+    paymentMethodId: record.paymentMethodId,
+    paymentName: record.paymentName,
+    paymentType: record.paymentType,
+    stationId: record.stationId,
+    stationName: record.stationName,
+    memo: record.memo,
+    createdAt: record.createdAt,
+    vehicleId: record.vehicleId,
+  };
+};
 /**
  * 특정 차량의 연료 기록 목록을 조회하는 Query Hook
  */
@@ -16,7 +33,11 @@ export const useFuelRecords = (vehicleId: string) => {
     queryKey: queryKeys.fuelRecords.list(vehicleId),
     queryFn: () => fuelRecordRepository.findByVehicleId(vehicleId),
     enabled: !!vehicleId,
-    staleTime: 1000 * 60 * 2, // 2분간 fresh
+    staleTime: 0, // 2분간 fresh
+    select(data) {
+      if (!data) return [];
+      return data.map((record) => recordToType(record));
+    },
   });
 };
 
@@ -46,7 +67,12 @@ export const useFuelRecordsByDateRange = (
     queryFn: () =>
       fuelRecordRepository.findByDateRange(vehicleId, startDate, endDate),
     enabled: !!vehicleId && !!startDate && !!endDate,
-    staleTime: 1000 * 60 * 10, // 10분간 fresh
+    staleTime: 0, // 10분간 fresh
+    select(data) {
+      if (!data) return [];
+
+      return data.map((record) => recordToType(record));
+    },
   });
 };
 
@@ -59,6 +85,11 @@ export const useFuelRecord = (recordId: string) => {
     queryFn: () => fuelRecordRepository.findById(recordId),
     enabled: !!recordId,
     staleTime: 0,
+    select(data) {
+      if (!data) return null;
+
+      return recordToType(data);
+    },
   });
 };
 
@@ -100,7 +131,7 @@ export const useRecentStations = (vehicleId: string, limit: number = 5) => {
     queryKey: queryKeys.fuelRecords.recentStations(vehicleId, limit),
     queryFn: () => fuelRecordRepository.getRecentStations(vehicleId, limit),
     enabled: !!vehicleId,
-    staleTime: 1000 * 60 * 5, // 5분간 fresh
+    staleTime: 0,
   });
 };
 

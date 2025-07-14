@@ -11,22 +11,24 @@ export const VehicleProfileHeaderMenu = () => {
   const { isOpen, open, close } = useModal();
 
   return (
-    <HStack>
-      <Button
-        className="px-4 flex flex-row items-center gap-2 data-[active=true]:bg-background-50"
-        action="default"
-        onPress={open}
-      >
-        <ButtonText
-          className={cn(
-            'text-black font-medium text-lg data-[active=true]:text-black',
-          )}
+    <>
+      <HStack>
+        <Button
+          className="px-4 flex flex-row items-center gap-2 data-[active=true]:bg-background-50"
+          action="default"
+          onPress={open}
         >
-          {selectedVehicle?.nickname || '프로필 선택'}
-        </ButtonText>
-        <ButtonIcon as={ChevronDownIcon} color="black" />
-      </Button>
+          <ButtonText
+            className={cn(
+              'text-black font-medium text-lg data-[active=true]:text-black',
+            )}
+          >
+            {selectedVehicle?.nickname || '프로필 선택'}
+          </ButtonText>
+          <ButtonIcon as={ChevronDownIcon} color="black" />
+        </Button>
+      </HStack>
       <VehicleSelectModal isOpen={isOpen} onClose={close} />
-    </HStack>
+    </>
   );
 };

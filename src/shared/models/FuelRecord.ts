@@ -21,7 +21,22 @@ export default class FuelRecord extends Model {
 }
 
 // FuelRecord 타입 (클래스가 아닌 타입으로 사용할 때)
-export type FuelRecordType = FuelRecord;
+export type FuelRecordType = Pick<
+  FuelRecord,
+  | 'id'
+  | 'date'
+  | 'totalCost'
+  | 'unitPrice'
+  | 'amount'
+  | 'paymentMethodId'
+  | 'paymentName'
+  | 'paymentType'
+  | 'stationId'
+  | 'stationName'
+  | 'memo'
+  | 'createdAt'
+  | 'vehicleId'
+>;
 
 // 연료 기록 생성을 위한 데이터 타입
 export interface CreateFuelRecordData {

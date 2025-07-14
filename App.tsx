@@ -6,7 +6,12 @@ import { GluestackUIProvider } from '@shared/components/ui/gluestack-ui-provider
 import { QueryProvider } from '@shared/providers/QueryProvider';
 
 import { Icon } from '@/shared/components/ui/icon';
-import { FuelIcon, SettingsIcon, WrenchIcon } from 'lucide-react-native';
+import {
+  FuelIcon,
+  HomeIcon,
+  SettingsIcon,
+  WrenchIcon,
+} from 'lucide-react-native';
 
 import { MaintenanceStackScreen } from '@pages/maintenanceManagement';
 import { FuelStackScreen } from '@pages/fuelManagement';
@@ -21,6 +26,7 @@ import {
 
 import 'react-native-gesture-handler';
 import { Box } from '@/shared/components/ui/box';
+import { HomeStackScreen } from '@/pages/home/navigator';
 
 // 각 Stack Navigator 정의
 
@@ -40,6 +46,9 @@ export type RootStackParamList = {
   };
   정비: {
     screen: 'MaintenanceStackScreen';
+  };
+  홈: {
+    screen: 'HomeStackScreen';
   };
 };
 
@@ -85,6 +94,15 @@ const HomeTab = () => {
         );
       }}
     >
+      <Tab.Screen
+        name="홈"
+        component={HomeStackScreen}
+        options={{
+          headerShown: false,
+          popToTopOnBlur: true,
+          tabBarIcon: ({ color }) => <Icon as={HomeIcon} color={color} />,
+        }}
+      />
       <Tab.Screen
         name="정비"
         component={MaintenanceStackScreen}
@@ -140,18 +158,18 @@ const AppNavigator = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <GluestackUIProvider>
-        <SafeAreaProvider>
-          <AppStatusProvider>
-            <QueryProvider>
+    <QueryProvider>
+      <NavigationContainer>
+        <GluestackUIProvider>
+          <SafeAreaProvider>
+            <AppStatusProvider>
               <SelectedVehicleProvider>
                 <AppNavigator />
               </SelectedVehicleProvider>
-            </QueryProvider>
-          </AppStatusProvider>
-        </SafeAreaProvider>
-      </GluestackUIProvider>
-    </NavigationContainer>
+            </AppStatusProvider>
+          </SafeAreaProvider>
+        </GluestackUIProvider>
+      </NavigationContainer>
+    </QueryProvider>
   );
 }

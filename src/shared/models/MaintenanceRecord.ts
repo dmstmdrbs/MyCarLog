@@ -32,3 +32,18 @@ export const maintenanceRecordSchema: TableSchemaSpec = {
     { name: 'created_at', type: 'number' },
   ],
 };
+
+export type MaintenanceRecordType = Pick<
+  MaintenanceRecord,
+  | 'id'
+  | 'date'
+  | 'odometer'
+  | 'maintenanceItemId'
+  | 'cost'
+  | 'isDiy'
+  | 'shopId'
+  | 'shopName'
+  | 'memo'
+  | 'createdAt'
+  | 'vehicleId'
+>;
