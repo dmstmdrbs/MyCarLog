@@ -39,7 +39,7 @@ const RecordItem = ({
 }) => {
   const navigation = useNavigation<NavigationProp<FuelStackParamList>>();
   const { selectedVehicle } = useSelectedVehicle();
-  const deleteFuelRecordMutation = useDeleteFuelRecord();
+  const deleteFuelRecordMutation = useDeleteFuelRecord(item);
   const { isOpen, open, close } = useModal();
 
   const navigateToFuelRecord = useCallback(() => {

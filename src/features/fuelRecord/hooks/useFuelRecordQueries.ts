@@ -5,7 +5,6 @@ import {
   CreateFuelRecordData,
   UpdateFuelRecordData,
   FuelRecordType,
-  MonthlyFuelStats,
 } from '@shared/models/FuelRecord';
 
 const recordToType = (record: FuelRecordType) => {
@@ -25,21 +24,6 @@ const recordToType = (record: FuelRecordType) => {
     vehicleId: record.vehicleId,
   };
 };
-/**
- * 특정 차량의 연료 기록 목록을 조회하는 Query Hook
- */
-export const useFuelRecords = (vehicleId: string) => {
-  return useQuery({
-    queryKey: queryKeys.fuelRecords.list(vehicleId),
-    queryFn: () => fuelRecordRepository.findByVehicleId(vehicleId),
-    enabled: !!vehicleId,
-    staleTime: 0, // 2분간 fresh
-    select(data) {
-      if (!data) return [];
-      return data.map((record) => recordToType(record));
-    },
-  });
-};
 
 /**
  * 특정 차량의 월별 연료 기록을 조회하는 Query Hook
@@ -53,7 +37,19 @@ export const useFuelRecordsByMonth = (
     queryKey: queryKeys.fuelRecords.byMonth(vehicleId, year, month),
     queryFn: () => fuelRecordRepository.findByMonth(vehicleId, year, month),
     enabled: !!vehicleId && !!year && !!month,
-    staleTime: 1000 * 60 * 10, // 10분간 fresh (월별 데이터는 덜 자주 변경됨)
+  });
+};
+
+export const useFuelRecordsByDate = (vehicleId: string, date: number) => {
+  return useQuery({
+    queryKey: queryKeys.fuelRecords.byDate(vehicleId, date),
+    queryFn: () => fuelRecordRepository.findByDate(vehicleId, date),
+    enabled: !!vehicleId && !!date,
+    select(data) {
+      if (!data) return [];
+
+      return data.map((record) => recordToType(record));
+    },
   });
 };
 
@@ -67,7 +63,6 @@ export const useFuelRecordsByDateRange = (
     queryFn: () =>
       fuelRecordRepository.findByDateRange(vehicleId, startDate, endDate),
     enabled: !!vehicleId && !!startDate && !!endDate,
-    staleTime: 0, // 10분간 fresh
     select(data) {
       if (!data) return [];
 
@@ -84,54 +79,11 @@ export const useFuelRecord = (recordId: string) => {
     queryKey: queryKeys.fuelRecords.detail(recordId),
     queryFn: () => fuelRecordRepository.findById(recordId),
     enabled: !!recordId,
-    staleTime: 0,
     select(data) {
       if (!data) return null;
 
       return recordToType(data);
     },
-  });
-};
-
-/**
- * 특정 차량의 월별 연료 통계를 조회하는 Query Hook
- */
-export const useFuelRecordMonthlyStats = (
-  vehicleId: string,
-  year: number,
-  month: number,
-) => {
-  return useQuery({
-    queryKey: queryKeys.fuelRecords.monthlyStats(vehicleId, year, month),
-    queryFn: async (): Promise<MonthlyFuelStats> => {
-      const stats = await fuelRecordRepository.getMonthlyStats(
-        vehicleId,
-        year,
-        month,
-      );
-      return {
-        year,
-        month,
-        totalCost: stats.totalCost,
-        totalAmount: stats.totalAmount,
-        averagePrice: stats.avgUnitPrice,
-        recordCount: stats.recordCount,
-      };
-    },
-    enabled: !!vehicleId && !!year && !!month,
-    staleTime: 1000 * 60 * 15, // 15분간 fresh (통계는 덜 자주 변경됨)
-  });
-};
-
-/**
- * 특정 차량의 최근 사용 주유소를 조회하는 Query Hook
- */
-export const useRecentStations = (vehicleId: string, limit: number = 5) => {
-  return useQuery({
-    queryKey: queryKeys.fuelRecords.recentStations(vehicleId, limit),
-    queryFn: () => fuelRecordRepository.getRecentStations(vehicleId, limit),
-    enabled: !!vehicleId,
-    staleTime: 0,
   });
 };
 
@@ -144,42 +96,20 @@ export const useCreateFuelRecord = () => {
   return useMutation({
     mutationFn: (data: CreateFuelRecordData) =>
       fuelRecordRepository.create(data),
-    onSuccess: (newRecord) => {
+    onSuccess: (record) => {
+      console.log('created', record);
       // 해당 차량의 연료 기록 캐시 무효화
       queryClient.invalidateQueries({
-        queryKey: invalidationHelpers.invalidateFuelRecords(
-          newRecord.vehicleId,
-        ),
+        queryKey: invalidationHelpers.invalidateFuelRecords(record.vehicleId),
+        exact: false,
       });
 
       // 새 레코드를 개별 캐시에 설정
-      queryClient.setQueryData(
-        queryKeys.fuelRecords.detail(newRecord.id),
-        newRecord,
-      );
+      queryClient.setQueryData(queryKeys.fuelRecords.detail(record.id), record);
 
-      // 월별 통계 캐시 무효화
-      const recordDate = new Date(newRecord.date);
+      // 최근 주유소 무효화
       queryClient.invalidateQueries({
-        queryKey: queryKeys.fuelRecords.monthlyStats(
-          newRecord.vehicleId,
-          recordDate.getFullYear(),
-          recordDate.getMonth() + 1,
-        ),
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: [
-          'fuelStats',
-          newRecord.vehicleId,
-          recordDate.getFullYear(),
-          recordDate.getMonth() + 1,
-        ],
-      });
-
-      // 최근 주유소 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.fuelRecords.recentStations(newRecord.vehicleId),
+        queryKey: queryKeys.fuelRecords.recentStations(record.vehicleId),
       });
     },
     onError: (error) => {
@@ -197,42 +127,19 @@ export const useUpdateFuelRecord = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateFuelRecordData }) =>
       fuelRecordRepository.update(id, data),
-    onSuccess: (updatedRecord) => {
+    onSuccess: (record) => {
       // 해당 차량의 연료 기록 캐시 무효화
       queryClient.invalidateQueries({
-        queryKey: invalidationHelpers.invalidateFuelRecords(
-          updatedRecord.vehicleId,
-        ),
+        queryKey: invalidationHelpers.invalidateFuelRecords(record.vehicleId),
+        exact: false,
       });
 
       // 새 레코드를 개별 캐시에 설정
-      queryClient.setQueryData(
-        queryKeys.fuelRecords.detail(updatedRecord.id),
-        updatedRecord,
-      );
+      queryClient.setQueryData(queryKeys.fuelRecords.detail(record.id), record);
 
-      // 월별 통계 캐시 무효화
-      const recordDate = new Date(updatedRecord.date);
+      // 최근 주유소 무효화
       queryClient.invalidateQueries({
-        queryKey: queryKeys.fuelRecords.monthlyStats(
-          updatedRecord.vehicleId,
-          recordDate.getFullYear(),
-          recordDate.getMonth() + 1,
-        ),
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: [
-          'fuelStats',
-          updatedRecord.vehicleId,
-          recordDate.getFullYear(),
-          recordDate.getMonth() + 1,
-        ],
-      });
-
-      // 최근 주유소 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.fuelRecords.recentStations(updatedRecord.vehicleId),
+        queryKey: queryKeys.fuelRecords.recentStations(record.vehicleId),
       });
     },
     onError: (error) => {
@@ -244,7 +151,7 @@ export const useUpdateFuelRecord = () => {
 /**
  * 연료 기록 삭제 Mutation Hook
  */
-export const useDeleteFuelRecord = () => {
+export const useDeleteFuelRecord = (originalRecord: FuelRecordType) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -256,29 +163,19 @@ export const useDeleteFuelRecord = () => {
       );
       return { record };
     },
-    onSuccess: (_, recordId, context) => {
-      const { record } = context || {};
-
-      if (record) {
-        // 해당 차량의 연료 기록 캐시 무효화
-        queryClient.invalidateQueries({
-          queryKey: invalidationHelpers.invalidateFuelRecords(record.vehicleId),
-        });
-
-        // 월별 통계 캐시 무효화
-        const recordDate = new Date(record.date);
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.fuelRecords.monthlyStats(
-            record.vehicleId,
-            recordDate.getFullYear(),
-            recordDate.getMonth() + 1,
-          ),
-        });
-      }
-
+    onSuccess: (_, recordId) => {
+      console.log('deleted', originalRecord);
       // 삭제된 레코드의 개별 캐시 제거
       queryClient.removeQueries({
         queryKey: queryKeys.fuelRecords.detail(recordId),
+      });
+
+      // 해당 차량의 연료 기록 캐시 무효화
+      queryClient.invalidateQueries({
+        queryKey: invalidationHelpers.invalidateFuelRecords(
+          originalRecord.vehicleId,
+        ),
+        exact: false,
       });
     },
     onError: (error) => {

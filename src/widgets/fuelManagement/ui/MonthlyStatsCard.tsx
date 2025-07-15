@@ -26,6 +26,13 @@ export const MonthlyStatsCard = ({
   recordCount,
   hideIcon = false,
 }: Props) => {
+  console.log(
+    'MonthlyStatsCard',
+    totalCost,
+    totalAmount,
+    avgUnitPrice,
+    recordCount,
+  );
   const stats: StatItem[] = [
     { icon: '💸', label: '총 주유비', value: `${formatNumber(totalCost)}원` },
     { icon: '⛽️', label: '총 주유량', value: `${formatNumber(totalAmount)}L` },

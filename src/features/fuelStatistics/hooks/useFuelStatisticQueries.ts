@@ -1,52 +1,81 @@
 import { useQuery } from '@tanstack/react-query';
-import { useFuelStatistics } from './useFuelStatistics';
 
-interface UseFuelStatisticQueriesProps {
-  vehicleId: string;
-  year: number;
-  month: number;
-}
+import { queryKeys } from '@/shared/queries/queryKeys';
+import { useCallback } from 'react';
+import { fuelRecordRepository } from '@/shared/repositories/FuelRecordRepository';
 
-export function useFuelStatisticQueries({
-  vehicleId,
-  year,
-  month,
-}: UseFuelStatisticQueriesProps) {
-  const {
-    getMonthlyStats,
-    getPaymentStats,
-    getMonthlyStatsWithComparisons,
-    getYearlyStats,
-  } = useFuelStatistics(vehicleId, year, month);
+export const useMonthlyStats = (
+  vehicleId: string,
+  year: number,
+  month: number,
+) => {
+  // 월별 통계
+  const getMonthlyStats = useCallback(async () => {
+    return await fuelRecordRepository.getMonthlyStats(vehicleId, year, month);
+  }, [vehicleId, year, month]);
 
-  const monthlyStatsQuery = useQuery({
-    queryKey: ['fuelStats', vehicleId, year, month],
+  return useQuery({
+    queryKey: queryKeys.fuelRecords.monthlyStats(vehicleId, year, month),
     queryFn: getMonthlyStats,
     staleTime: 0,
   });
+};
 
-  const paymentStatsQuery = useQuery({
-    queryKey: ['fuelPaymentStats', vehicleId, year, month],
+export const usePaymentStats = (
+  vehicleId: string,
+  year: number,
+  month: number,
+) => {
+  // 결제 수단별 통계
+  const getPaymentStats = useCallback(async () => {
+    return await fuelRecordRepository.getPaymentStatsByMonth(
+      vehicleId,
+      year,
+      month,
+    );
+  }, [vehicleId, year, month]);
+
+  return useQuery({
+    queryKey: queryKeys.paymentMethods.stats(vehicleId, year, month),
     queryFn: getPaymentStats,
     staleTime: 0,
   });
+};
 
-  const comparisonStatsQuery = useQuery({
-    queryKey: ['fuelStatsComparison', vehicleId, year, month],
+export const useMonthlyStatsWithComparisons = (
+  vehicleId: string,
+  year: number,
+  month: number,
+) => {
+  // 월별 비교 통계
+  const getMonthlyStatsWithComparisons = useCallback(async () => {
+    return await fuelRecordRepository.getMonthlyStatsWithComparisons(
+      vehicleId,
+      year,
+      month,
+    );
+  }, [vehicleId, year, month]);
+
+  return useQuery({
+    queryKey: queryKeys.fuelRecords.monthlyStatsWithComparisons(
+      vehicleId,
+      year,
+      month,
+    ),
     queryFn: getMonthlyStatsWithComparisons,
     staleTime: 0,
   });
+};
 
-  const yearlyStatsQuery = useQuery({
-    queryKey: ['fuelYearlyStats', vehicleId, year],
+export const useYearlyStats = (vehicleId: string, year: number) => {
+  // 연간 통계
+  const getYearlyStats = useCallback(async () => {
+    return await fuelRecordRepository.getYearlyStats(vehicleId, year);
+  }, [vehicleId, year]);
+
+  return useQuery({
+    queryKey: queryKeys.fuelRecords.yearlyStats(vehicleId, year),
     queryFn: getYearlyStats,
     staleTime: 0,
   });
-
-  return {
-    monthlyStatsQuery,
-    paymentStatsQuery,
-    comparisonStatsQuery,
-    yearlyStatsQuery,
-  };
-}
+};

@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Platform, ScrollView } from 'react-native';
 
-import { useFuelStatisticQueries } from '@/features/fuelStatistics';
+import {
+  useMonthlyStats,
+  useMonthlyStatsWithComparisons,
+  usePaymentStats,
+  useYearlyStats,
+} from '@/features/fuelStatistics';
 
 import { Button, ButtonText } from '@shared/components/ui/button';
 import { ChevronDownIcon, Icon } from '@shared/components/ui/icon';
@@ -51,19 +56,25 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
   const [month, setMonth] = useState(now.getMonth() + 1);
 
   const {
-    monthlyStatsQuery,
-    paymentStatsQuery,
-    comparisonStatsQuery,
-    yearlyStatsQuery,
-  } = useFuelStatisticQueries({ vehicleId, year, month });
-
-  const { data: monthlyStats, isLoading: monthlyStatsLoading } =
-    monthlyStatsQuery;
-  const { data: paymentStats, isLoading: paymentStatsLoading } =
-    paymentStatsQuery;
-  const { data: comparisonStats, isLoading: comparisonStatsLoading } =
-    comparisonStatsQuery;
-  const { data: yearlyStats, isLoading: yearlyStatsLoading } = yearlyStatsQuery;
+    data: monthlyStats,
+    isLoading: monthlyStatsLoading,
+    isError: monthlyStatsError,
+  } = useMonthlyStats(vehicleId, year, month);
+  const {
+    data: paymentStats,
+    isLoading: paymentStatsLoading,
+    isError: paymentStatsError,
+  } = usePaymentStats(vehicleId, year, month);
+  const {
+    data: comparisonStats,
+    isLoading: comparisonStatsLoading,
+    isError: comparisonStatsError,
+  } = useMonthlyStatsWithComparisons(vehicleId, year, month);
+  const {
+    data: yearlyStats,
+    isLoading: yearlyStatsLoading,
+    isError: yearlyStatsError,
+  } = useYearlyStats(vehicleId, year);
 
   const debouncedMonthlyStatsLoading = useDebounce(monthlyStatsLoading, 300);
   const debouncedPaymentStatsLoading = useDebounce(paymentStatsLoading, 300);
@@ -73,6 +84,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
   );
   const debouncedYearlyStatsLoading = useDebounce(yearlyStatsLoading, 300);
 
+  console.log(monthlyStats);
   return (
     <VStack className="flex-1 bg-background-light">
       <HStack className="flex-row justify-end p-2">
@@ -145,7 +157,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
       <ScrollView contentContainerClassName="bg-white p-2">
         {/* 월별 주유 통계 카드 */}
         <Box className="h-24 w-full">
-          {debouncedMonthlyStatsLoading || monthlyStatsQuery.error ? (
+          {debouncedMonthlyStatsLoading || monthlyStatsError ? (
             <MonthlyStatsCardSkeleton />
           ) : (
             <MonthlyStatsCard
@@ -158,7 +170,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
         </Box>
 
         {/* 결제 수단별 지출 통계 차트 */}
-        {debouncedPaymentStatsLoading || paymentStatsQuery.error ? (
+        {debouncedPaymentStatsLoading || paymentStatsError ? (
           <PaymentStatsBarChartSkeleton />
         ) : (
           <PaymentStatsBarChart paymentStats={paymentStats ?? []} />
@@ -166,7 +178,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
 
         <Box className="h-24 w-full mb-2">
           {/* 전월/전년 대비 통계 카드 */}
-          {debouncedComparisonStatsLoading || comparisonStatsQuery.error ? (
+          {debouncedComparisonStatsLoading || comparisonStatsError ? (
             <ComparisonStatsCardSkeleton />
           ) : comparisonStats ? (
             <ComparisonStatsCard
@@ -179,7 +191,7 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
 
         <Box className="w-full mb-2">
           {/* 연간 통계 (월별) 라인차트 */}
-          {debouncedYearlyStatsLoading || yearlyStatsQuery.error ? (
+          {debouncedYearlyStatsLoading || yearlyStatsError ? (
             <Skeleton className="h-56 rounded-xl w-full" />
           ) : (
             <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />

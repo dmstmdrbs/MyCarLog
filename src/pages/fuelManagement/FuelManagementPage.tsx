@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FuelStackParamList } from './navigator';
 import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
-import { useFuelRecordsByDateRange } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
+import { useFuelRecordsByDate } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
 import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
 import { Heading } from '@/shared/components/ui/heading';
 import { Pressable } from 'react-native';
@@ -23,7 +23,7 @@ import {
   MonthlyStatsCard,
   MonthlyStatsCardSkeleton,
 } from '@/widgets/fuelManagement/ui/MonthlyStatsCard';
-import { useFuelStatisticQueries } from '@/features/fuelStatistics';
+import { useMonthlyStats } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
 import { Text } from '@/shared/components/ui/text';
 
@@ -44,16 +44,18 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(
     selectedVehicle?.id || '',
   );
-  const { monthlyStatsQuery } = useFuelStatisticQueries({
-    vehicleId: vehicle?.id || '',
-    year: currentDate.getFullYear(),
-    month: currentDate.getMonth() + 1,
-  });
-  const { data: monthlyStats } = monthlyStatsQuery;
-
-  const { data: fuelRecordsByDate } = useFuelRecordsByDateRange(
+  const {
+    data: monthlyStats,
+    isLoading: monthlyStatsLoading,
+    isError: monthlyStatsError,
+  } = useMonthlyStats(
     vehicle?.id || '',
-    currentDate.getTime(),
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+  );
+
+  const { data: fuelRecordsByDate } = useFuelRecordsByDate(
+    vehicle?.id || '',
     currentDate.getTime(),
   );
 
@@ -79,6 +81,15 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   const unit = getFuelUnit(vehicle?.type);
   const unitPrice = getFuelUnitPrice(vehicle?.type);
 
+  const { totalCost, totalAmount, avgUnitPrice, recordCount } =
+    monthlyStats ?? {};
+  console.log(
+    'monthlyStats',
+    totalCost,
+    totalAmount,
+    avgUnitPrice,
+    recordCount,
+  );
   return (
     <PageLayout>
       <Tab>
@@ -113,18 +124,18 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
         <VStack className="flex-1">
           {/* 월별 통계 카드 */}
           <VStack>
-            {monthlyStatsQuery.isLoading ? (
+            {monthlyStatsLoading ? (
               <MonthlyStatsCardSkeleton />
-            ) : monthlyStatsQuery.isError ? (
+            ) : monthlyStatsError ? (
               <Box className="flex-1 justify-center items-center h-24">
                 <Text>Error</Text>
               </Box>
             ) : monthlyStats ? (
               <MonthlyStatsCard
-                totalCost={monthlyStats.totalCost ?? 0}
-                totalAmount={monthlyStats.totalAmount ?? 0}
-                avgUnitPrice={monthlyStats.avgUnitPrice ?? 0}
-                recordCount={monthlyStats.recordCount ?? 0}
+                totalCost={totalCost ?? 0}
+                totalAmount={totalAmount ?? 0}
+                avgUnitPrice={avgUnitPrice ?? 0}
+                recordCount={recordCount ?? 0}
                 hideIcon={true}
               />
             ) : null}

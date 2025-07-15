@@ -49,7 +49,7 @@ const RecentRecordItem = ({ record }: { record: RecentRecord }) => {
         <HStack className="justify-between">
           <Text className="text-gray-800" size="lg">
             {record.type === 'fuel'
-              ? `${record.stationName}${selectedVehicle?.type === 'EV' ? ' 충전소' : ' 주유소'}`
+              ? record.stationName
               : record.isDiy
                 ? '자가정비'
                 : (record?.shopName ?? '정비소')}

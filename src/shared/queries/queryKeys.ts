@@ -21,41 +21,58 @@ export const queryKeys = {
   // FuelRecord 관련 쿼리
   fuelRecords: {
     all: () => ['fuelRecords'] as const,
-    lists: () => [...queryKeys.fuelRecords.all(), 'list'] as const,
-    list: (vehicleId: string) =>
-      [...queryKeys.fuelRecords.lists(), vehicleId] as const,
+    list: (vehicleId: string) => ['fuelRecords', 'list', vehicleId] as const,
     byMonth: (vehicleId: string, year: number, month: number) =>
-      [...queryKeys.fuelRecords.list(vehicleId), 'month', year, month] as const,
+      ['fuelRecords', 'list', vehicleId, 'month', year, month] as const,
+    byDate: (vehicleId: string, date: number) => {
+      const year = new Date(date).getFullYear();
+      const month = new Date(date).getMonth() + 1;
+      const day = new Date(date).getDate();
+
+      return [
+        'fuelRecords',
+        'list',
+        vehicleId,
+        'year',
+        year,
+        'month',
+        month,
+        'day',
+        day,
+      ] as const;
+    },
     byDateRange: (vehicleId: string, startDate: number, endDate: number) =>
       [
-        ...queryKeys.fuelRecords.list(vehicleId),
+        'fuelRecords',
+        'list',
+        vehicleId,
         'dateRange',
         startDate,
         endDate,
       ] as const,
-    details: () => [...queryKeys.fuelRecords.all(), 'detail'] as const,
-    detail: (id: string) => [...queryKeys.fuelRecords.details(), id] as const,
-
+    detail: (id: string) => ['fuelRecords', 'detail', id] as const,
     // 통계 관련
-    stats: (vehicleId: string) =>
-      [...queryKeys.fuelRecords.list(vehicleId), 'stats'] as const,
     monthlyStats: (vehicleId: string, year: number, month: number) =>
-      [
-        ...queryKeys.fuelRecords.byMonth(vehicleId, year, month),
-        'stats',
-      ] as const,
-    totalCost: (vehicleId: string) =>
-      [...queryKeys.fuelRecords.stats(vehicleId), 'totalCost'] as const,
-    totalAmount: (vehicleId: string) =>
-      [...queryKeys.fuelRecords.stats(vehicleId), 'totalAmount'] as const,
-
+      ['fuelRecords', 'list', vehicleId, 'stats', year, month] as const,
     // 관련 데이터
     recentStations: (vehicleId: string, limit?: number) =>
+      ['fuelRecords', 'list', vehicleId, 'recentStations', limit] as const,
+    monthlyStatsWithComparisons: (
+      vehicleId: string,
+      year: number,
+      month: number,
+    ) =>
       [
-        ...queryKeys.fuelRecords.list(vehicleId),
-        'recentStations',
-        limit,
+        'fuelRecords',
+        'list',
+        vehicleId,
+        'stats',
+        year,
+        month,
+        'comparison',
       ] as const,
+    yearlyStats: (vehicleId: string, year: number) =>
+      ['fuelRecords', 'list', vehicleId, 'year', year, 'stats'] as const,
   },
 
   // PaymentMethod 관련 쿼리
@@ -67,7 +84,16 @@ export const queryKeys = {
     details: () => [...queryKeys.paymentMethods.all(), 'detail'] as const,
     detail: (id: string) =>
       [...queryKeys.paymentMethods.details(), id] as const,
-    stats: () => [...queryKeys.paymentMethods.all(), 'stats'] as const,
+    stats: (vehicleId: string, year: number, month: number) =>
+      [
+        'paymentMethods',
+        'list',
+        vehicleId,
+        'month',
+        year,
+        month,
+        'stats',
+      ] as const,
   },
 
   // Station 관련 쿼리
@@ -108,10 +134,8 @@ export const invalidationHelpers = {
   invalidateDefaultVehicle: () => queryKeys.vehicles.defaultVehicle(),
 
   // 특정 차량의 연료 기록 관련 캐시 무효화
-  invalidateFuelRecords: (vehicleId?: string) =>
-    vehicleId
-      ? queryKeys.fuelRecords.list(vehicleId)
-      : queryKeys.fuelRecords.all(),
+  invalidateFuelRecords: (vehicleId: string) =>
+    queryKeys.fuelRecords.list(vehicleId),
 
   // 결제 수단 관련 모든 캐시 무효화
   invalidatePaymentMethods: () => queryKeys.paymentMethods.all(),

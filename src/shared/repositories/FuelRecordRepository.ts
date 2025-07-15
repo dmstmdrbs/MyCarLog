@@ -136,6 +136,21 @@ export class FuelRecordRepository
     }
   }
 
+  async findByDate(vehicleId: string, date: number): Promise<FuelRecord[]> {
+    try {
+      return await this.collection
+        .query(
+          Q.where('vehicle_id', vehicleId),
+          Q.where('date', date),
+          Q.sortBy('date', Q.desc),
+        )
+        .fetch();
+    } catch (error) {
+      console.error(`Error finding fuel records by date:`, error);
+      throw error;
+    }
+  }
+
   async findByDateRange(
     vehicleId: string,
     startDate: number,

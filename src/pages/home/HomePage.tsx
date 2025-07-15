@@ -8,7 +8,6 @@ import { Text } from '@/shared/components/ui/text';
 import { VStack } from '@/shared/components/ui/vstack';
 import { ProfileCard } from '@/widgets/vehicle/ProfileCard';
 import { ScrollView } from 'react-native';
-import { formatNumber } from '@/shared/utils/format';
 import { Button, ButtonText } from '@/shared/components/ui/button';
 import { Icon } from '@/shared/components/ui/icon';
 import { Edit } from 'lucide-react-native';

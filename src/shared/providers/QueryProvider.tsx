@@ -7,8 +7,8 @@ const createQueryClient = () => {
     defaultOptions: {
       queries: {
         // 기본 설정
-        staleTime: 0, // 5분간 fresh 상태 유지
-        gcTime: 0, // 30분간 캐시 유지 (이전 cacheTime)
+        staleTime: 0,
+        gcTime: 0,
         retry: (failureCount, error) => {
           // 네트워크 에러가 아닌 경우 재시도하지 않음
           if (error instanceof Error && error.message.includes('not found')) {
