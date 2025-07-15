@@ -272,33 +272,6 @@ export class FuelRecordRepository
     }
   }
 
-  async updateFuelRecord(
-    id: string,
-    data: UpdateFuelRecordData,
-  ): Promise<FuelRecord> {
-    try {
-      return await this.database.write(async () => {
-        const record = await this.collection.find(id);
-        return await record.update((r) => {
-          if (data.date !== undefined) r.date = data.date;
-          if (data.totalCost !== undefined) r.totalCost = data.totalCost;
-          if (data.unitPrice !== undefined) r.unitPrice = data.unitPrice;
-          if (data.amount !== undefined) r.amount = data.amount;
-          if (data.paymentMethodId !== undefined)
-            r.paymentMethodId = data.paymentMethodId;
-          if (data.paymentName !== undefined) r.paymentName = data.paymentName;
-          if (data.paymentType !== undefined) r.paymentType = data.paymentType;
-          if (data.stationId !== undefined) r.stationId = data.stationId;
-          if (data.stationName !== undefined) r.stationName = data.stationName;
-          if (data.memo !== undefined) r.memo = data.memo;
-        });
-      });
-    } catch (error) {
-      console.error(`Error updating fuel record ${id}:`, error);
-      throw error;
-    }
-  }
-
   async getRecentStations(
     vehicleId: string,
     limit: number = 10,

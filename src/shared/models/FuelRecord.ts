@@ -51,6 +51,7 @@ export interface CreateFuelRecordData {
   stationId: string;
   stationName: string;
   memo?: string;
+  odometer: number;
 }
 
 // 연료 기록 수정을 위한 데이터 타입
@@ -65,6 +66,7 @@ export interface UpdateFuelRecordData {
   paymentType?: PaymentMethodType['type'];
   stationId?: string;
   stationName?: string;
+  odometer?: number;
   memo?: string;
 }
 

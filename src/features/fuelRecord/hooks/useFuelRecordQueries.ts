@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, invalidationHelpers } from '@shared/queries/queryKeys';
-import { fuelRecordRepository } from '@shared/repositories';
+import { fuelRecordRepository, vehicleRepository } from '@shared/repositories';
 import {
   CreateFuelRecordData,
   UpdateFuelRecordData,
@@ -94,10 +94,31 @@ export const useCreateFuelRecord = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateFuelRecordData) =>
-      fuelRecordRepository.create(data),
+    mutationFn: async (data: CreateFuelRecordData) => {
+      const record = await fuelRecordRepository.create(data);
+      const vehicle = await vehicleRepository.findById(record.vehicleId);
+
+      const currentOdometer = vehicle?.odometer ?? 0;
+      if (currentOdometer < data.odometer) {
+        await vehicleRepository.updateVehicle(record.vehicleId, {
+          odometer: data.odometer,
+        });
+      }
+      return record;
+    },
     onSuccess: (record) => {
       console.log('created', record);
+      // 차량 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicle(record.vehicleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.defaultVehicle(),
+      });
+
       // 해당 차량의 연료 기록 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: invalidationHelpers.invalidateFuelRecords(record.vehicleId),
@@ -125,9 +146,37 @@ export const useUpdateFuelRecord = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateFuelRecordData }) =>
-      fuelRecordRepository.update(id, data),
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateFuelRecordData;
+    }) => {
+      const record = await fuelRecordRepository.update(id, data);
+      const vehicle = await vehicleRepository.findById(record.vehicleId);
+      const currentOdometer = vehicle?.odometer ?? 0;
+      const newOdometer = data.odometer ?? 0;
+      if (currentOdometer < newOdometer) {
+        await vehicleRepository.updateVehicle(record.vehicleId, {
+          odometer: newOdometer,
+        });
+      }
+
+      return record;
+    },
     onSuccess: (record) => {
+      // 차량 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicle(record.vehicleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.defaultVehicle(),
+      });
+
       // 해당 차량의 연료 기록 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: invalidationHelpers.invalidateFuelRecords(record.vehicleId),

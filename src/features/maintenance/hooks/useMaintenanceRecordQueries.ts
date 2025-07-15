@@ -8,6 +8,8 @@ import { getMonth, getYear } from 'date-fns';
 import MaintenanceRecord, {
   MaintenanceRecordType,
 } from '@/shared/models/MaintenanceRecord';
+import { vehicleRepository } from '@/shared/repositories/VehicleRepository';
+import { queryKeys } from '@/shared/queries/queryKeys';
 
 const recordToType = (record: MaintenanceRecord): MaintenanceRecordType => {
   return {
@@ -41,7 +43,7 @@ export function useMaintenanceRecords(vehicleId: string) {
     queryKey: maintenanceRecordsKey(vehicleId),
     queryFn: () => maintenanceRecordRepository.findByVehicleId(vehicleId),
     enabled: !!vehicleId,
-    staleTime: 0, // 5분
+    staleTime: 0,
     select(data) {
       if (!data) return [];
       return data.map((record) => recordToType(record));
@@ -79,12 +81,34 @@ export function useMaintenanceRecordsByDate(
 export function useCreateMaintenanceRecord(vehicleId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<CreateMaintenanceRecordData, 'vehicleId'>) =>
-      maintenanceRecordRepository.create({
+    mutationFn: async (
+      data: Omit<CreateMaintenanceRecordData, 'vehicleId'>,
+    ) => {
+      const record = await maintenanceRecordRepository.create({
         ...data,
         vehicleId,
-      }),
+      });
+
+      const vehicle = await vehicleRepository.findById(record.vehicleId);
+      const currentOdometer = vehicle?.odometer ?? 0;
+      if (currentOdometer < data.odometer) {
+        await vehicleRepository.updateVehicle(record.vehicleId, {
+          odometer: data.odometer,
+        });
+      }
+      return record;
+    },
     onSuccess: (data) => {
+      // 차량 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicle(vehicleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.defaultVehicle(),
+      });
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsByDateKey(
           vehicleId,
@@ -103,14 +127,34 @@ export function useCreateMaintenanceRecord(vehicleId: string) {
 export function useUpdateMaintenanceRecord(vehicleId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
+    mutationFn: async (params: {
       id: string;
       data: UpdateMaintenanceRecordData;
-    }) => maintenanceRecordRepository.update(id, data),
+    }) => {
+      const { id, data } = params;
+      const record = await maintenanceRecordRepository.update(id, data);
+      const vehicle = await vehicleRepository.findById(record.vehicleId);
+      const currentOdometer = vehicle?.odometer ?? 0;
+      const newOdometer = data.odometer ?? 0;
+      if (currentOdometer < newOdometer) {
+        await vehicleRepository.updateVehicle(record.vehicleId, {
+          odometer: newOdometer,
+        });
+      }
+      return record;
+    },
     onSuccess: () => {
+      // 차량 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicle(vehicleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.defaultVehicle(),
+      });
+
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsKey(vehicleId),
       });

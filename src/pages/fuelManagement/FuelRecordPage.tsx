@@ -21,8 +21,6 @@ type Props = NativeStackScreenProps<FuelStackParamList, 'FuelRecord'>;
 export function FuelRecordPage({ route, navigation }: Props) {
   const { vehicleId, targetDate, recordId } = route.params;
   const { data: fuelRecord } = useFuelRecord(recordId || '');
-  console.log('fuelRecord', fuelRecord);
-  console.log('recordId', recordId);
   const { data: vehicle, isLoading: vehicleLoading } = useVehicle(vehicleId);
 
   const createFuelRecordMutation = useCreateFuelRecord();
@@ -61,7 +59,7 @@ export function FuelRecordPage({ route, navigation }: Props) {
 
   const initialFormData = useMemo(
     () => ({
-      date: targetDate,
+      date: new Date(targetDate).getTime(),
       odometer: vehicle?.odometer || 0,
       totalCost: fuelRecord?.totalCost || 0,
       unitPrice: fuelRecord?.unitPrice || 0,

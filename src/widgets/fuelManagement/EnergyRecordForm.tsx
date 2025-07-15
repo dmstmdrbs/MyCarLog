@@ -8,7 +8,6 @@ import { useMemo, useReducer, useEffect } from 'react';
 import { formatDate } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useStations } from '@features/station';
-import type { PaymentMethodType } from '@shared/models/PaymentMethod';
 
 import { formatDateForDisplay } from '@/shared/utils/format';
 import { FormCard } from '@/shared/components/form/FormCard';
@@ -19,20 +18,9 @@ import { FloatingSubmitButton } from '@/shared/components/FloatingSubmitButton';
 import { ScrollView } from 'react-native';
 import { useModal } from '@/shared/hooks/useModal';
 import { DateSelectModal } from './ui/DateSelectModal';
+import { CreateFuelRecordData } from '@/shared/models/FuelRecord';
 
-interface EnergyRecordFormData {
-  date: string; // YYYY-MM-DD 형식
-  totalCost: number;
-  unitPrice: number;
-  amount: number;
-  paymentMethodId: string;
-  paymentName: string;
-  paymentType: PaymentMethodType['type'];
-  stationId: string;
-  stationName: string;
-  memo: string;
-  odometer: number;
-}
+type EnergyRecordFormData = Omit<CreateFuelRecordData, 'id' | 'vehicleId'>;
 
 interface EnergyRecordFormProps {
   vehicleType: 'ICE' | 'EV';
@@ -74,7 +62,7 @@ export function EnergyRecordForm({
 
   // 초기값
   const initialState: EnergyRecordFormData = {
-    date: formatDate(new Date(), 'yyyy-MM-dd'),
+    date: new Date().getTime(),
     odometer: 0,
     totalCost: 0,
     unitPrice: 0,
