@@ -49,12 +49,12 @@ export function SettingsMainPage({ route, navigation }: Props) {
       icon: WrenchIcon,
       onPress: () => navigation.navigate('SettingsMaintenanceItem'),
     },
-    {
-      key: 'backup',
-      title: '데이터 백업 및 복구',
-      icon: CloudUploadIcon,
-      onPress: () => navigation.navigate('SettingsDataBackup'),
-    },
+    // {
+    //   key: 'backup',
+    //   title: '데이터 백업 및 복구',
+    //   icon: CloudUploadIcon,
+    //   onPress: () => navigation.navigate('SettingsDataBackup'),
+    // },
   ];
 
   return (
