@@ -89,13 +89,10 @@ export function useCreateMaintenanceRecord(vehicleId: string) {
         vehicleId,
       });
 
-      const vehicle = await vehicleRepository.findById(record.vehicleId);
-      const currentOdometer = vehicle?.odometer ?? 0;
-      if (currentOdometer < data.odometer) {
-        await vehicleRepository.updateVehicle(record.vehicleId, {
-          odometer: data.odometer,
-        });
-      }
+      await vehicleRepository.updateVehicle(record.vehicleId, {
+        odometer: data.odometer,
+      });
+
       return record;
     },
     onSuccess: (data) => {
@@ -133,14 +130,10 @@ export function useUpdateMaintenanceRecord(vehicleId: string) {
     }) => {
       const { id, data } = params;
       const record = await maintenanceRecordRepository.update(id, data);
-      const vehicle = await vehicleRepository.findById(record.vehicleId);
-      const currentOdometer = vehicle?.odometer ?? 0;
-      const newOdometer = data.odometer ?? 0;
-      if (currentOdometer < newOdometer) {
-        await vehicleRepository.updateVehicle(record.vehicleId, {
-          odometer: newOdometer,
-        });
-      }
+      await vehicleRepository.updateVehicle(record.vehicleId, {
+        odometer: data.odometer,
+      });
+
       return record;
     },
     onSuccess: () => {

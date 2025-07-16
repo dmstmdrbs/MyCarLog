@@ -3,6 +3,7 @@ import { field, readonly } from '@nozbe/watermelondb/decorators';
 import { TableSchemaSpec } from '@nozbe/watermelondb/Schema';
 import { PaymentMethodType } from './PaymentMethod';
 
+// TODO: odometer는 각 레코드 별로 관리되어야 함. 그리고 가장 최근 레코드의 odometer가 차량의 odometer가 되어야 함.
 export default class FuelRecord extends Model {
   static table = 'fuel_records';
 
@@ -17,6 +18,7 @@ export default class FuelRecord extends Model {
   @field('station_id') stationId!: string;
   @field('station_name') stationName!: string;
   @field('memo') memo!: string;
+  @field('odometer') odometer!: number;
   @readonly @field('created_at') createdAt!: number;
 }
 
@@ -36,6 +38,7 @@ export type FuelRecordType = Pick<
   | 'memo'
   | 'createdAt'
   | 'vehicleId'
+  | 'odometer'
 >;
 
 // 연료 기록 생성을 위한 데이터 타입
@@ -94,6 +97,7 @@ export const fuelRecordSchema: TableSchemaSpec = {
     { name: 'station_id', type: 'string' },
     { name: 'station_name', type: 'string' },
     { name: 'memo', type: 'string', isOptional: true },
+    { name: 'odometer', type: 'number' },
     { name: 'created_at', type: 'number' },
   ],
 };

@@ -5,7 +5,7 @@ import { FlatList } from 'react-native';
 import {
   CarIcon,
   ChevronRightIcon,
-  CloudUploadIcon,
+  // CloudUploadIcon,
   WrenchIcon,
 } from 'lucide-react-native';
 import { Icon } from '@/shared/components/ui/icon';

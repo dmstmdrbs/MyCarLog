@@ -7,6 +7,8 @@ import {
   FuelRecordType,
 } from '@shared/models/FuelRecord';
 
+import { VehicleType } from '@/shared/models/Vehicle';
+
 const recordToType = (record: FuelRecordType) => {
   return {
     id: record.id,
@@ -22,6 +24,7 @@ const recordToType = (record: FuelRecordType) => {
     memo: record.memo,
     createdAt: record.createdAt,
     vehicleId: record.vehicleId,
+    odometer: record.odometer,
   };
 };
 
@@ -96,19 +99,13 @@ export const useCreateFuelRecord = () => {
   return useMutation({
     mutationFn: async (data: CreateFuelRecordData) => {
       const record = await fuelRecordRepository.create(data);
-      const vehicle = await vehicleRepository.findById(record.vehicleId);
+      await vehicleRepository.updateVehicle(record.vehicleId, {
+        odometer: data.odometer,
+      });
 
-      const currentOdometer = vehicle?.odometer ?? 0;
-      if (currentOdometer < data.odometer) {
-        await vehicleRepository.updateVehicle(record.vehicleId, {
-          odometer: data.odometer,
-        });
-      }
       return record;
     },
     onSuccess: (record) => {
-      console.log('created', record);
-      // 차량 정보 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.vehicles(),
       });
@@ -118,6 +115,22 @@ export const useCreateFuelRecord = () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.defaultVehicle(),
       });
+      queryClient.setQueryData<VehicleType>(
+        queryKeys.vehicles.vehicle(record.vehicleId),
+        (vehicle) => {
+          if (!vehicle) return vehicle;
+          return { ...vehicle, odometer: record.odometer };
+        },
+      );
+      queryClient.setQueryData<VehicleType[]>(
+        queryKeys.vehicles.vehicles(),
+        (vehicles) => {
+          if (!vehicles) return vehicles;
+          return vehicles.map((v) =>
+            v.id === record.vehicleId ? { ...v, odometer: record.odometer } : v,
+          );
+        },
+      );
 
       // 해당 차량의 연료 기록 캐시 무효화
       queryClient.invalidateQueries({
@@ -154,18 +167,38 @@ export const useUpdateFuelRecord = () => {
       data: UpdateFuelRecordData;
     }) => {
       const record = await fuelRecordRepository.update(id, data);
-      const vehicle = await vehicleRepository.findById(record.vehicleId);
-      const currentOdometer = vehicle?.odometer ?? 0;
-      const newOdometer = data.odometer ?? 0;
-      if (currentOdometer < newOdometer) {
-        await vehicleRepository.updateVehicle(record.vehicleId, {
-          odometer: newOdometer,
-        });
-      }
+      await vehicleRepository.updateVehicle(record.vehicleId, {
+        odometer: data.odometer,
+      });
 
       return record;
     },
     onSuccess: (record) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicles(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.vehicle(record.vehicleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vehicles.defaultVehicle(),
+      });
+      queryClient.setQueryData<VehicleType>(
+        queryKeys.vehicles.vehicle(record.vehicleId),
+        (vehicle) => {
+          if (!vehicle) return vehicle;
+          return { ...vehicle, odometer: record.odometer };
+        },
+      );
+      queryClient.setQueryData<VehicleType[]>(
+        queryKeys.vehicles.vehicles(),
+        (vehicles) => {
+          if (!vehicles) return vehicles;
+          return vehicles.map((v) =>
+            v.id === record.vehicleId ? { ...v, odometer: record.odometer } : v,
+          );
+        },
+      );
       // 차량 정보 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.vehicles(),

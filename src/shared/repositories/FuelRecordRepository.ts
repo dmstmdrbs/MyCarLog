@@ -84,6 +84,7 @@ export interface CreateFuelRecordData {
   stationId: string;
   stationName: string;
   memo?: string;
+  odometer?: number;
 }
 
 export interface UpdateFuelRecordData {
@@ -97,6 +98,7 @@ export interface UpdateFuelRecordData {
   stationId?: string;
   stationName?: string;
   memo?: string;
+  odometer?: number;
 }
 
 export class FuelRecordRepository
@@ -120,6 +122,7 @@ export class FuelRecordRepository
     if (data.stationId !== undefined) record.stationId = data.stationId;
     if (data.stationName !== undefined) record.stationName = data.stationName;
     if (data.memo !== undefined) record.memo = data.memo;
+    if (data.odometer !== undefined) record.odometer = data.odometer;
   }
 
   async findByVehicleId(vehicleId: string): Promise<FuelRecord[]> {
@@ -138,13 +141,16 @@ export class FuelRecordRepository
 
   async findByDate(vehicleId: string, date: number): Promise<FuelRecord[]> {
     try {
-      return await this.collection
+      console.log('findByDate', vehicleId, date);
+      const records = await this.collection
         .query(
           Q.where('vehicle_id', vehicleId),
           Q.where('date', date),
           Q.sortBy('date', Q.desc),
         )
         .fetch();
+      console.log('records', records);
+      return records;
     } catch (error) {
       console.error(`Error finding fuel records by date:`, error);
       throw error;
@@ -264,6 +270,7 @@ export class FuelRecordRepository
           record.stationId = data.stationId;
           record.stationName = data.stationName;
           record.memo = data.memo || '';
+          record.odometer = data.odometer || 0;
         });
       });
     } catch (error) {

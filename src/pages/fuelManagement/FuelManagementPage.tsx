@@ -26,6 +26,7 @@ import {
 import { useMonthlyStats } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
 import { Text } from '@/shared/components/ui/text';
+import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
 
 export type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -33,7 +34,7 @@ export type FuelManagementPageProps = NativeStackScreenProps<
 >;
 
 export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { currentDate, setCurrentDate } = useCurrentDate();
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',
@@ -55,7 +56,7 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
   );
 
   const { data: fuelRecordsByDate } = useFuelRecordsByDate(
-    vehicle?.id || '',
+    selectedVehicle?.id || '',
     currentDate.getTime(),
   );
 
@@ -83,13 +84,6 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
 
   const { totalCost, totalAmount, avgUnitPrice, recordCount } =
     monthlyStats ?? {};
-  console.log(
-    'monthlyStats',
-    totalCost,
-    totalAmount,
-    avgUnitPrice,
-    recordCount,
-  );
   return (
     <PageLayout>
       <Tab>

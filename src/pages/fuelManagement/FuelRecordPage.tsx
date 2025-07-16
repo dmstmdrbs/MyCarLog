@@ -60,7 +60,7 @@ export function FuelRecordPage({ route, navigation }: Props) {
   const initialFormData = useMemo(
     () => ({
       date: new Date(targetDate).getTime(),
-      odometer: vehicle?.odometer || 0,
+      odometer: fuelRecord?.odometer || 0,
       totalCost: fuelRecord?.totalCost || 0,
       unitPrice: fuelRecord?.unitPrice || 0,
       amount: fuelRecord?.amount || 0,
@@ -72,7 +72,7 @@ export function FuelRecordPage({ route, navigation }: Props) {
       stationName: fuelRecord?.stationName || '',
       memo: fuelRecord?.memo || '',
     }),
-    [vehicle?.odometer, targetDate, fuelRecord],
+    [targetDate, fuelRecord],
   );
 
   return (

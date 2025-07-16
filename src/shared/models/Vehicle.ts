@@ -15,7 +15,16 @@ export default class Vehicle extends Model {
 }
 
 // Vehicle 타입 (클래스가 아닌 타입으로 사용할 때)
-export type VehicleType = Vehicle;
+export type VehicleType = Pick<
+  Vehicle,
+  | 'id'
+  | 'type'
+  | 'nickname'
+  | 'manufacturer'
+  | 'model'
+  | 'isDefault'
+  | 'odometer'
+>;
 
 // 차량 생성을 위한 데이터 타입
 export interface CreateVehicleData {

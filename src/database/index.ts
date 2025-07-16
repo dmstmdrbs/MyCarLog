@@ -61,11 +61,20 @@ const migrations = schemaMigrations({
         }),
       ],
     },
+    {
+      toVersion: 7,
+      steps: [
+        addColumns({
+          table: 'fuel_records',
+          columns: [{ name: 'odometer', type: 'number', isOptional: true }],
+        }),
+      ],
+    },
   ],
 });
 
 const schema = appSchema({
-  version: 6,
+  version: 7,
   tables: [
     tableSchema(vehicleSchema),
     tableSchema(fuelRecordSchema),
