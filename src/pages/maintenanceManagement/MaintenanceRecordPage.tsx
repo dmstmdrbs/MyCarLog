@@ -1,12 +1,10 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import {
   useCreateMaintenanceRecord,
-  // useDeleteMaintenanceRecord,
-  useMaintenanceRecords,
+  useMaintenanceRecord,
   useUpdateMaintenanceRecord,
 } from '@/features/maintenance/hooks/useMaintenanceRecordQueries';
 import { useSelectedVehicle } from '@/features/vehicle/contexts/SelectedVehicleContext';
-// import { useVehicle } from '@/features/vehicle/hooks/useVehicleQueries';
 import { FloatingSubmitButton } from '@/shared/components/FloatingSubmitButton';
 import PageLayout from '@/shared/components/layout/PageLayout';
 import { Box } from '@/shared/components/ui/box';
@@ -37,17 +35,15 @@ export const MaintenanceRecordPage = ({
   const { selectedVehicle } = useSelectedVehicle();
   const vehicleId = selectedVehicle?.id || '';
 
-  // const { data: vehicle } = useVehicle(vehicleId);
-  const { data: records } = useMaintenanceRecords(vehicleId);
+  const { data: existingRecord } = useMaintenanceRecord(
+    vehicleId,
+    recordId ?? '',
+  );
   const createMaintenanceRecord = useCreateMaintenanceRecord(vehicleId);
   const updateMaintenanceRecord = useUpdateMaintenanceRecord(vehicleId);
-  // const deleteMutation = useDeleteMaintenanceRecord(vehicleId);
-  const exiteingRecord = useMemo(() => {
-    return records?.find((record) => record.id === recordId);
-  }, [records, recordId]);
 
   const initialData: CreateMaintenanceRecordData | UpdateMaintenanceRecordData =
-    exiteingRecord ?? {
+    {
       vehicleId: vehicleId,
       date: formatDate(currentDate, 'yyyy-MM-dd'),
       odometer: 0,
@@ -61,6 +57,13 @@ export const MaintenanceRecordPage = ({
       shopName: '',
       memo: '',
     };
+  useEffect(() => {
+    if (!recordId) return;
+
+    if (existingRecord) {
+      dispatch({ type: 'setExistingRecord', data: existingRecord });
+    }
+  }, [existingRecord, recordId]);
 
   const [formData, dispatch] = useReducer(reducer, initialData);
 

@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useLayoutEffect } from 'react';
-import { FlatList } from 'react-native';
+import { Alert, FlatList } from 'react-native';
 import {
   useDeleteMaintenanceRecord,
   useMaintenanceRecordsByDate,
@@ -20,7 +20,10 @@ import {
   AlertDialogBackdrop,
 } from '@/shared/components/ui/alert-dialog';
 import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 import { MaintenanceStackParamList } from './navigator';
 import { useSelectedVehicle } from '@features/vehicle';
 import { useVehicle } from '@features/vehicle/hooks/useVehicleQueries';
@@ -42,6 +45,8 @@ import { MaintenanceRecordType } from '@/shared/models/MaintenanceRecord';
 import { VStack } from '@/shared/components/ui/vstack';
 import { HStack } from '@/shared/components/ui/hstack';
 import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
+import { Pressable } from '@/shared/components/ui/pressable';
+import { useNavigation } from '@react-navigation/native';
 
 type MaintenanceManagementPageProps = NativeStackScreenProps<
   MaintenanceStackParamList,
@@ -55,6 +60,8 @@ const MaintenanceRecordItem = ({
   recordItem: MaintenanceRecordType;
   onPressDelete: (id: string) => void;
 }) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<MaintenanceStackParamList>>();
   const { data: maintenanceItems } = useMaintenanceItemQueries();
   const maintenanceItem = useMemo(() => {
     return maintenanceItems?.find(
@@ -63,48 +70,68 @@ const MaintenanceRecordItem = ({
   }, [maintenanceItems, recordItem.maintenanceItemId]);
 
   const handleDelete = useCallback(async () => {
-    onPressDelete(recordItem.id);
+    Alert.alert('정비 기록 삭제', '정비 기록을 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', onPress: () => onPressDelete(recordItem.id) },
+    ]);
   }, [recordItem.id, onPressDelete]);
+
+  const handleEdit = useCallback(() => {
+    navigation.navigate('MaintenanceRecord', {
+      vehicleId: recordItem.vehicleId,
+      recordId: recordItem.id,
+      targetDate: recordItem.date,
+    });
+  }, [navigation, recordItem.date, recordItem.id, recordItem.vehicleId]);
+
+  const handleAlertDialog = useCallback(() => {
+    Alert.alert('정비 기록 수정', '정비 기록을 수정하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      { text: '수정', onPress: handleEdit },
+    ]);
+  }, [handleEdit]);
 
   return (
     <HStack className="justify-between border-gray-200 p-2">
-      <VStack className="flex-1 p-2">
-        <Text className="font-bold">
-          {format(new Date(recordItem.date), 'yyyy년 MM월 dd일')}
-        </Text>
-        <Box className="flex-row items-center gap-1">
-          <Heading size="sm" className="text-typography-500">
-            항목:
-          </Heading>
-          <Text className="text-typography-700">
-            {maintenanceItem?.name ?? ''}
+      <Pressable onPress={handleAlertDialog} className="flex-1 p-2">
+        <VStack className="flex-1">
+          <Text className="font-bold">
+            {format(new Date(recordItem.date), 'yyyy년 MM월 dd일')}
           </Text>
-        </Box>
-        <Box className="flex-row items-center gap-1">
-          <Heading size="sm" className="text-typography-500">
-            비용:
-          </Heading>
-          <Text className="text-typography-700">
-            {formatNumber(recordItem.cost)}원
-          </Text>
-          <Divider orientation="vertical" className="h-4" />
-          {recordItem?.isDiy ? (
-            <Text className="text-typography-700">자가 정비</Text>
-          ) : recordItem?.shopName ? (
-            <Text className="text-typography-700">{recordItem.shopName}</Text>
-          ) : null}
-        </Box>
-        {recordItem?.memo ? (
-          <Box className="p-0">
+          <Box className="flex-row items-center gap-1">
             <Heading size="sm" className="text-typography-500">
-              메모
+              항목:
             </Heading>
-            <Box className="p-1">
-              <Text className="text-typography-500">{recordItem.memo}</Text>
-            </Box>
+            <Text className="text-typography-700">
+              {maintenanceItem?.name ?? ''}
+            </Text>
           </Box>
-        ) : null}
-      </VStack>
+          <Box className="flex-row items-center gap-1">
+            <Heading size="sm" className="text-typography-500">
+              비용:
+            </Heading>
+            <Text className="text-typography-700">
+              {formatNumber(recordItem.cost)}원
+            </Text>
+            <Divider orientation="vertical" className="h-4" />
+            {recordItem?.isDiy ? (
+              <Text className="text-typography-700">자가 정비</Text>
+            ) : recordItem?.shopName ? (
+              <Text className="text-typography-700">{recordItem.shopName}</Text>
+            ) : null}
+          </Box>
+          {recordItem?.memo ? (
+            <Box className="p-0">
+              <Heading size="sm" className="text-typography-500">
+                메모
+              </Heading>
+              <Box className="p-1">
+                <Text className="text-typography-500">{recordItem.memo}</Text>
+              </Box>
+            </Box>
+          ) : null}
+        </VStack>
+      </Pressable>
       <Button
         action="negative"
         size="sm"

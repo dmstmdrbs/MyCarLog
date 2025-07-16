@@ -10,6 +10,7 @@ import MaintenanceRecord, {
 } from '@/shared/models/MaintenanceRecord';
 import { vehicleRepository } from '@/shared/repositories/VehicleRepository';
 import { queryKeys } from '@/shared/queries/queryKeys';
+import { VehicleType } from '@/shared/models/Vehicle';
 
 const recordToType = (record: MaintenanceRecord): MaintenanceRecordType => {
   return {
@@ -31,6 +32,11 @@ const maintenanceRecordsKey = (vehicleId: string) => [
   'maintenanceRecords',
   vehicleId,
 ];
+const maintenanceRecordKey = (vehicleId: string, recordId: string) => [
+  'maintenanceRecord',
+  vehicleId,
+  recordId,
+];
 
 const maintenanceRecordsByDateKey = (
   vehicleId: string,
@@ -47,6 +53,18 @@ export function useMaintenanceRecords(vehicleId: string) {
     select(data) {
       if (!data) return [];
       return data.map((record) => recordToType(record));
+    },
+  });
+}
+
+export function useMaintenanceRecord(vehicleId: string, recordId: string) {
+  return useQuery({
+    queryKey: maintenanceRecordKey(vehicleId, recordId),
+    queryFn: () => maintenanceRecordRepository.findById(recordId),
+    enabled: !!vehicleId && !!recordId,
+    select(data) {
+      if (!data) return null;
+      return recordToType(data);
     },
   });
 }
@@ -106,6 +124,22 @@ export function useCreateMaintenanceRecord(vehicleId: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.defaultVehicle(),
       });
+      queryClient.setQueryData<VehicleType>(
+        queryKeys.vehicles.vehicle(data.vehicleId),
+        (vehicle) => {
+          if (!vehicle) return vehicle;
+          return { ...vehicle, odometer: data.odometer };
+        },
+      );
+      queryClient.setQueryData<VehicleType[]>(
+        queryKeys.vehicles.vehicles(),
+        (vehicles) => {
+          if (!vehicles) return vehicles;
+          return vehicles.map((v) =>
+            v.id === data.vehicleId ? { ...v, odometer: data.odometer } : v,
+          );
+        },
+      );
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsByDateKey(
           vehicleId,
@@ -136,7 +170,7 @@ export function useUpdateMaintenanceRecord(vehicleId: string) {
 
       return record;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       // 차량 정보 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.vehicles(),
@@ -147,7 +181,22 @@ export function useUpdateMaintenanceRecord(vehicleId: string) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.vehicles.defaultVehicle(),
       });
-
+      queryClient.setQueryData<VehicleType>(
+        queryKeys.vehicles.vehicle(data.vehicleId),
+        (vehicle) => {
+          if (!vehicle) return vehicle;
+          return { ...vehicle, odometer: data.odometer };
+        },
+      );
+      queryClient.setQueryData<VehicleType[]>(
+        queryKeys.vehicles.vehicles(),
+        (vehicles) => {
+          if (!vehicles) return vehicles;
+          return vehicles.map((v) =>
+            v.id === data.vehicleId ? { ...v, odometer: data.odometer } : v,
+          );
+        },
+      );
       queryClient.invalidateQueries({
         queryKey: maintenanceRecordsKey(vehicleId),
       });

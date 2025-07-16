@@ -13,7 +13,8 @@ export type Action = {
     | 'setMemo'
     | 'setPaymentMethod'
     | 'setVehicleId'
-    | 'setIsDiy';
+    | 'setIsDiy'
+    | 'setExistingRecord';
   data: UpdateMaintenanceRecordData;
 };
 
@@ -54,6 +55,11 @@ export const reducer = (
         isDiy: action.data.isDiy,
         shopName: action.data.shopName,
         shopId: action.data.shopId,
+      };
+    case 'setExistingRecord':
+      return {
+        ...state,
+        ...action.data,
       };
     default:
       return state;
