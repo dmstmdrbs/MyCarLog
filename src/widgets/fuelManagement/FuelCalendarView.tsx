@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo } from 'react';
 import { format } from 'date-fns';
 import { DateData } from 'react-native-calendars';
 
@@ -9,23 +9,23 @@ import { Calendar } from '@shared/components/Calendar';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { MarkingProps } from 'react-native-calendars/src/calendar/day/marking';
 import { calendarTheme } from '../../shared/constants/calendar';
+import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
 
 type Props = {
+  initialDate: Date;
   vehicleId: string;
   onDateChange?: (date: Date) => void;
 };
 
-export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export const FuelCalendarView = ({
+  initialDate,
+  vehicleId,
+  onDateChange,
+}: Props) => {
+  const { currentDate, setCurrentDate, dateString, year, month, timestamp } =
+    useCurrentDate(initialDate);
 
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1;
-
-  const { data: fuelRecords } = useFuelRecordsByMonth(
-    vehicleId,
-    currentYear,
-    currentMonth,
-  );
+  const { data: fuelRecords } = useFuelRecordsByMonth(vehicleId, year, month);
   const records = useMemo(() => {
     return (
       fuelRecords?.map((record) =>
@@ -38,7 +38,7 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
     const selectedColor = calendarTheme.selectedColor;
     const dotColor = calendarTheme.accentColor1;
     return {
-      [format(currentDate, 'yyyy-MM-dd')]: {
+      [dateString]: {
         selected: true,
         selectedColor,
       },
@@ -56,7 +56,7 @@ export const FuelCalendarView = ({ vehicleId, onDateChange }: Props) => {
         return acc;
       }, {} as MarkedDates) ?? ({} as MarkedDates)),
     };
-  }, [currentDate, records]);
+  }, [currentDate, dateString, timestamp, records]);
 
   const handleDayPress = (day: DateData) => {
     setCurrentDate(new Date(day.dateString));

@@ -5,7 +5,7 @@ import { Button, ButtonText } from '@shared/components/ui/button';
 import { Textarea, TextareaInput } from '@shared/components/ui/textarea';
 import { useMemo, useReducer, useEffect } from 'react';
 
-import { formatDate } from 'date-fns';
+import { format, formatDate } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useStations } from '@features/station';
 
@@ -19,6 +19,9 @@ import { ScrollView } from 'react-native';
 import { useModal } from '@/shared/hooks/useModal';
 import { DateSelectModal } from './ui/DateSelectModal';
 import { CreateFuelRecordData } from '@/shared/models/FuelRecord';
+import { MarkedDates } from 'react-native-calendars/src/types';
+
+import { calendarTheme } from '@/shared/constants/calendar';
 
 type EnergyRecordFormData = Omit<CreateFuelRecordData, 'id' | 'vehicleId'>;
 
@@ -184,6 +187,18 @@ export function EnergyRecordForm({
   const displayCurrency = (value: number) =>
     value === 0 ? '' : value.toLocaleString();
 
+  const markedDates: MarkedDates = useMemo(() => {
+    const selectedColor = calendarTheme.selectedColor;
+    const marked = {
+      [format(new Date(energyRecord.date), 'yyyy-MM-dd')]: {
+        selected: true,
+        selectedColor,
+      },
+    };
+
+    return marked;
+  }, [energyRecord.date]);
+
   return (
     <>
       <Box className="flex-1 relative">
@@ -235,6 +250,7 @@ export function EnergyRecordForm({
                     onClose={dateModal.close}
                     currentDate={new Date(energyRecord.date)}
                     onDayPress={handleDateChange}
+                    markedDates={markedDates}
                   />
                 </Box>
 

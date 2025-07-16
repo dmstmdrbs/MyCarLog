@@ -11,7 +11,6 @@ import { CalendarDaysIcon, ChartBarIcon } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { cn } from '@/shared/utils/cn';
 import { FloatingAddButton } from '@/shared/components/FloatingAddButton';
-import { format } from 'date-fns';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FuelStackParamList } from './navigator';
 import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
@@ -34,7 +33,8 @@ export type FuelManagementPageProps = NativeStackScreenProps<
 >;
 
 export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
-  const { currentDate, setCurrentDate } = useCurrentDate();
+  const { currentDate, setCurrentDate, dateString, year, month, timestamp } =
+    useCurrentDate();
   // 기본 차량이 있으면 그 차량, 없으면 첫 번째 차량, 둘 다 없으면 안내
   const [selectedTab, setSelectedTab] = useState<'calendar' | 'statistics'>(
     'calendar',
@@ -49,15 +49,11 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
     data: monthlyStats,
     isLoading: monthlyStatsLoading,
     isError: monthlyStatsError,
-  } = useMonthlyStats(
-    vehicle?.id || '',
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-  );
+  } = useMonthlyStats(vehicle?.id || '', year, month);
 
   const { data: fuelRecordsByDate } = useFuelRecordsByDate(
     selectedVehicle?.id || '',
-    currentDate.getTime(),
+    timestamp,
   );
 
   const navigateToFuelRecord = useCallback(() => {
@@ -65,9 +61,9 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
 
     navigation.navigate('FuelRecord', {
       vehicleId: vehicle.id,
-      targetDate: format(currentDate, 'yyyy-MM-dd'),
+      targetDate: dateString,
     });
-  }, [navigation, vehicle, currentDate]);
+  }, [navigation, vehicle, dateString]);
 
   if (vehicleLoading || !vehicle) {
     return (
@@ -145,15 +141,16 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
               </Pressable>
               {!calendarCollapsed && (
                 <FuelCalendarView
-                  vehicleId={vehicle.id}
+                  initialDate={currentDate}
                   onDateChange={setCurrentDate}
+                  vehicleId={vehicle.id}
                 />
               )}
             </VStack>
           </VStack>
           <VStack className="flex-1">
             <Heading size="sm" className="px-4 py-2">
-              {format(currentDate, 'yyyy-MM-dd')} 주유 내역
+              {dateString} 주유 내역
             </Heading>
             <Box className="py-0 flex-1 bg-white">
               <FuelRecordList

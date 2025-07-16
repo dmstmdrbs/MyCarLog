@@ -21,6 +21,7 @@ import { formatDate } from 'date-fns';
 import { MaintenanceStackParamList } from './navigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { reducer } from '@/features/maintenance/reducer/maintenanceReducer';
+import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
 
 type MaintenanceRecordPageProps = NativeStackScreenProps<
   MaintenanceStackParamList,
@@ -32,7 +33,7 @@ export const MaintenanceRecordPage = ({
   navigation,
 }: MaintenanceRecordPageProps) => {
   const { targetDate, recordId } = route.params;
-  const currentDate = useMemo(() => new Date(targetDate), [targetDate]);
+  const { currentDate } = useCurrentDate(targetDate);
   const { selectedVehicle } = useSelectedVehicle();
   const vehicleId = selectedVehicle?.id || '';
 

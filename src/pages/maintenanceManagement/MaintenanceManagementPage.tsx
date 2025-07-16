@@ -38,9 +38,10 @@ import { useMaintenanceItemQueries } from '@/features/maintenance/hooks/useMaint
 import { startOfMonth, endOfMonth } from 'date-fns';
 import { Icon } from '@/shared/components/ui/icon';
 import { TrashIcon } from 'lucide-react-native';
-import MaintenanceRecord from '@/shared/models/MaintenanceRecord';
+import { MaintenanceRecordType } from '@/shared/models/MaintenanceRecord';
 import { VStack } from '@/shared/components/ui/vstack';
 import { HStack } from '@/shared/components/ui/hstack';
+import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
 
 type MaintenanceManagementPageProps = NativeStackScreenProps<
   MaintenanceStackParamList,
@@ -51,7 +52,7 @@ const MaintenanceRecordItem = ({
   recordItem,
   onPressDelete,
 }: {
-  recordItem: MaintenanceRecord;
+  recordItem: MaintenanceRecordType;
   onPressDelete: (id: string) => void;
 }) => {
   const { data: maintenanceItems } = useMaintenanceItemQueries();
@@ -138,9 +139,8 @@ export const MaintenanceManagementPage = ({
     }
   }, [selectedDateString, route.params]);
 
-  const currentDate = useMemo(() => {
-    return selectedDateString ? new Date(selectedDateString) : new Date();
-  }, [selectedDateString]);
+  const { currentDate, setCurrentDate, dateString, timestamp } =
+    useCurrentDate(selectedDateString);
 
   const firstDayOfMonth = startOfMonth(new Date(currentDate));
   const lastDayOfMonth = endOfMonth(new Date(currentDate));
@@ -164,11 +164,12 @@ export const MaintenanceManagementPage = ({
     if (!vehicle) return;
     navigation.navigate('MaintenanceRecord', {
       vehicleId: vehicle?.id || '',
-      targetDate: format(currentDate, 'yyyy-MM-dd'),
+      targetDate: dateString,
     });
   };
 
   const handleDateChange = (day: DateData) => {
+    setCurrentDate(new Date(day.dateString));
     navigation.replaceParams({
       selectedDateString: format(new Date(day.dateString), 'yyyy-MM-dd'),
     });
@@ -177,18 +178,17 @@ export const MaintenanceManagementPage = ({
   const dayRecords = useMemo(() => {
     return records?.filter((record) => {
       return (
-        new Date(record.date).getTime() >= currentDate.getTime() &&
-        new Date(record.date).getTime() <=
-          currentDate.getTime() + 24 * 60 * 60 * 1000 - 1
+        new Date(record.date).getTime() >= timestamp &&
+        new Date(record.date).getTime() <= timestamp + 24 * 60 * 60 * 1000 - 1
       );
     });
-  }, [records, currentDate]);
+  }, [records, timestamp]);
 
   const markedDates: MarkedDates = useMemo(() => {
     const selectedColor = calendarTheme.selectedColor;
     const dotColor = calendarTheme.accentColor1;
     return {
-      [format(currentDate, 'yyyy-MM-dd')]: {
+      [dateString]: {
         selected: true,
         selectedColor,
       },
@@ -200,13 +200,13 @@ export const MaintenanceManagementPage = ({
         };
         acc[record.date] = {
           dots: [dot],
-          selected: currentDate.getTime() === new Date(record.date).getTime(),
+          selected: timestamp === new Date(record.date).getTime(),
           selectedColor,
         };
         return acc;
       }, {} as MarkedDates) ?? ({} as MarkedDates)),
     };
-  }, [currentDate, records]);
+  }, [currentDate, records, timestamp]);
 
   return (
     <PageLayout>
@@ -218,7 +218,7 @@ export const MaintenanceManagementPage = ({
       />
       <VStack className="flex-1">
         <Heading size="sm" className="px-4 py-2">
-          {format(currentDate, 'yyyy-MM-dd')} 정비 기록
+          {dateString} 정비 기록
         </Heading>
         <Box className="py-0 flex-1">
           {isLoading && (
