@@ -8,16 +8,13 @@ import { Text } from '@/shared/components/ui/text';
 import { VStack } from '@/shared/components/ui/vstack';
 import { ProfileCard } from '@/widgets/vehicle/ProfileCard';
 import { ScrollView } from 'react-native';
-import { Button, ButtonText } from '@/shared/components/ui/button';
-import { Icon } from '@/shared/components/ui/icon';
-import { Edit } from 'lucide-react-native';
 import { Divider } from '@/shared/components/ui/divider';
-import {
-  RecentOdometer,
-  RecentRecords,
-  useRecentRecords,
-} from '@/widgets/home';
+import { RecentRecords, useRecentRecords } from '@/widgets/home';
 import { cn } from '@/shared/utils/cn';
+import { formatNumber } from '@/shared/utils/format';
+import { useMaintenanceRecordsByDate } from '@/features/maintenance/hooks/useMaintenanceRecordQueries';
+import { useEffect, useMemo } from 'react';
+import { useFuelRecordsByDateRange } from '@/features/fuelRecord';
 
 const Card = ({
   children,
@@ -63,9 +60,44 @@ export const HomePage = () => {
 
   const { recentRecords } = useRecentRecords();
 
-  const handlePressEditOdometer = () => {
-    console.log('edit odometer');
-  };
+  const now = new Date();
+  const localYear = now.getFullYear(); // 로컬 시간 기준 연도
+  // 로컬 시간 기준으로 연도 시작/끝
+  const firstDateOfYear = new Date(localYear, 0, 1, 0, 0, 0, 0);
+  const lastDateOfYear = new Date(localYear, 11, 31, 23, 59, 59, 999);
+
+  const { data: fuelRecords } = useFuelRecordsByDateRange(
+    selectedVehicle?.id ?? '',
+    firstDateOfYear.getTime(),
+    lastDateOfYear.getTime(),
+  );
+
+  const { data: maintenanceRecords } = useMaintenanceRecordsByDate(
+    selectedVehicle?.id ?? '',
+    firstDateOfYear,
+    lastDateOfYear,
+  );
+
+  const totalMaintenanceCost = useMemo(
+    () =>
+      maintenanceRecords?.reduce<number>(
+        (acc, record) => acc + record.cost,
+        0,
+      ) ?? 0,
+    [maintenanceRecords],
+  );
+
+  const totalFuelCost = useMemo(
+    () =>
+      fuelRecords?.reduce<number>((acc, record) => acc + record.totalCost, 0) ??
+      0,
+    [fuelRecords],
+  );
+
+  const totalYearCost = useMemo(
+    () => totalMaintenanceCost + totalFuelCost,
+    [totalMaintenanceCost, totalFuelCost],
+  );
 
   return (
     <PageLayout>
@@ -75,26 +107,42 @@ export const HomePage = () => {
             <ProfileCard vehicle={selectedVehicle} />
           </Card>
           <Card>
-            <CardHeader title="주행 기록">
-              <Button
-                variant="solid"
-                size="sm"
-                action="default"
-                onPress={handlePressEditOdometer}
-              >
-                <ButtonText>
-                  <Icon as={Edit} size="md" color="#4a4a4a" />
-                </ButtonText>
-              </Button>
-            </CardHeader>
+            <CardHeader title="올해 지출 요약" />
             <Divider orientation="horizontal" />
-            {selectedVehicle?.odometer === 0 ? (
-              <Center>
-                <Text className="text-gray-400">주행 기록이 없습니다.</Text>
-              </Center>
-            ) : (
-              <RecentOdometer odometer={selectedVehicle?.odometer ?? 0} />
-            )}
+            <VStack space="lg">
+              <HStack className="items-center justify-center">
+                <HStack className="items-center">
+                  <Text className="text-gray-700" size="lg">
+                    {localYear}년 {selectedVehicle?.nickname}에게{' '}
+                    <Text className="font-bold text-primary-500" size="2xl">
+                      {formatNumber(totalYearCost)}원
+                    </Text>{' '}
+                    지출했어요
+                  </Text>
+                </HStack>
+              </HStack>
+
+              <HStack className="p-4 gap-4 justify-evenly flex">
+                <VStack className="items-center">
+                  <Text size="lg">⛽️</Text>
+                  <Text className="font-bold" size="lg">
+                    {formatNumber(totalFuelCost)}원
+                  </Text>
+                  <Text className="text-gray-600" size="md">
+                    주유
+                  </Text>
+                </VStack>
+                <VStack className="items-center">
+                  <Text size="lg">🔧</Text>
+                  <Text className="font-bold" size="lg">
+                    {formatNumber(totalMaintenanceCost)}원
+                  </Text>
+                  <Text className="text-gray-600" size="md">
+                    정비
+                  </Text>
+                </VStack>
+              </HStack>
+            </VStack>
           </Card>
           <Card>
             <CardHeader title="최근 관리 내역" />

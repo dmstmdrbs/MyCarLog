@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.2.0",
     "@expo/html-elements": "^0.4.2",
     "@gluestack-ui/actionsheet": "^0.2.53",
     "@gluestack-ui/alert-dialog": "^0.1.38",
