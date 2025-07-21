@@ -13,7 +13,7 @@ import { RecentRecords, useRecentRecords } from '@/widgets/home';
 import { cn } from '@/shared/utils/cn';
 import { formatNumber } from '@/shared/utils/format';
 import { useMaintenanceRecordsByDate } from '@/features/maintenance/hooks/useMaintenanceRecordQueries';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFuelRecordsByDateRange } from '@/features/fuelRecord';
 
 const Card = ({

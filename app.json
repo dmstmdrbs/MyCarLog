@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.MyCarLog"
+      "bundleIdentifier": "com.sgeun.MyCarLog"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#f8f7f8"
       },
-      "package": "com.anonymous.MyCarLog"
+      "package": "com.sgeun.MyCarLog"
     },
     "web": {
       "favicon": "./assets/favicon.png"
