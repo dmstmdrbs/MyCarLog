@@ -27,6 +27,7 @@ import {
 import 'react-native-gesture-handler';
 import { Box } from '@/shared/components/ui/box';
 import { HomeStackScreen } from '@/pages/home/navigator';
+import { useNoProfileGuard } from '@/shared/components/layout/useNoProfileGuard';
 
 // 각 Stack Navigator 정의
 
@@ -145,6 +146,8 @@ const HomeTab = () => {
 
 const NativeStack = createNativeStackNavigator();
 const AppNavigator = () => {
+  useNoProfileGuard();
+
   return (
     <NativeStack.Navigator initialRouteName="HomeTab">
       <NativeStack.Screen
