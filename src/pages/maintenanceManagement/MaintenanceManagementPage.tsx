@@ -47,6 +47,7 @@ import { HStack } from '@/shared/components/ui/hstack';
 import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
 import { Pressable } from '@/shared/components/ui/pressable';
 import { useNavigation } from '@react-navigation/native';
+import { Center } from '@/shared/components/ui/center';
 
 type MaintenanceManagementPageProps = NativeStackScreenProps<
   MaintenanceStackParamList,
@@ -237,50 +238,49 @@ export const MaintenanceManagementPage = ({
 
   return (
     <PageLayout>
-      <Calendar
-        currentDate={currentDate}
-        onDayPress={handleDateChange}
-        onMonthChange={handleDateChange}
-        markedDates={markedDates}
-      />
       <VStack className="flex-1">
-        <Heading size="sm" className="px-4 py-2">
-          {dateString} 정비 기록
-        </Heading>
         <Box className="py-0 flex-1">
-          {isLoading && (
-            <Box className="items-center justify-center flex-1">
-              <Spinner />
-            </Box>
-          )}
           {error && (
             <Text className="text-error-600 mb-2">
               에러가 발생했습니다: {String(error)}
             </Text>
           )}
-          {!isLoading && !error && (!records || records.length === 0) && (
-            <Box className="flex-1 items-center justify-center bg-background-light h-full">
-              <Text className="text-typography-500 text-center">
-                정비 기록이 없습니다.
-              </Text>
-            </Box>
-          )}
-          {Array.isArray(dayRecords) && dayRecords.length > 0 && (
-            <FlatList
-              className="bg-white flex-1"
-              data={Array.isArray(dayRecords) ? dayRecords : []}
-              keyExtractor={(item) => String(item.id) + item.date}
-              ItemSeparatorComponent={() => (
-                <Divider orientation="horizontal" className="bg-gray-200" />
-              )}
-              renderItem={({ item }) => (
-                <MemoizedMaintenanceRecordItem
-                  recordItem={item}
-                  onPressDelete={openDeleteDialog}
+
+          <FlatList
+            ListEmptyComponent={
+              <Center className="h-56">
+                <Text className="text-typography-500 text-center">
+                  정비 기록이 없습니다.
+                </Text>
+              </Center>
+            }
+            ListHeaderComponent={
+              <VStack>
+                <Calendar
+                  currentDate={currentDate}
+                  onDayPress={handleDateChange}
+                  onMonthChange={handleDateChange}
+                  markedDates={markedDates}
                 />
-              )}
-            />
-          )}
+                <Divider orientation="horizontal" className="my-2" />
+                <Heading size="md" className="px-4">
+                  {dateString} 정비 기록
+                </Heading>
+              </VStack>
+            }
+            className="bg-white flex-1"
+            data={Array.isArray(dayRecords) ? dayRecords : []}
+            keyExtractor={(item) => String(item.id) + item.date}
+            ItemSeparatorComponent={() => (
+              <Divider orientation="horizontal" className="bg-gray-200" />
+            )}
+            renderItem={({ item }) => (
+              <MemoizedMaintenanceRecordItem
+                recordItem={item}
+                onPressDelete={openDeleteDialog}
+              />
+            )}
+          />
         </Box>
       </VStack>
       {/* 삭제 확인 다이얼로그 */}

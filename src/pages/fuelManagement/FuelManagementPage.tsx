@@ -17,7 +17,7 @@ import { FuelRecordList } from '@/widgets/fuelManagement/ui/FuelRecordList';
 import { useFuelRecordsByDate } from '@/features/fuelRecord/hooks/useFuelRecordQueries';
 import { getFuelUnit, getFuelUnitPrice } from '@/shared/utils/unitUtils';
 import { Heading } from '@/shared/components/ui/heading';
-import { Pressable } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import {
   MonthlyStatsCard,
   MonthlyStatsCardSkeleton,
@@ -26,6 +26,7 @@ import { useMonthlyStats } from '@/features/fuelStatistics';
 import { VStack } from '@/shared/components/ui/vstack';
 import { Text } from '@/shared/components/ui/text';
 import { useCurrentDate } from '@/shared/hooks/useCurrentDate';
+import { Divider } from '@/shared/components/ui/divider';
 
 export type FuelManagementPageProps = NativeStackScreenProps<
   FuelStackParamList,
@@ -110,61 +111,73 @@ export const FuelManagementPage = ({ navigation }: FuelManagementPageProps) => {
           onPress={() => setSelectedTab('statistics')}
         />
       </Tab>
+
       {selectedTab === 'calendar' && (
         <VStack className="flex-1">
-          {/* 월별 통계 카드 */}
-          <VStack>
-            {monthlyStatsLoading ? (
-              <MonthlyStatsCardSkeleton />
-            ) : monthlyStatsError ? (
-              <Box className="flex-1 justify-center items-center h-24">
-                <Text>Error</Text>
-              </Box>
-            ) : monthlyStats ? (
-              <MonthlyStatsCard
-                totalCost={totalCost ?? 0}
-                totalAmount={totalAmount ?? 0}
-                avgUnitPrice={avgUnitPrice ?? 0}
-                recordCount={recordCount ?? 0}
-                hideIcon={true}
-              />
-            ) : null}
-
-            <VStack className="max-h-1/2" space="sm">
-              <Pressable
-                onPress={() => setCalendarCollapsed((prev) => !prev)}
-                className=" self-end px-4 py-1"
-              >
-                <Text>
-                  {calendarCollapsed ? '캘린더 펼치기 ▲' : '캘린더 접기 ▼'}
-                </Text>
-              </Pressable>
-              {!calendarCollapsed && (
-                <FuelCalendarView
-                  initialDate={currentDate}
-                  onDateChange={setCurrentDate}
-                  vehicleId={vehicle.id}
+          <VStack className="flex-1 h-full">
+            <Box className="py-0 flex-1 bg-white h-full">
+              {monthlyStatsLoading ? (
+                <MonthlyStatsCardSkeleton />
+              ) : monthlyStatsError ? (
+                <Box className="flex-1 justify-center items-center h-24">
+                  <Text>Error</Text>
+                </Box>
+              ) : monthlyStats ? (
+                <MonthlyStatsCard
+                  totalCost={totalCost ?? 0}
+                  totalAmount={totalAmount ?? 0}
+                  avgUnitPrice={avgUnitPrice ?? 0}
+                  recordCount={recordCount ?? 0}
+                  hideIcon={true}
                 />
-              )}
-            </VStack>
-          </VStack>
-          <VStack className="flex-1">
-            <Heading size="sm" className="px-4 py-2">
-              {dateString} 주유 내역
-            </Heading>
-            <Box className="py-0 flex-1 bg-white">
+              ) : null}
               <FuelRecordList
+                headerComponent={
+                  <VStack>
+                    {/* 월별 통계 카드 */}
+
+                    <VStack>
+                      <VStack className="max-h-1/2" space="sm">
+                        <Pressable
+                          onPress={() => setCalendarCollapsed((prev) => !prev)}
+                          className=" self-end px-4 py-1"
+                        >
+                          <Text>
+                            {calendarCollapsed
+                              ? '캘린더 펼치기 ▲'
+                              : '캘린더 접기 ▼'}
+                          </Text>
+                        </Pressable>
+                        {!calendarCollapsed && (
+                          <FuelCalendarView
+                            initialDate={currentDate}
+                            onDateChange={setCurrentDate}
+                            vehicleId={vehicle.id}
+                          />
+                        )}
+                      </VStack>
+                    </VStack>
+                    <Divider orientation="horizontal" className="my-2" />
+                    <Heading size="md" className="px-4">
+                      {dateString} 주유 내역
+                    </Heading>
+                  </VStack>
+                }
                 fuelRecords={fuelRecordsByDate ?? []}
                 unit={unit}
                 unitPrice={unitPrice}
               />
             </Box>
           </VStack>
-          <FloatingAddButton onPress={navigateToFuelRecord} />
         </VStack>
       )}
       {selectedTab === 'statistics' && (
-        <FuelStatisticsView vehicleId={vehicle.id} />
+        <ScrollView className="flex-1 relative">
+          <FuelStatisticsView vehicleId={vehicle.id} />
+        </ScrollView>
+      )}
+      {selectedTab === 'calendar' && (
+        <FloatingAddButton onPress={navigateToFuelRecord} />
       )}
     </PageLayout>
   );

@@ -1,4 +1,3 @@
-import { Box } from '@/shared/components/ui/box';
 import { Text } from '@/shared/components/ui/text';
 import { format } from 'date-fns';
 import { formatNumber } from '@/shared/utils/format';
@@ -21,8 +20,10 @@ import {
 } from '@/shared/components/ui/modal';
 import { Button, ButtonText } from '@/shared/components/ui/button';
 import { HStack } from '@/shared/components/ui/hstack';
+import { Center } from '@/shared/components/ui/center';
 
 interface FuelRecordListProps {
+  headerComponent?: React.ComponentType | React.ReactElement | null | undefined;
   fuelRecords: FuelRecordType[];
   unit: string;
   unitPrice: string;
@@ -125,21 +126,22 @@ const RecordItem = ({
 };
 
 export const FuelRecordList = ({
+  headerComponent,
   fuelRecords,
   unit,
   unitPrice,
 }: FuelRecordListProps) => {
-  if (fuelRecords.length === 0) {
-    return (
-      <Box className="flex-1 items-center justify-center bg-background-light h-full">
-        <Text className="text-typography-500 text-center">
-          주유 기록이 없습니다.
-        </Text>
-      </Box>
-    );
-  }
   return (
     <FlatList
+      ListHeaderComponent={headerComponent}
+      ListEmptyComponent={
+        <Center className="h-56">
+          <Text className="text-typography-500 text-center text-lg">
+            주유 기록이 없습니다.
+          </Text>
+        </Center>
+      }
+      className="flex-1 h-full"
       data={fuelRecords}
       renderItem={({ item }) => (
         <RecordItem item={item} unit={unit} unitPrice={unitPrice} />

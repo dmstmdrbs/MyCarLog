@@ -17,7 +17,6 @@ import { MaintenanceStackScreen } from '@pages/maintenanceManagement';
 import { FuelStackScreen } from '@pages/fuelManagement';
 import { SettingsStackScreen } from '@pages/settings';
 import { SelectedVehicleProvider, useSelectedVehicle } from '@features/vehicle';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppStatusProvider } from '@/shared/providers/AppStatusProvider';
 import {
   SafeAreaProvider,
@@ -55,6 +54,8 @@ export type RootStackParamList = {
 
 const HomeTab = () => {
   const safeAreaInsets = useSafeAreaInsets();
+  useNoProfileGuard();
+
   const { selectedVehicle } = useSelectedVehicle();
   const isEV = selectedVehicle?.type === 'EV';
 
@@ -79,6 +80,7 @@ const HomeTab = () => {
         tabBarItemStyle: {
           height: 36,
         },
+        tabBarHideOnKeyboard: true,
       }}
       safeAreaInsets={safeAreaInsets}
       layout={({ children }) => {
@@ -144,21 +146,6 @@ const HomeTab = () => {
   );
 };
 
-const NativeStack = createNativeStackNavigator();
-const AppNavigator = () => {
-  useNoProfileGuard();
-
-  return (
-    <NativeStack.Navigator initialRouteName="HomeTab">
-      <NativeStack.Screen
-        name="HomeTab"
-        component={HomeTab}
-        options={{ headerShown: false }}
-      />
-    </NativeStack.Navigator>
-  );
-};
-
 export default function App() {
   return (
     <QueryProvider>
@@ -167,7 +154,7 @@ export default function App() {
           <SafeAreaProvider>
             <AppStatusProvider>
               <SelectedVehicleProvider>
-                <AppNavigator />
+                <HomeTab />
               </SelectedVehicleProvider>
             </AppStatusProvider>
           </SafeAreaProvider>

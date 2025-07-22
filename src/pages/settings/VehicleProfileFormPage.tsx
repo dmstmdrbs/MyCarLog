@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { Alert } from 'react-native';
 import { Box } from '@shared/components/ui/box';
 import { Button, ButtonText } from '@shared/components/ui/button';
-
+import { VStack } from '@/shared/components/ui/vstack';
 import {
   Toast,
   ToastDescription,
   ToastTitle,
   useToast,
 } from '@shared/components/ui/toast';
-import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
 import {
   useCreateVehicle,
   useUpdateVehicle,
@@ -26,7 +25,8 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from 'App';
 import PageLayout from '@/shared/components/layout/PageLayout';
 import { VehicleFormData } from '@/features/vehicle/VehicleForm';
-import { HStack } from '@/shared/components/ui/hstack';
+import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
+import { VehicleRestoreSection } from '@/widgets/dataBackup';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -89,8 +89,8 @@ export function VehicleProfileFormPage({
           index: 0,
           routes: [
             {
-              name: '정비',
-              state: { routes: [{ name: 'MaintenanceStackScreen' }] },
+              name: '홈',
+              state: { routes: [{ name: 'HomeStackScreen' }] },
             },
           ],
         });
@@ -146,40 +146,64 @@ export function VehicleProfileFormPage({
 
   return (
     <PageLayout>
-      <HStack className="h-full p-4 gap-3">
-        <Box className="flex-1 bg-white">
-          <VehicleForm
-            onSubmit={handleSave}
-            editingId={vehicleId ?? null}
-            setDefaultProfile={handleSetDefaultProfile}
+      <VStack className="flex-1 bg-white p-4 pb-10">
+        {/* 최초 진입 시에만 데이터 복원 옵션 표시 */}
+        {isInitial && (
+          <VehicleRestoreSection
+            title="기존 데이터가 있으신가요?"
+            description="이전에 백업한 데이터가 있다면 복원할 수 있습니다."
+            buttonText="데이터 복원"
+            showResults={true}
+            onRestore={() => {
+              console.log('onRestore data');
+              rootNavigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: '홈',
+                    state: { routes: [{ name: 'HomeStackScreen' }] },
+                  },
+                ],
+              });
+            }}
           />
-        </Box>
-        {vehicleId && (
-          <>
-            <Box className="flex flex-row">
-              <Button
-                onPress={() => setIsConfirmModalOpen(true)}
-                className="flex-1"
-                variant="link"
-                action="negative"
-              >
-                <ButtonText className="text-red-500 opacity-70 text-sm">
-                  삭제하기
-                </ButtonText>
-              </Button>
-            </Box>
-            <ConfirmModal
-              isOpen={isConfirmModalOpen}
-              onClose={() => setIsConfirmModalOpen(false)}
-              onConfirm={handleDelete}
-              title="삭제하기"
-              description="해당 차량 프로필을 삭제하시겠습니까?"
-              confirmText="확인"
-              cancelText="취소"
-            />
-          </>
         )}
-      </HStack>
+
+        <VehicleForm
+          onSubmit={handleSave}
+          editingId={vehicleId ?? null}
+          setDefaultProfile={handleSetDefaultProfile}
+        />
+
+        {/* 삭제 버튼 (수정 모드에서만) */}
+        {vehicleId && (
+          <Box className="flex flex-row">
+            <Button
+              onPress={() => setIsConfirmModalOpen(true)}
+              className="flex-1"
+              variant="link"
+              action="negative"
+            >
+              <ButtonText className="text-red-500 opacity-70 text-sm">
+                삭제하기
+              </ButtonText>
+            </Button>
+          </Box>
+        )}
+
+        {/* 삭제 확인 모달 */}
+        {vehicleId && (
+          <ConfirmModal
+            isOpen={isConfirmModalOpen}
+            onClose={() => setIsConfirmModalOpen(false)}
+            onConfirm={handleDelete}
+            title="삭제하기"
+            description="해당 차량 프로필을 삭제하시겠습니까?"
+            confirmText="확인"
+            cancelText="취소"
+          />
+        )}
+      </VStack>
     </PageLayout>
   );
 }

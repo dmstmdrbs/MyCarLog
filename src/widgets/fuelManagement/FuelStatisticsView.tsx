@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Platform, ScrollView } from 'react-native';
+import { Platform } from 'react-native';
 
 import {
   useMonthlyStats,
@@ -154,50 +154,48 @@ export const FuelStatisticsView = ({ vehicleId }: Props) => {
         </Box>
       </HStack>
 
-      <ScrollView contentContainerClassName="bg-white p-2">
-        {/* 월별 주유 통계 카드 */}
-        <Box className="h-24 w-full">
-          {debouncedMonthlyStatsLoading || monthlyStatsError ? (
-            <MonthlyStatsCardSkeleton />
-          ) : (
-            <MonthlyStatsCard
-              totalCost={monthlyStats?.totalCost ?? 0}
-              totalAmount={monthlyStats?.totalAmount ?? 0}
-              avgUnitPrice={monthlyStats?.avgUnitPrice ?? 0}
-              recordCount={monthlyStats?.recordCount ?? 0}
-            />
-          )}
-        </Box>
-
-        {/* 결제 수단별 지출 통계 차트 */}
-        {debouncedPaymentStatsLoading || paymentStatsError ? (
-          <PaymentStatsBarChartSkeleton />
+      {/* 월별 주유 통계 카드 */}
+      <Box className="h-24 w-full">
+        {debouncedMonthlyStatsLoading || monthlyStatsError ? (
+          <MonthlyStatsCardSkeleton />
         ) : (
-          <PaymentStatsBarChart paymentStats={paymentStats ?? []} />
+          <MonthlyStatsCard
+            totalCost={monthlyStats?.totalCost ?? 0}
+            totalAmount={monthlyStats?.totalAmount ?? 0}
+            avgUnitPrice={monthlyStats?.avgUnitPrice ?? 0}
+            recordCount={monthlyStats?.recordCount ?? 0}
+          />
         )}
+      </Box>
 
-        <Box className="h-24 w-full mb-2">
-          {/* 전월/전년 대비 통계 카드 */}
-          {debouncedComparisonStatsLoading || comparisonStatsError ? (
-            <ComparisonStatsCardSkeleton />
-          ) : comparisonStats ? (
-            <ComparisonStatsCard
-              current={comparisonStats.current.totalCost ?? 0}
-              prevMonth={comparisonStats.prevMonth.totalCost ?? 0}
-              prevYear={comparisonStats.prevYear.totalCost ?? 0}
-            />
-          ) : null}
-        </Box>
+      {/* 결제 수단별 지출 통계 차트 */}
+      {debouncedPaymentStatsLoading || paymentStatsError ? (
+        <PaymentStatsBarChartSkeleton />
+      ) : (
+        <PaymentStatsBarChart paymentStats={paymentStats ?? []} />
+      )}
 
-        <Box className="w-full mb-2">
-          {/* 연간 통계 (월별) 라인차트 */}
-          {debouncedYearlyStatsLoading || yearlyStatsError ? (
-            <Skeleton className="h-56 rounded-xl w-full" />
-          ) : (
-            <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
-          )}
-        </Box>
-      </ScrollView>
+      <Box className="h-24 w-full mb-2">
+        {/* 전월/전년 대비 통계 카드 */}
+        {debouncedComparisonStatsLoading || comparisonStatsError ? (
+          <ComparisonStatsCardSkeleton />
+        ) : comparisonStats ? (
+          <ComparisonStatsCard
+            current={comparisonStats.current.totalCost ?? 0}
+            prevMonth={comparisonStats.prevMonth.totalCost ?? 0}
+            prevYear={comparisonStats.prevYear.totalCost ?? 0}
+          />
+        ) : null}
+      </Box>
+
+      <Box className="w-full mb-2">
+        {/* 연간 통계 (월별) 라인차트 */}
+        {debouncedYearlyStatsLoading || yearlyStatsError ? (
+          <Skeleton className="h-56 rounded-xl w-full" />
+        ) : (
+          <YearlyStatsLineChart yearlyStats={yearlyStats ?? []} />
+        )}
+      </Box>
     </VStack>
   );
 };
