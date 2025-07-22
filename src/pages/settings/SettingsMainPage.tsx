@@ -5,6 +5,7 @@ import { FlatList } from 'react-native';
 import {
   CarIcon,
   ChevronRightIcon,
+  DatabaseIcon,
   // CloudUploadIcon,
   WrenchIcon,
 } from 'lucide-react-native';
@@ -17,7 +18,7 @@ import { useDefaultVehicle, useSelectedVehicle } from '@/features/vehicle';
 import { useIsFocused } from '@react-navigation/native';
 import { VStack } from '@/shared/components/ui/vstack';
 import { ProfileCard } from '@/widgets/vehicle/ProfileCard';
-import { Center } from '@/shared/components/ui/center';
+import { HStack } from '@/shared/components/ui/hstack';
 
 type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsMain'>;
 
@@ -49,20 +50,20 @@ export function SettingsMainPage({ route, navigation }: Props) {
       icon: WrenchIcon,
       onPress: () => navigation.navigate('SettingsMaintenanceItem'),
     },
-    // {
-    //   key: 'backup',
-    //   title: '데이터 백업 및 복구',
-    //   icon: CloudUploadIcon,
-    //   onPress: () => navigation.navigate('SettingsDataBackup'),
-    // },
+    {
+      key: 'backup',
+      title: '데이터 백업 및 복구',
+      icon: DatabaseIcon,
+      onPress: () => navigation.navigate('SettingsDataBackup'),
+    },
   ];
 
   return (
     <PageLayout>
       <VStack space="sm" className="flex-1">
-        <Center className="mt-5 h-44 w-full px-4 py-2">
+        <HStack className="h-44 w-full">
           <ProfileCard vehicle={selectedVehicle} />
-        </Center>
+        </HStack>
         <FlatList
           className="flex-1"
           data={menu}
