@@ -20,7 +20,7 @@ import React, { useEffect, useState } from 'react';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
 import { useVehicle } from './hooks/useVehicleQueries';
 import { VStack } from '@/shared/components/ui/vstack';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { FormField } from '@/shared/components/form/FormField';
 
 interface VehicleFormProps {
@@ -76,14 +76,14 @@ export const VehicleForm = ({
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{ paddingBottom: 100 }}
-      showsVerticalScrollIndicator={false}
-      keyboardShouldPersistTaps="handled"
-    >
-      <VStack className="flex-1 px-4 py-6">
-        <FormControl className="flex-1 flex flex-col justify-between">
+    <View className="flex-1">
+      <ScrollView
+        className="flex-1 px-4"
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <FormControl className="flex-1">
           <VStack space="lg">
             {/* 헤더 섹션 */}
             <FormControlHelper>
@@ -228,22 +228,22 @@ export const VehicleForm = ({
                 </VStack>
               )}
             </VStack>
-
-            {/* 하단 고정 버튼 */}
-            <Box className="mt-6">
-              <Button
-                onPress={handleSubmit}
-                className="w-full bg-primary-500 rounded-xl"
-                action="primary"
-              >
-                <ButtonText className="text-base font-semibold text-white">
-                  {editingId ? '수정 완료' : '차량 추가'}
-                </ButtonText>
-              </Button>
-            </Box>
           </VStack>
         </FormControl>
-      </VStack>
-    </ScrollView>
+      </ScrollView>
+
+      {/* 하단 고정 버튼 */}
+      <View className="absolute bottom-0 left-0 right-0">
+        <Button
+          onPress={handleSubmit}
+          className="w-full bg-primary-500 rounded-xl h-14"
+          action="primary"
+        >
+          <ButtonText className="text-xl font-semibold text-white">
+            저장
+          </ButtonText>
+        </Button>
+      </View>
+    </View>
   );
 };

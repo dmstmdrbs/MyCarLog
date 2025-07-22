@@ -17,7 +17,7 @@ export const FormSubmitButton = ({
   return (
     <Button
       onPress={onSubmit}
-      className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 shadow-xl active:shadow-lg active:scale-95 transform transition-all duration-150"
+      className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 active:scale-95 transform transition-all duration-150 h-14"
     >
       <Box className="flex-row items-center justify-center space-x-2">
         <Text className="text-2xl">{buttonIcon}</Text>

@@ -90,10 +90,10 @@ export const MaintenanceRecordPage = ({
 
   return (
     <PageLayout>
-      <Box className="flex-1 pb-8">
+      <Box className="flex-1">
         <ScrollView
           className="flex-1 bg-gray-50"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 56 }}
           showsVerticalScrollIndicator={false}
         >
           <Box className="px-4 py-6">

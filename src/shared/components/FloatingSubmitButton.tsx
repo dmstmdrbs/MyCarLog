@@ -13,8 +13,8 @@ export const FloatingSubmitButton = ({
   buttonText,
 }: FloatingSubmitButtonProps) => {
   return (
-    <Box className="absolute bottom-0 left-0 right-0 border-gray-100 shadow-xs">
-      <Box className="px-4 pt-4 pb-5">
+    <Box className="absolute bottom-0 left-0 right-0 border-gray-100">
+      <Box className="p-4">
         <FormSubmitButton
           onSubmit={onSubmit}
           buttonIcon={buttonIcon}

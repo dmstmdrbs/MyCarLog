@@ -145,7 +145,7 @@ export function VehicleProfileFormPage({
 
   return (
     <PageLayout>
-      <VStack className="flex-1 bg-white p-4 pb-10">
+      <VStack className="flex-1 bg-white p-4">
         <VehicleForm
           onSubmit={handleSave}
           editingId={vehicleId ?? null}

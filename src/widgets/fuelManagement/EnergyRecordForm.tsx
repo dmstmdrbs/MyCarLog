@@ -1,8 +1,6 @@
 import { Box } from '@shared/components/ui/box';
 import { FormControl } from '@shared/components/ui/form-control';
-import { Input, InputField } from '@shared/components/ui/input';
 import { Button, ButtonText } from '@shared/components/ui/button';
-import { Textarea, TextareaInput } from '@shared/components/ui/textarea';
 import { useMemo, useReducer, useEffect } from 'react';
 
 import { format, formatDate } from 'date-fns';
@@ -12,6 +10,7 @@ import { useStations } from '@features/station';
 import { formatDateForDisplay } from '@/shared/utils/format';
 import { FormCard } from '@/shared/components/form/FormCard';
 import { FormLabel } from '@/shared/components/form/FormLabel';
+import { FormField } from '@/shared/components/form/FormField';
 import { PaymentMethodModal } from '../../features/paymentMethods/ui/PaymentMethodModal';
 import { StationPickerModal } from '../../features/station/ui/StationPickerModal';
 import { FloatingSubmitButton } from '@/shared/components/FloatingSubmitButton';
@@ -204,28 +203,24 @@ export function EnergyRecordForm({
       <Box className="flex-1 relative">
         <ScrollView
           className="flex-1 bg-gray-50"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 56 }}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           <Box className="px-4 py-6">
             <FormControl className="flex-1">
               <FormCard>
                 <FormLabel name="주행 정보" />
-                <Box>
-                  <Box>
-                    <FormLabel name="총 주행거리 (km)" size="sm" />
-                    <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                      <InputField
-                        placeholder="예: 100"
-                        value={displayValue(energyRecord.odometer)}
-                        className="text-lg font-medium"
-                        keyboardType="numeric"
-                        onChangeText={handleTotalDistanceChange}
-                      />
-                    </Input>
-                  </Box>
-                </Box>
+                <FormField
+                  type="number"
+                  label="총 주행거리 (km)"
+                  value={displayValue(energyRecord.odometer)}
+                  onChangeText={handleTotalDistanceChange}
+                  placeholder="예: 100"
+                  keyboardType="numeric"
+                />
               </FormCard>
+
               {/* 에너지 정보 카드 - 동적 */}
               <FormCard>
                 <FormLabel
@@ -254,57 +249,42 @@ export function EnergyRecordForm({
                   />
                 </Box>
 
-                <Box>
-                  <FormLabel name="총 비용" size="sm" />
-                  <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                    <InputField
-                      placeholder="예: 50,000"
-                      value={displayCurrency(energyRecord.totalCost)}
-                      className="text-lg font-medium"
-                      keyboardType="numeric"
-                      onChangeText={handleTotalCostChange}
-                      onBlur={calculateAmount}
-                    />
-                  </Input>
-                </Box>
+                <FormField
+                  type="number"
+                  label="총 비용"
+                  value={displayCurrency(energyRecord.totalCost)}
+                  onChangeText={handleTotalCostChange}
+                  placeholder="예: 50,000"
+                  keyboardType="numeric"
+                  onBlur={calculateAmount}
+                />
 
-                <Box>
-                  <FormLabel name={`단가 (${config.unitPrice})`} size="sm" />
-                  <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                    <InputField
-                      placeholder={config.unitPricePlaceholder}
-                      value={displayCurrency(energyRecord.unitPrice)}
-                      className="text-lg font-medium"
-                      keyboardType="numeric"
-                      onChangeText={handleUnitPriceChange}
-                      onBlur={() => {
-                        // 단가 변경 시 총 비용이 있으면 주유/충전량 계산, 주유/충전량이 있으면 총 비용 계산
-                        if (energyRecord.totalCost > 0) {
-                          calculateAmount();
-                        } else if (energyRecord.amount > 0) {
-                          calculateTotalCost();
-                        }
-                      }}
-                    />
-                  </Input>
-                </Box>
+                <FormField
+                  type="number"
+                  label={`단가 (${config.unitPrice})`}
+                  value={displayCurrency(energyRecord.unitPrice)}
+                  onChangeText={handleUnitPriceChange}
+                  placeholder={config.unitPricePlaceholder}
+                  keyboardType="numeric"
+                  onBlur={() => {
+                    // 단가 변경 시 총 비용이 있으면 주유/충전량 계산, 주유/충전량이 있으면 총 비용 계산
+                    if (energyRecord.totalCost > 0) {
+                      calculateAmount();
+                    } else if (energyRecord.amount > 0) {
+                      calculateTotalCost();
+                    }
+                  }}
+                />
 
-                <Box>
-                  <FormLabel
-                    name={`${config.energyType}량 (${config.unit})`}
-                    size="sm"
-                  />
-                  <Input className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all">
-                    <InputField
-                      placeholder={config.amountPlaceholder}
-                      value={displayValue(energyRecord.amount)}
-                      className="text-lg font-medium"
-                      keyboardType="numeric"
-                      onChangeText={handleAmountChange}
-                      onBlur={calculateTotalCost}
-                    />
-                  </Input>
-                </Box>
+                <FormField
+                  type="number"
+                  label={`${config.energyType}량 (${config.unit})`}
+                  value={displayValue(energyRecord.amount)}
+                  onChangeText={handleAmountChange}
+                  placeholder={config.amountPlaceholder}
+                  keyboardType="numeric"
+                  onBlur={calculateTotalCost}
+                />
 
                 <Box>
                   <FormLabel name={config.station} size="sm" />
@@ -370,18 +350,14 @@ export function EnergyRecordForm({
               {/* 메모 카드 - 공통 */}
               <FormCard>
                 <FormLabel name="메모" />
-
-                <Textarea className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all ">
-                  <TextareaInput
-                    placeholder="특이사항이나 기억하고 싶은 내용을 적어보세요 (선택사항)"
-                    className="text-base align-top"
-                    value={energyRecord.memo}
-                    onChangeText={handleMemoChange}
-                    multiline={true}
-                    numberOfLines={4}
-                    textAlignVertical="top"
-                  />
-                </Textarea>
+                <FormField
+                  type="textarea"
+                  value={energyRecord.memo || ''}
+                  onChangeText={handleMemoChange}
+                  placeholder="특이사항이나 기억하고 싶은 내용을 적어보세요 (선택사항)"
+                  numberOfLines={4}
+                  multiline={true}
+                />
               </FormCard>
             </FormControl>
           </Box>

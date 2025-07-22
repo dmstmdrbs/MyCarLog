@@ -1,8 +1,6 @@
 import { Dispatch, useMemo, useState } from 'react';
 
-import { Input, InputField } from '@/shared/components/ui/input';
 import { Button, ButtonText } from '@/shared/components/ui/button';
-import { Textarea, TextareaInput } from '@/shared/components/ui/textarea';
 import { FormControl } from '@/shared/components/ui/form-control';
 import { Box } from '@/shared/components/ui/box';
 import {
@@ -16,6 +14,7 @@ import { format, formatDate } from 'date-fns';
 import { calendarTheme } from '@/shared/constants/calendar';
 import { FormCard } from '@/shared/components/form/FormCard';
 import { FormLabel } from '@/shared/components/form/FormLabel';
+import { FormField } from '@/shared/components/form/FormField';
 import { useMaintenanceItemQueries } from '@/features/maintenance/hooks/useMaintenanceItemQueries';
 import {
   CreateMaintenanceRecordData,
@@ -112,6 +111,7 @@ export const MaintenanceRecordForm = ({
             </ModalContent>
           </Modal>
         </Box>
+
         <Box>
           <FormLabel name="정비 항목" size="sm" />
           <Button
@@ -133,6 +133,7 @@ export const MaintenanceRecordForm = ({
             }}
           />
         </Box>
+
         <Box>
           <FormLabel name="정비 업체" size="sm" />
           <Button
@@ -151,20 +152,20 @@ export const MaintenanceRecordForm = ({
             dispatch={dispatch}
           />
         </Box>
-        <Box>
-          <FormLabel name="정비 비용(원)" size="sm" />
-          <Input>
-            <InputField
-              value={formData.cost?.toString() ?? ''}
-              onChangeText={(text) =>
-                dispatch({
-                  type: 'setCost',
-                  data: { ...formData, cost: Number(text) || 0 },
-                })
-              }
-            />
-          </Input>
-        </Box>
+
+        <FormField
+          type="number"
+          label="정비 비용(원)"
+          value={formData.cost?.toString() ?? ''}
+          onChangeText={(text) =>
+            dispatch({
+              type: 'setCost',
+              data: { ...formData, cost: Number(text) || 0 },
+            })
+          }
+          placeholder="예: 50000"
+          keyboardType="numeric"
+        />
       </FormCard>
 
       <FormCard>
@@ -199,36 +200,32 @@ export const MaintenanceRecordForm = ({
 
       <FormCard>
         <FormLabel name="누적 주행거리(km)" size="lg" />
-        <Input>
-          <InputField
-            value={formData.odometer?.toString() ?? ''}
-            onChangeText={(text) =>
-              dispatch({
-                type: 'setMileage',
-                data: { odometer: Number(text) || 0 },
-              })
-            }
-            keyboardType="numeric"
-          />
-        </Input>
+        <FormField
+          type="number"
+          value={formData.odometer?.toString() ?? ''}
+          onChangeText={(text) =>
+            dispatch({
+              type: 'setMileage',
+              data: { odometer: Number(text) || 0 },
+            })
+          }
+          placeholder="예: 50000"
+          keyboardType="numeric"
+        />
       </FormCard>
 
       <FormCard>
         <FormLabel name="메모" />
-
-        <Textarea className="rounded-xl border-2 border-gray-200 bg-gray-50 focus:border-primary-500 focus:bg-white transition-all ">
-          <TextareaInput
-            placeholder="특이사항이나 기억하고 싶은 내용을 적어보세요 (선택사항)"
-            className="text-base align-top"
-            value={formData.memo ?? ''}
-            onChangeText={(text) =>
-              dispatch({ type: 'setMemo', data: { memo: text } })
-            }
-            multiline={true}
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </Textarea>
+        <FormField
+          type="textarea"
+          value={formData.memo ?? ''}
+          onChangeText={(text) =>
+            dispatch({ type: 'setMemo', data: { memo: text } })
+          }
+          placeholder="특이사항이나 기억하고 싶은 내용을 적어보세요 (선택사항)"
+          numberOfLines={4}
+          multiline={true}
+        />
       </FormCard>
     </FormControl>
   );
