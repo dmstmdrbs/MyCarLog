@@ -26,7 +26,6 @@ import { RootStackParamList } from 'App';
 import PageLayout from '@/shared/components/layout/PageLayout';
 import { VehicleFormData } from '@/features/vehicle/VehicleForm';
 import ConfirmModal from '@shared/components/ui/modal/ConfirmModal';
-import { VehicleRestoreSection } from '@/widgets/dataBackup';
 
 type VehicleProfileFormPageProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -147,28 +146,6 @@ export function VehicleProfileFormPage({
   return (
     <PageLayout>
       <VStack className="flex-1 bg-white p-4 pb-10">
-        {/* 최초 진입 시에만 데이터 복원 옵션 표시 */}
-        {isInitial && (
-          <VehicleRestoreSection
-            title="기존 데이터가 있으신가요?"
-            description="이전에 백업한 데이터가 있다면 복원할 수 있습니다."
-            buttonText="데이터 복원"
-            showResults={true}
-            onRestore={() => {
-              console.log('onRestore data');
-              rootNavigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: '홈',
-                    state: { routes: [{ name: 'HomeStackScreen' }] },
-                  },
-                ],
-              });
-            }}
-          />
-        )}
-
         <VehicleForm
           onSubmit={handleSave}
           editingId={vehicleId ?? null}
