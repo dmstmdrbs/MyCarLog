@@ -1,33 +1,3 @@
-// 백업 데이터의 전체 구조
-export interface BackupData {
-  version: string;
-  createdAt: number;
-  appVersion: string;
-  data: {
-    vehicles: VehicleBackup[];
-    fuelRecords: FuelRecordBackup[];
-    maintenanceRecords: MaintenanceRecordBackup[];
-    maintenanceItems: MaintenanceItemBackup[];
-    maintenancePlans: MaintenancePlanBackup[];
-    paymentMethods: PaymentMethodBackup[];
-    stations: StationBackup[];
-    shops: ShopBackup[];
-  };
-}
-
-// 각 모델별 백업 타입
-export interface VehicleBackup {
-  id: string;
-  type: 'ICE' | 'EV';
-  nickname: string;
-  manufacturer: string;
-  model: string;
-  isDefault: boolean;
-  odometer: number;
-  createdAt: number;
-  updatedAt: number;
-}
-
 export interface FuelRecordBackup {
   id: string;
   vehicleId: string;
@@ -107,93 +77,11 @@ export interface ShopBackup {
   updatedAt: number;
 }
 
-// 백업 결과 타입
-export interface BackupResult {
-  success: boolean;
-  fileUri?: string;
-  error?: string;
-  dataCount?: {
-    vehicles: number;
-    fuelRecords: number;
-    maintenanceRecords: number;
-    maintenanceItems: number;
-    maintenancePlans: number;
-    paymentMethods: number;
-    stations: number;
-    shops: number;
-  };
-}
-
-// 복원 결과 타입
-export interface RestoreResult {
-  success: boolean;
-  error?: string;
-  restoredCount?: {
-    vehicles: number;
-    fuelRecords: number;
-    maintenanceRecords: number;
-    maintenanceItems: number;
-    maintenancePlans: number;
-    paymentMethods: number;
-    stations: number;
-    shops: number;
-  };
-  mergeResult?: {
-    vehicles: { added: number; updated: number; skipped: number };
-    fuelRecords: { added: number; updated: number; skipped: number };
-    maintenanceRecords: { added: number; updated: number; skipped: number };
-    maintenanceItems: { added: number; updated: number; skipped: number };
-    maintenancePlans: { added: number; updated: number; skipped: number };
-    paymentMethods: { added: number; updated: number; skipped: number };
-    stations: { added: number; updated: number; skipped: number };
-    shops: { added: number; updated: number; skipped: number };
-  };
-}
-
 export type MergeStrategy =
   | 'smart'
   | 'backup_first'
   | 'existing_first'
   | 'replace_all';
-
-export interface MergeOptions {
-  strategy: MergeStrategy;
-  onConflict?: 'skip' | 'backup' | 'existing' | 'ask_user';
-}
-
-// ID 매핑 정보 (백업 ID -> 새로 생성된 ID)
-export interface IdMapping {
-  [backupId: string]: string;
-}
-
-// 복원 시 ID 매핑 정보
-export interface RestoreIdMapping {
-  vehicles: IdMapping;
-  fuelRecords: IdMapping;
-  maintenanceRecords: IdMapping;
-  maintenanceItems: IdMapping;
-  maintenancePlans: IdMapping;
-  paymentMethods: IdMapping;
-  stations: IdMapping;
-  shops: IdMapping;
-}
-
-// 복원 순서 정의
-export type RestoreTableOrder =
-  | 'vehicles'
-  | 'paymentMethods'
-  | 'stations'
-  | 'shops'
-  | 'maintenanceItems'
-  | 'fuelRecords'
-  | 'maintenanceRecords'
-  | 'maintenancePlans';
-
-// 복원 옵션
-export interface RestoreOptions {
-  strategy: MergeStrategy;
-  idMapping?: RestoreIdMapping;
-}
 
 // 차량별 백업 데이터 구조
 export interface VehicleBackupData {

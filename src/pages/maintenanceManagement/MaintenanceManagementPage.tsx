@@ -9,7 +9,6 @@ import { Heading } from '@/shared/components/ui/heading';
 import { Text } from '@/shared/components/ui/text';
 import { Button, ButtonText } from '@/shared/components/ui/button';
 import { Divider } from '@/shared/components/ui/divider';
-import { Spinner } from '@/shared/components/ui/spinner';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -173,11 +172,11 @@ export const MaintenanceManagementPage = ({
   const firstDayOfMonth = startOfMonth(new Date(currentDate));
   const lastDayOfMonth = endOfMonth(new Date(currentDate));
 
-  const {
-    data: records,
-    isLoading,
-    error,
-  } = useMaintenanceRecordsByDate(vehicleId, firstDayOfMonth, lastDayOfMonth);
+  const { data: records, error } = useMaintenanceRecordsByDate(
+    vehicleId,
+    firstDayOfMonth,
+    lastDayOfMonth,
+  );
 
   const deleteMutation = useDeleteMaintenanceRecord(vehicleId);
 

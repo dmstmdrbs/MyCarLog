@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { VehicleBackupService } from '../services/VehicleBackupService';
-import { VehicleRestoreResult, MergeStrategy } from '../types/backup.types';
+import { VehicleRestoreResult } from '../types/backup.types';
 
 export const useVehicleBackup = () => {
   const [isBackingUp, setIsBackingUp] = useState(false);
@@ -63,7 +63,7 @@ export const useVehicleBackup = () => {
   };
 
   // 차량별 백업 복원 (새 차량으로만 복원)
-  const restoreBackup = async (strategy: MergeStrategy = 'smart') => {
+  const restoreBackup = async () => {
     try {
       setIsRestoring(true);
       setLastRestoreResult(null);
@@ -74,29 +74,22 @@ export const useVehicleBackup = () => {
       // 백업 파일 검증
       const backupData =
         await VehicleBackupService.validateVehicleBackupFile(fileUri);
-
-      // 복원 옵션 설정 (항상 새 차량 생성)
-      const options = {
-        createNewVehicle: true,
-        mergeStrategy: strategy,
-      };
+      console.log('backupData', backupData);
 
       // 복원 실행
-      const result = await VehicleBackupService.restoreVehicleBackup(
-        backupData,
-        options,
-      );
+      const result =
+        await VehicleBackupService.restoreVehicleBackup(backupData);
       setLastRestoreResult(result);
 
       if (result.success) {
         Alert.alert(
           '복원 완료',
           `차량별 데이터 복원이 완료되었습니다.\n\n` +
-            `새 차량: ${result.targetVehicleName}\n` +
-            `정비항목: ${result.mergeResult?.maintenanceItems.added || 0}개 추가, ${result.mergeResult?.maintenanceItems.updated || 0}개 업데이트\n` +
-            `연료기록: ${result.mergeResult?.fuelRecords.added || 0}개 추가, ${result.mergeResult?.fuelRecords.updated || 0}개 업데이트\n` +
-            `정비기록: ${result.mergeResult?.maintenanceRecords.added || 0}개 추가, ${result.mergeResult?.maintenanceRecords.updated || 0}개 업데이트\n` +
-            `정비계획: ${result.mergeResult?.maintenancePlans.added || 0}개 추가, ${result.mergeResult?.maintenancePlans.updated || 0}개 업데이트`,
+            `새 차량: ${result.newVehicleName}\n` +
+            `정비항목: ${result.stats?.maintenanceItemsAdded || 0}개 추가\n` +
+            `연료기록: ${result.stats?.fuelRecordsAdded || 0}개 추가\n` +
+            `정비기록: ${result.stats?.maintenanceRecordsAdded || 0}개 추가\n` +
+            `정비계획: ${result.stats?.maintenancePlansAdded || 0}개 추가`,
         );
       } else {
         Alert.alert(
@@ -139,21 +132,21 @@ export const useVehicleBackup = () => {
   };
 
   // 복원 확인 및 실행
-  const confirmAndRestoreBackup = (strategy: MergeStrategy = 'smart') => {
+  const confirmAndRestoreBackup = () => {
     return new Promise((resolve, reject) => {
       const strategyText = {
         smart: '스마트 병합 (최신 데이터 우선)',
         backup_first: '백업 데이터 우선',
         existing_first: '기존 데이터 우선',
         replace_all: '모든 데이터 교체 (기존 데이터 삭제)',
-      }[strategy];
+      }['smart'];
 
       Alert.alert(
         '차량별 복원',
         `백업 파일을 선택하여 새 차량으로 데이터를 복원하시겠습니까?\n\n` +
           `복원 방식: 새 차량 생성\n` +
           `병합 전략: ${strategyText}\n\n` +
-          `${strategy === 'replace_all' ? '⚠️ 경고: 기존 데이터가 모두 삭제됩니다!' : '기존 데이터와 병합됩니다.'}`,
+          `${strategyText === 'replace_all' ? '⚠️ 경고: 기존 데이터가 모두 삭제됩니다!' : '기존 데이터와 병합됩니다.'}`,
         [
           {
             text: '취소',
@@ -167,7 +160,7 @@ export const useVehicleBackup = () => {
             style: 'destructive',
             onPress: async () => {
               try {
-                await restoreBackup(strategy);
+                await restoreBackup();
                 resolve(true);
               } catch (error) {
                 reject(error);

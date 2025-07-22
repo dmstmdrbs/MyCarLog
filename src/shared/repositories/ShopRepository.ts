@@ -9,7 +9,17 @@ export interface IShopRepository extends IRepository<Shop> {
   create(data: Shop): Promise<Shop>;
   update(id: string, data: Shop): Promise<Shop>;
   delete(id: string): Promise<void>;
+  findByName(name: string): Promise<Shop | null>;
 }
+
+export interface CreateShopData {
+  name: string;
+}
+
+export interface UpdateShopData {
+  name?: string;
+}
+
 class ShopRepository extends BaseRepository<Shop> implements IShopRepository {
   constructor() {
     super('shops');
@@ -45,23 +55,27 @@ class ShopRepository extends BaseRepository<Shop> implements IShopRepository {
     }
   }
 
-  async createShop(shopName: Shop['name']): Promise<Shop> {
+  async findByName(name: string): Promise<Shop | null> {
     try {
-      const existingShop = await this.collection
-        .query(Q.where('name', shopName))
-        .fetch();
+      return await this.collection
+        .query(Q.where('name', name))
+        .fetch()
+        .then((items) => items[0] || null);
+    } catch (error) {
+      throw new Error('Failed to find shop by name', { cause: error });
+    }
+  }
 
-      if (existingShop.length > 0) {
-        throw new Error('Shop already exists');
+  async create(data: CreateShopData): Promise<Shop> {
+    try {
+      const existingShop = await this.findByName(data.name);
+      if (existingShop) {
+        return existingShop;
       }
 
-      const newShop = {
-        name: shopName,
-      };
-
-      return this.database.write(async () => {
+      return await this.database.write(async () => {
         return await this.collection.create((record) => {
-          this.assignData(record, newShop);
+          this.assignData(record, data);
         });
       });
     } catch (error) {

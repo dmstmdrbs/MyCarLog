@@ -5,6 +5,7 @@ import { Q } from '@nozbe/watermelondb';
 export interface IMaintenanceItemRepository {
   findAll(): Promise<MaintenanceItem[]>;
   findById(id: string): Promise<MaintenanceItem | null>;
+  findByName(name: string): Promise<MaintenanceItem | null>;
   create(data: CreateMaintenanceItemData): Promise<MaintenanceItem>;
   update(id: string, data: UpdateMaintenanceItemData): Promise<MaintenanceItem>;
   delete(id: string): Promise<void>;
@@ -58,6 +59,18 @@ export class MaintenanceItemRepository
         .then((items) => items[0] || null);
     } catch (error) {
       console.error(`Error finding maintenance item by id:`, error);
+      throw error;
+    }
+  }
+
+  async findByName(name: string): Promise<MaintenanceItem | null> {
+    try {
+      return await this.collection
+        .query(Q.where('name', name))
+        .fetch()
+        .then((items) => items[0] || null);
+    } catch (error) {
+      console.error(`Error finding maintenance item by name:`, error);
       throw error;
     }
   }

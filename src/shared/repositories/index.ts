@@ -51,3 +51,19 @@ export {
   maintenanceRecordRepository,
   type IMaintenanceRecordRepository,
 } from './MaintenanceRecordRepository';
+
+// MaintenancePlan Repository
+export {
+  maintenancePlanRepository,
+  type IMaintenancePlanRepository,
+  type CreateMaintenancePlanData,
+  type UpdateMaintenancePlanData,
+} from './MaintenancePlanRepository';
+
+// Shop Repository
+export {
+  shopRepository,
+  type IShopRepository,
+  type CreateShopData,
+  type UpdateShopData,
+} from './ShopRepository';

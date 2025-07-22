@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from '@/shared/components/ui/box';
 import { Button, ButtonText } from '@/shared/components/ui/button';
 import { VStack } from '@/shared/components/ui/vstack';
@@ -17,7 +17,8 @@ import {
 import { Spinner } from '@/shared/components/ui/spinner';
 
 import { useVehicleBackup } from '@/features/dataBackup/hooks/useVehicleBackup';
-import { MergeStrategy } from '@/features/dataBackup/types/backup.types';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/shared/queries/queryKeys';
 
 interface VehicleRestoreSectionProps {
   title?: string;
@@ -36,13 +37,15 @@ export const VehicleRestoreSection = ({
   className = '',
   onRestore,
 }: VehicleRestoreSectionProps) => {
-  const [selectedStrategy, setSelectedStrategy] =
-    useState<MergeStrategy>('smart');
+  const queryClient = useQueryClient();
   const { isRestoring, lastRestoreResult, confirmAndRestoreBackup } =
     useVehicleBackup();
 
-  const handleRestore = () => {
-    confirmAndRestoreBackup(selectedStrategy);
+  const handleRestore = async () => {
+    await confirmAndRestoreBackup();
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.vehicles.vehicles(),
+    });
     onRestore?.();
   };
 
@@ -58,18 +61,13 @@ export const VehicleRestoreSection = ({
 
         <VStack space="sm">
           <Text className="text-sm font-medium text-gray-700">병합 전략</Text>
-          <Select
-            selectedValue={selectedStrategy}
-            onValueChange={(value) =>
-              setSelectedStrategy(value as MergeStrategy)
-            }
-          >
+          <Select selectedValue="smart">
             <SelectTrigger>
               <SelectInput placeholder="병합 전략을 선택하세요" />
             </SelectTrigger>
             <SelectPortal>
               <SelectBackdrop />
-              <SelectContent className="pb-10">
+              <SelectContent className="pb-">
                 <SelectDragIndicatorWrapper>
                   <SelectDragIndicator />
                 </SelectDragIndicatorWrapper>
@@ -77,9 +75,6 @@ export const VehicleRestoreSection = ({
                   label="스마트 병합 (최신 데이터 우선)"
                   value="smart"
                 />
-                <SelectItem label="백업 데이터 우선" value="backup_first" />
-                <SelectItem label="기존 데이터 우선" value="existing_first" />
-                <SelectItem label="모든 데이터 교체" value="replace_all" />
               </SelectContent>
             </SelectPortal>
           </Select>
